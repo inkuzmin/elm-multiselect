@@ -3,17 +3,17 @@ module Main exposing (..)
 import DOM exposing (..)
 import Dom
 import Html exposing (Html, button, div, text)
+import Html.Attributes exposing (style)
 import Html.CssHelpers
 import Html.Events exposing (onClick)
 import Json.Decode exposing (Decoder)
+import Json.Encode as Encode
 import Mouse
 import Process
 import SelectCss
 import String
 import Task
 import Time
-import Html.Attributes exposing (style)
-import Json.Encode as Encode
 
 
 main =
@@ -104,31 +104,28 @@ update msg model =
             ( model, Cmd.none )
 
         Toggle ->
-            (if model.status == Opened then
+            if model.status == Opened then
                 ( { model | status = Closed }, Cmd.none )
-             else
+            else
                 ( { model | status = Opened }, Cmd.none )
-            )
 
         Click _ ->
-            (if model.protected then
+            if model.protected then
                 ( { model | protected = False }, Cmd.none )
-             else
+            else
                 ( { model | status = Closed }, Cmd.none )
-            )
 
         DisableProtection ->
             ( { model | protected = False }, Cmd.none )
 
         ClickOnComponent ->
-            (if model.protected then
+            if model.protected then
                 ( model, Cmd.none )
-             else
+            else
                 { model | status = Opened, protected = True }
                     ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
                       , delay (Time.millisecond * 100) <| DisableProtection
                       ]
-            )
 
         FocusResult result ->
             case result of
@@ -153,16 +150,16 @@ update msg model =
                     List.filter (\v -> not (List.member v model.selected))
                         (List.filter (\( name, val ) -> String.contains (String.toLower value) (String.toLower val)) model.values)
             in
-                { model
-                    | filtered = v
-                    , input = value
-                    , status =
-                        if List.isEmpty v then
-                            Closed
-                        else
-                            Opened
-                }
-                    ! []
+            { model
+                | filtered = v
+                , input = value
+                , status =
+                    if List.isEmpty v then
+                        Closed
+                    else
+                        Opened
+            }
+                ! []
 
         OnSelect item ->
             let
@@ -170,37 +167,35 @@ update msg model =
                     List.filter (\v -> not (List.member v model.selected))
                         (List.filter (\value -> value /= item) model.values)
             in
-                ({ model
-                    | selected = model.selected ++ [ item ]
-                    , filtered = v
-                    , input = invisibleCharacter
-                    , status =
-                        if List.isEmpty v then
-                            Closed
-                        else
-                            Opened
-                 }
-                    ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
-                      ]
-                )
+            { model
+                | selected = model.selected ++ [ item ]
+                , filtered = v
+                , input = invisibleCharacter
+                , status =
+                    if List.isEmpty v then
+                        Closed
+                    else
+                        Opened
+            }
+                ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
+                  ]
 
         RemoveItem item ->
             ( { model
                 | selected = List.filter (\value -> value /= item) model.selected
-                , filtered = List.sortWith (\t1 t2 -> compare (Tuple.first t1) (Tuple.first t2)) (item :: model.values)
+                , filtered = List.sortWith (\t1 t2 -> compare (Tuple.first t1) (Tuple.first t2)) (item :: model.filtered)
               }
             , Cmd.none
             )
 
         Clear ->
-            ({ model
+            { model
                 | filtered = sortValues model.values
                 , selected = []
                 , input = invisibleCharacter
-             }
+            }
                 ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
                   ]
-            )
 
 
 delay : Time.Time -> msg -> Cmd msg
@@ -232,7 +227,7 @@ onClickNoDefault message =
             , preventDefault = True
             }
     in
-        Html.Events.onWithOptions "click" config (Json.Decode.succeed message)
+    Html.Events.onWithOptions "click" config (Json.Decode.succeed message)
 
 
 view : Model -> Html Msg
@@ -246,20 +241,20 @@ view model =
             else
                 [ SelectCss.Container ]
     in
-        div
-            [ class [ SelectCss.Wrap ]
-            , onClick ClickOnComponent
+    div
+        [ class [ SelectCss.Wrap ]
+        , onClick ClickOnComponent
+        ]
+        [ div
+            [ class inputClasses
             ]
-            [ div
-                [ class inputClasses
-                ]
-                [ tags model
-                , input model
-                , clear model
-                , arrow model
-                ]
-            , menu model
+            [ tags model
+            , input model
+            , clear model
+            , arrow model
             ]
+        , menu model
+        ]
 
 
 send : msg -> Cmd msg
@@ -283,18 +278,18 @@ input model =
             else
                 Html.Attributes.property "type" (Encode.string "text")
     in
-        div [ class [ SelectCss.InputWrap ] ]
-            [ div [ class [ SelectCss.InputMirrow ] ] [ text model.input ]
-            , Html.input
-                [ id "multiselectInput"
-                , class [ SelectCss.Input ]
-                , onKeyUp Filter
-                , onKeyPress Adjust
-                , inputStyle
-                , value
-                ]
-                []
+    div [ class [ SelectCss.InputWrap ] ]
+        [ div [ class [ SelectCss.InputMirrow ] ] [ text model.input ]
+        , Html.input
+            [ id "multiselectInput"
+            , class [ SelectCss.Input ]
+            , onKeyUp Filter
+            , onKeyPress Adjust
+            , inputStyle
+            , value
             ]
+            []
+        ]
 
 
 onKeyUp : (String -> msg) -> Html.Attribute msg
@@ -339,11 +334,11 @@ arrow model =
             else
                 [ SelectCss.Arrow ]
     in
-        div
-            [ class [ SelectCss.ArrowWrap ]
-            , onClickNoDefault Toggle
-            ]
-            [ div [ class arrowClasses ] [] ]
+    div
+        [ class [ SelectCss.ArrowWrap ]
+        , onClickNoDefault Toggle
+        ]
+        [ div [ class arrowClasses ] [] ]
 
 
 clear : Model -> Html Msg
