@@ -21,6 +21,7 @@ type CssClasses
     | ArrowUpside
     | Menu
     | MenuItem
+    | MenuItemHovered
     | Focused
     | Opened
     | InputMirrow
@@ -228,10 +229,15 @@ css =
             [ Css.color (hex "#666")
             , Css.cursor Css.pointer
             , Css.padding2 (px 8) (px 10)
-            , hover
-                [ Css.backgroundColor (Css.rgba 0 126 255 0.08)
-                , Css.color (hex "#333")
-                ]
+
+            --, hover
+            --    [ Css.backgroundColor (Css.rgba 0 126 255 0.08)
+            --    , Css.color (hex "#333")
+            --    ]
+            ]
+        , class MenuItemHovered
+            [ Css.backgroundColor (Css.rgba 0 126 255 0.08)
+            , Css.color (hex "#333")
             ]
         ]
 
