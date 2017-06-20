@@ -282,13 +282,12 @@ update msg model =
                       ]
 
         RemoveItem item ->
-            ( { model
+            { model
                 | selected = List.filter (\value -> value /= item) model.selected
                 , filtered = List.sortWith (\t1 t2 -> compare (fst t1) (fst t2)) (item :: model.filtered)
                 , hovered = Just item
-              }
-            , Cmd.none
-            )
+            }
+                ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
 
         Clear ->
             { model
@@ -311,26 +310,29 @@ update msg model =
                 Ok y ->
                     case model.hovered of
                         Nothing ->
-                            model ! []
+                            Debug.log "222"
+                                (model ! [])
 
                         Just item ->
                             case indexOf item model.filtered of
                                 Nothing ->
-                                    model ! []
+                                    Debug.log "222" (model ! [])
 
                                 Just idx ->
-                                    let
-                                        boundaries =
-                                            getBoundaries (toFloat idx)
+                                    Debug.log "111"
+                                        (let
+                                            boundaries =
+                                                getBoundaries (toFloat idx)
 
-                                        vpBoundaries =
-                                            getViewPortBoundaries y
+                                            vpBoundaries =
+                                                getViewPortBoundaries y
 
-                                        scroll =
-                                            fitViewPort boundaries vpBoundaries
-                                    in
-                                        { model | error = Nothing }
-                                            ! [ Dom.Scroll.toY "multiselectMenu" scroll |> Task.attempt ScrollResult ]
+                                            scroll =
+                                                fitViewPort boundaries vpBoundaries
+                                         in
+                                            { model | error = Nothing }
+                                                ! [ Dom.Scroll.toY "multiselectMenu" scroll |> Task.attempt ScrollResult ]
+                                        )
 
         Shortcut key ->
             if key == 38 then
@@ -409,7 +411,7 @@ update msg model =
                                 , filtered = List.sortWith (\t1 t2 -> compare (fst t1) (fst t2)) (item :: model.filtered)
                                 , hovered = Just item
                             }
-                                ! []
+                                ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
                 else
                     model ! []
             else
