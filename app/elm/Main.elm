@@ -15,17 +15,26 @@ import String
 import Task
 import Time
 import Dom.Scroll
+import Keycodes
 
 
 --
 
 
-itemHeight =
-    32
-
-
-menuHeight =
-    200
+values : List ( String, String )
+values =
+    [ ( "elixir-estonia", "ELIXIR Estonia" )
+    , ( "unitartu", "University of Tartu" )
+    , ( "cs", "Institute of Computer Science" )
+    , ( "biit", "BIIT" )
+    , ( "javascript", "JavaScript" )
+    , ( "elm", "Elm" )
+    , ( "multiselect", "Multiselect" )
+    , ( "haskell", "Haskell" )
+    , ( "elixir", "Elixir" )
+    , ( "clojure", "Clojure" )
+    , ( "shen", "Shen" )
+    ]
 
 
 fst =
@@ -34,6 +43,10 @@ fst =
 
 snd =
     Tuple.second
+
+
+invisibleCharacter =
+    "\x200C\x200C"
 
 
 
@@ -57,31 +70,11 @@ type alias Flags =
     {}
 
 
-values : List ( String, String )
-values =
-    [ ( "elixir-estonia", "ELIXIR Estonia" )
-    , ( "unitartu", "University of Tartu" )
-    , ( "cs", "Institute of Computer Science" )
-    , ( "biit", "BIIT" )
-    , ( "javascript", "JavaScript" )
-    , ( "elm", "Elm" )
-    , ( "haskell", "Haskell" )
-    , ( "hask1ell", "Haskrell" )
-    , ( "has2kell", "Haskrelel" )
-    , ( "has3kell", "Haswkell" )
-    , ( "has4kell", "Hasekell" )
-    ]
-
-
 type Status
     = Closed
     | Focused
     | Opened
     | Disabled
-
-
-invisibleCharacter =
-    "\x200C\x200C"
 
 
 type alias Model =
@@ -102,20 +95,20 @@ init flags =
     ( Model
         Closed
         values
-        (sortValues values)
+        values
         []
         False
         Nothing
         ""
         23.0
-        (List.head (sortValues values))
+        (List.head values)
     , Cmd.none
     )
 
 
-sortValues : List ( String, String ) -> List ( String, String )
-sortValues =
-    List.sortWith (\t1 t2 -> compare (fst t1) (fst t2))
+filter : List ( String, String ) -> List ( String, String ) -> List ( String, String )
+filter selected values =
+    List.filter (\value -> not (List.member value selected)) values
 
 
 
@@ -139,10 +132,6 @@ type Msg
     | OnHover ( String, String )
     | Shortcut Int
     | ScrollY (Result Dom.Error Float)
-
-
-
---| OnUnhover ( String, String )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -211,8 +200,8 @@ update msg model =
 
         Filter value ->
             let
-                v =
-                    List.filter (\v -> not (List.member v model.selected))
+                filtered =
+                    filter model.selected
                         (List.filter (\( name, val ) -> String.contains (String.toLower value) (String.toLower val))
                             model.values
                         )
@@ -223,11 +212,11 @@ update msg model =
                     case model.hovered of
                         Nothing ->
                             { model
-                                | filtered = sortValues v
+                                | filtered = filtered
                                 , input = value
-                                , hovered = List.head (sortValues v)
+                                , hovered = List.head filtered
                                 , status =
-                                    if List.isEmpty v then
+                                    if List.isEmpty filtered then
                                         Closed
                                     else
                                         Opened
@@ -235,13 +224,13 @@ update msg model =
                                 ! []
 
                         Just item ->
-                            if List.length (List.filter (\i -> i == item) v) == 0 then
+                            if List.length (List.filter (\i -> i == item) filtered) == 0 then
                                 { model
-                                    | filtered = sortValues v
+                                    | filtered = filtered
                                     , input = value
-                                    , hovered = List.head (sortValues v)
+                                    , hovered = List.head filtered
                                     , status =
-                                        if List.isEmpty v then
+                                        if List.isEmpty filtered then
                                             Closed
                                         else
                                             Opened
@@ -249,12 +238,10 @@ update msg model =
                                     ! []
                             else
                                 { model
-                                    | filtered = sortValues v
+                                    | filtered = filtered
                                     , input = value
-
-                                    --, hovered = List.head v
                                     , status =
-                                        if List.isEmpty v then
+                                        if List.isEmpty filtered then
                                             Closed
                                         else
                                             Opened
@@ -263,17 +250,19 @@ update msg model =
 
         OnSelect item ->
             let
-                v =
-                    List.filter (\v -> not (List.member v model.selected))
-                        (List.filter (\value -> value /= item) model.values)
+                selected =
+                    model.selected ++ [ item ]
+
+                filtered =
+                    filter selected model.values
             in
                 { model
-                    | selected = model.selected ++ [ item ]
-                    , filtered = sortValues v
+                    | selected = selected
+                    , filtered = filtered
                     , hovered = nextSelectedItem model.filtered item
                     , input = invisibleCharacter
                     , status =
-                        if List.isEmpty v then
+                        if List.isEmpty filtered then
                             Closed
                         else
                             Opened
@@ -282,22 +271,30 @@ update msg model =
                       ]
 
         RemoveItem item ->
-            { model
-                | selected = List.filter (\value -> value /= item) model.selected
-                , filtered = List.sortWith (\t1 t2 -> compare (fst t1) (fst t2)) (item :: model.filtered)
-                , hovered = Just item
-            }
-                ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
+            let
+                selected =
+                    List.filter (\value -> value /= item) model.selected
+            in
+                { model
+                    | selected = selected
+                    , filtered = filter selected model.values
+                    , hovered = Just item
+                }
+                    ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
 
         Clear ->
-            { model
-                | filtered = sortValues model.values
-                , selected = []
-                , input = invisibleCharacter
-                , status = Closed
-            }
-                ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
-                  ]
+            let
+                selected =
+                    []
+            in
+                { model
+                    | selected = selected
+                    , filtered = filter selected model.values
+                    , input = invisibleCharacter
+                    , status = Closed
+                }
+                    ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
+                      ]
 
         OnHover item ->
             { model | hovered = Just item } ! []
@@ -310,32 +307,29 @@ update msg model =
                 Ok y ->
                     case model.hovered of
                         Nothing ->
-                            Debug.log "222"
-                                (model ! [])
+                            model ! []
 
                         Just item ->
                             case indexOf item model.filtered of
                                 Nothing ->
-                                    Debug.log "222" (model ! [])
+                                    model ! []
 
                                 Just idx ->
-                                    Debug.log "111"
-                                        (let
-                                            boundaries =
-                                                getBoundaries (toFloat idx)
+                                    let
+                                        boundaries =
+                                            getBoundaries (toFloat idx)
 
-                                            vpBoundaries =
-                                                getViewPortBoundaries y
+                                        vpBoundaries =
+                                            getViewPortBoundaries y
 
-                                            scroll =
-                                                fitViewPort boundaries vpBoundaries
-                                         in
-                                            { model | error = Nothing }
-                                                ! [ Dom.Scroll.toY "multiselectMenu" scroll |> Task.attempt ScrollResult ]
-                                        )
+                                        scroll =
+                                            fitViewPort boundaries vpBoundaries
+                                    in
+                                        { model | error = Nothing }
+                                            ! [ Dom.Scroll.toY "multiselectMenu" scroll |> Task.attempt ScrollResult ]
 
         Shortcut key ->
-            if key == 38 then
+            if key == Keycodes.upArrow then
                 case model.hovered of
                     Nothing ->
                         { model | hovered = List.head model.filtered } ! []
@@ -343,11 +337,11 @@ update msg model =
                     Just item ->
                         let
                             prev =
-                                prevItem (sortValues model.filtered) item
+                                prevItem (model.filtered) item
                         in
                             { model | hovered = prev }
                                 ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
-            else if key == 40 then
+            else if key == Keycodes.downArrow then
                 case model.hovered of
                     Nothing ->
                         { model | hovered = List.head model.filtered } ! []
@@ -355,63 +349,69 @@ update msg model =
                     Just item ->
                         let
                             next =
-                                nextItem (sortValues model.filtered) item
+                                nextItem (model.filtered) item
                         in
                             { model | hovered = next }
                                 ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
-            else if key == 33 || key == 36 then
+            else if key == Keycodes.pageUp || key == Keycodes.home then
                 let
                     first =
-                        List.head (sortValues model.filtered)
+                        List.head (model.filtered)
                 in
                     { model | hovered = first }
                         ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
-            else if key == 34 || key == 35 then
+            else if key == Keycodes.pageDown || key == Keycodes.end then
                 let
                     last =
-                        lastElem (sortValues model.filtered)
+                        lastElem (model.filtered)
                 in
                     { model | hovered = last }
                         ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
-            else if key == 13 then
+            else if key == Keycodes.return then
                 case model.hovered of
                     Nothing ->
                         model ! []
 
                     Just item ->
                         let
-                            v =
-                                List.filter (\v -> not (List.member v model.selected))
-                                    (List.filter (\value -> value /= item) model.values)
+                            selected =
+                                model.selected ++ [ item ]
+
+                            filtered =
+                                filter selected model.values
                         in
                             { model
-                                | selected = model.selected ++ [ item ]
-                                , filtered = sortValues v
+                                | selected = selected
+                                , filtered = filtered
                                 , hovered = nextSelectedItem model.filtered item
                                 , input = invisibleCharacter
                                 , status =
-                                    if List.isEmpty v then
+                                    if List.isEmpty filtered then
                                         Closed
                                     else
                                         Opened
                             }
                                 ! [ Dom.focus "multiselectInput" |> Task.attempt FocusResult
                                   ]
-            else if key == 27 then
+            else if key == Keycodes.escape then
                 { model | status = Closed, protected = True } ! []
-            else if key == 8 then
+            else if key == Keycodes.backspace then
                 if model.input == "" then
                     case lastElem model.selected of
                         Nothing ->
                             model ! []
 
                         Just item ->
-                            { model
-                                | selected = List.filter (\value -> value /= item) model.selected
-                                , filtered = List.sortWith (\t1 t2 -> compare (fst t1) (fst t2)) (item :: model.filtered)
-                                , hovered = Just item
-                            }
-                                ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
+                            let
+                                selected =
+                                    List.filter (\value -> value /= item) model.selected
+                            in
+                                { model
+                                    | selected = selected
+                                    , filtered = filter selected model.values
+                                    , hovered = Just item
+                                }
+                                    ! [ Dom.Scroll.y "multiselectMenu" |> Task.attempt ScrollY ]
                 else
                     model ! []
             else
@@ -420,12 +420,12 @@ update msg model =
 
 getViewPortBoundaries : Float -> ( Float, Float )
 getViewPortBoundaries i =
-    ( i, i + menuHeight )
+    ( i, i + SelectCss.menuHeight )
 
 
 getBoundaries : Float -> ( Float, Float )
 getBoundaries i =
-    ( (i * itemHeight), (i * itemHeight) + itemHeight )
+    ( (i * SelectCss.itemHeight), (i * SelectCss.itemHeight) + SelectCss.itemHeight )
 
 
 fitViewPort : ( Float, Float ) -> ( Float, Float ) -> Float
@@ -436,18 +436,6 @@ fitViewPort ( top, bottom ) ( vpTop, vpBottom ) =
         vpTop + (bottom - vpBottom)
     else
         vpTop
-
-
-
---OnUnhover item ->
---    case model.hovered of
---        Nothing ->
---            model ! []
---        Just item ->
---            if model.hovered == Just item then
---                { model | hovered = Nothing } ! []
---            else
---                model ! []
 
 
 indexOf : a -> List a -> Maybe Int
@@ -648,7 +636,7 @@ preventDefaultButtons =
             { preventDefault = True, stopPropagation = False }
 
         filterKey code =
-            if code == 38 || code == 40 then
+            if code == Keycodes.upArrow || code == Keycodes.downArrow then
                 Ok code
             else
                 Err "ignored input"
@@ -758,8 +746,6 @@ menu model =
                                     )
                                 , onClickNoDefault (OnSelect ( name, value ))
                                 , Html.Events.onMouseOver (OnHover ( name, value ))
-
-                                --, Html.Events.onMouseLeave (OnUnhover ( name, value ))
                                 ]
                                 [ text value ]
                         )

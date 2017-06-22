@@ -27,42 +27,33 @@ type CssClasses
     | InputMirrow
 
 
+type CssIds
+    = InputId
+    | MenuId
+
+
 boxShadowCustom : String -> Mixin
 boxShadowCustom p =
     property "box-shadow" <| p
 
 
-visibility : String -> Mixin
-visibility p =
-    property "visibility" <| p
+itemHeight =
+    32
 
 
-whiteSpace : String -> Mixin
-whiteSpace p =
-    property "white-space" <| p
-
-
-letterSpacing : String -> Mixin
-letterSpacing p =
-    property "letter-spacing" <| p
-
-
-
---type CssIds
---    = Page
+menuHeight =
+    200
 
 
 css =
     (stylesheet << namespace "multiselect")
         [ body
-            [ overflowX auto
-            , minWidth (px 1280)
-            , Css.fontSize (px 14)
+            [ Css.fontSize (px 14)
             , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
             ]
         , class Wrap
             [ Css.position Css.relative
-            , Css.width (px 500)
+            , Css.width (pct 100)
             ]
         , class Container
             [ Css.border3 (px 1) solid (hex "#ccc")
@@ -86,29 +77,21 @@ css =
             , Css.border Css.zero
             , Css.lineHeight (px 14)
             , Css.outlineStyle none
-            , Css.fontSize (px 14)
+            , Css.fontSize Css.inherit
+            , Css.lineHeight (int 1)
             , Css.padding Css.zero
             , Css.paddingTop (px 8)
-
-            --, Css.maxWidth (px 250)
-            --, Css.paddingBottom (px 12)
             ]
         , class InputMirrow
             [ Css.position Css.absolute
             , Css.top (px -100)
             , Css.left (px -100)
-
-            --, visibility "hidden"
             , Css.height Css.zero
             , Css.overflow Css.scroll
-
-            --, whiteSpace "pre"
-            , Css.fontSize (px 14)
-            , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
             , Css.fontWeight Css.normal
             , Css.fontStyle Css.normal
-
-            --, letterSpacing "normals"
+            , Css.fontSize Css.inherit
+            , Css.lineHeight (int 1)
             ]
         , class Focused
             [ Css.borderColor (hex "#007eff")
@@ -217,30 +200,20 @@ css =
             , Css.borderTopColor (hex "#e6e6e6")
             , Css.boxShadow4 Css.zero (px 1) Css.zero (Css.rgba 0 0 0 0.06)
             , Css.marginTop (px -1)
-            , Css.maxHeight (px 200)
+            , Css.maxHeight (px menuHeight)
             , Css.position Css.absolute
             , Css.width (pct 100)
             , Css.zIndex (int 1)
             , Css.overflowY Css.scroll
-
-            -- -webkit-overflow-scrolling: touch;
             ]
         , class MenuItem
             [ Css.color (hex "#666")
             , Css.cursor Css.pointer
             , Css.padding2 (px 8) (px 10)
-
-            --, hover
-            --    [ Css.backgroundColor (Css.rgba 0 126 255 0.08)
-            --    , Css.color (hex "#333")
-            --    ]
+            , Css.maxHeight (px itemHeight)
             ]
         , class MenuItemHovered
             [ Css.backgroundColor (Css.rgba 0 126 255 0.08)
             , Css.color (hex "#333")
             ]
         ]
-
-
-primaryAccentColor =
-    hex "ccffaa"
