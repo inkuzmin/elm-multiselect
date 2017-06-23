@@ -1,14 +1,15 @@
 {
     "version": "1.0.0",
-    "summary": "multiselect control",
+    "summary": "Example",
     "repository": "https://github.com/inkuzmin/elm-multiselect.git",
     "license": "BSD3",
     "source-directories": [
+        ".",
+        "../src/",
+        "../src/Multiselect",
         "src/"
     ],
-    "exposed-modules": [
-        "Multiselect"
-    ],
+    "exposed-modules": [],
     "dependencies": {
         "debois/elm-dom": "1.2.3 <= v < 2.0.0",
         "elm-lang/core": "5.0.0 <= v < 6.0.0",

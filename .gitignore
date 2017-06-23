@@ -1,3 +1,5 @@
 node_modules
 elm-stuff
 .DS_Store
+example/node_modules
+example/elm-stuff
