@@ -167,6 +167,10 @@ require.register("src/Multiselect.elm", function(exports, require, module) {
 
 });
 
+;require.register("src/MinimalExample.elm", function(exports, require, module) {
+
+});
+
 ;require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
