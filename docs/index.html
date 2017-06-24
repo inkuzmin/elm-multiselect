@@ -12,7 +12,7 @@
   <body>
     <style>
       body {
-        padding-bottom: 50px;
+        padding-bottom: 150px;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
       header {
@@ -67,10 +67,37 @@
 
       footer {
         position: absolute;
+        display: flex;
         bottom: 0;
         right: 0;
-        display: inline-block;
+        width: 100%;
+        height: 150px;
+        background-color: #efefef;
       }
+      .unitartu {
+        margin: 10px;
+      }
+
+      footer > div {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      a {
+        color: rgba(100,149,237, 0.9);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(100,149,237, 0.5);
+      }
+      a:hover {
+        color: rgba(100,149,237, 1);
+        border-bottom: 1px solid rgba(100,149,237, 0.8);
+      }
+      .image, .image:hover {
+        border: none;
+      }
+
     </style>
 
     <header>
@@ -96,7 +123,14 @@
     </script>
 
     <footer>
-      <a href="https://github.com/inkuzmin/elm-multiselect"><img alt="Repository on GitHub" src="https://a248.e.akamai.net/assets.github.com/images/icons/emoji/octocat.png" /></a>
+      <div class="acknowledgements">
+        <a class="image unitartu" href="https://www.ut.ee/en"><img alt="Emblem of the University of Tartu" src="https://inkuzmin.github.io/logos/assets/unitartu.svg" width="100"></a>
+        <a class="image biit" href="https://biit.cs.ut.ee/"><img alt="BIIT research group" src="https://inkuzmin.github.io/logos/assets/biit.svg" width="100"></a>
+      </div>
+      <div class="copy">
+        <p>All code for this site is open source. <a href="https://github.com/inkuzmin/elm-multiselect">Check it out!</a> — © 2017 Ivan Kuzmin</p>
+      </div>
+
     </footer>
   </body>
 </html>
