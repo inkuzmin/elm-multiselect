@@ -15751,15 +15751,16 @@ var _inkuzmin$elm_multiselect$Multiselect$Disabled = {ctor: 'Disabled'};
 var _inkuzmin$elm_multiselect$Multiselect$Opened = {ctor: 'Opened'};
 var _inkuzmin$elm_multiselect$Multiselect$Focused = {ctor: 'Focused'};
 var _inkuzmin$elm_multiselect$Multiselect$Closed = {ctor: 'Closed'};
-var _inkuzmin$elm_multiselect$Multiselect$initModel = function (tag) {
-	return _inkuzmin$elm_multiselect$Multiselect$Model(_inkuzmin$elm_multiselect$Multiselect$Closed)(_inkuzmin$elm_multiselect$Multiselect$values)(_inkuzmin$elm_multiselect$Multiselect$values)(
-		{ctor: '[]'})(false)(_elm_lang$core$Maybe$Nothing)('')(23.0)(
-		_elm_lang$core$List$head(_inkuzmin$elm_multiselect$Multiselect$values))(tag);
-};
+var _inkuzmin$elm_multiselect$Multiselect$initModel = F2(
+	function (values, tag) {
+		return _inkuzmin$elm_multiselect$Multiselect$Model(_inkuzmin$elm_multiselect$Multiselect$Closed)(values)(values)(
+			{ctor: '[]'})(false)(_elm_lang$core$Maybe$Nothing)('')(23.0)(
+			_elm_lang$core$List$head(values))(tag);
+	});
 var _inkuzmin$elm_multiselect$Multiselect$init = function (flags) {
 	return {
 		ctor: '_Tuple2',
-		_0: _inkuzmin$elm_multiselect$Multiselect$initModel('A'),
+		_0: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Multiselect$values, 'A'),
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
 };
@@ -16778,9 +16779,87 @@ var _inkuzmin$elm_multiselect$Multiselect$main = _elm_lang$html$Html$programWith
 	_elm_lang$core$Json_Decode$succeed(
 		{}));
 
+var _inkuzmin$elm_multiselect$Main$valuesB = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: '0', _1: 'AAA'},
+	_1: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: '1', _1: 'AAB'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: '2', _1: 'ABA'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: '3', _1: 'ABB'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: '4', _1: 'BAA'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: '5', _1: 'BAB'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: '6', _1: 'BBA'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: '7', _1: 'BBB'},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _inkuzmin$elm_multiselect$Main$valuesA = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: 'elixir-estonia', _1: 'ELIXIR Estonia'},
+	_1: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'unitartu', _1: 'University of Tartu'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'cs', _1: 'Institute of Computer Science'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'biit', _1: 'BIIT'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'javascript', _1: 'JavaScript'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'elm', _1: 'Elm'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'multiselect', _1: 'Multiselect'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'haskell', _1: 'Haskell'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'elixir', _1: 'Elixir'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'clojure', _1: 'Clojure'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'shen', _1: 'Shen'},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
 var _inkuzmin$elm_multiselect$Main$model = {
-	multiselectA: _inkuzmin$elm_multiselect$Multiselect$initModel('A'),
-	multiselectB: _inkuzmin$elm_multiselect$Multiselect$initModel('B')
+	multiselectA: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesA, 'A'),
+	multiselectB: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesB, 'B')
 };
 var _inkuzmin$elm_multiselect$Main$init = function (flags) {
 	return {ctor: '_Tuple2', _0: _inkuzmin$elm_multiselect$Main$model, _1: _elm_lang$core$Platform_Cmd$none};

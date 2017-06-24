@@ -20,6 +20,35 @@ main =
 -- MODEL
 
 
+valuesA : List ( String, String )
+valuesA =
+    [ ( "elixir-estonia", "ELIXIR Estonia" )
+    , ( "unitartu", "University of Tartu" )
+    , ( "cs", "Institute of Computer Science" )
+    , ( "biit", "BIIT" )
+    , ( "javascript", "JavaScript" )
+    , ( "elm", "Elm" )
+    , ( "multiselect", "Multiselect" )
+    , ( "haskell", "Haskell" )
+    , ( "elixir", "Elixir" )
+    , ( "clojure", "Clojure" )
+    , ( "shen", "Shen" )
+    ]
+
+
+valuesB : List ( String, String )
+valuesB =
+    [ ( "0", "AAA" )
+    , ( "1", "AAB" )
+    , ( "2", "ABA" )
+    , ( "3", "ABB" )
+    , ( "4", "BAA" )
+    , ( "5", "BAB" )
+    , ( "6", "BBA" )
+    , ( "7", "BBB" )
+    ]
+
+
 type alias Flags =
     {}
 
@@ -32,8 +61,8 @@ type alias Model =
 
 model : Model
 model =
-    { multiselectA = Multiselect.initModel "A"
-    , multiselectB = Multiselect.initModel "B"
+    { multiselectA = Multiselect.initModel valuesA "A"
+    , multiselectB = Multiselect.initModel valuesB "B"
     }
 
 

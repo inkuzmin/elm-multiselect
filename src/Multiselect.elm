@@ -93,13 +93,13 @@ type alias Model =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( initModel "A"
+    ( initModel values "A"
     , Cmd.none
     )
 
 
-initModel : String -> Model
-initModel tag =
+initModel : List ( String, String ) -> String -> Model
+initModel values tag =
     Model
         Closed
         values
