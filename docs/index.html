@@ -11,8 +11,11 @@
 
   <body>
     <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
       body {
-        padding-bottom: 150px;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
       header {
@@ -61,18 +64,19 @@
         justify-content: center;
       }
 
+      .wrapper {
+        min-height: 100%;
+        margin-bottom: -150px;
+      }
+
+
       #main {
         width: 500px;
         margin: 50px auto;
       }
 
       footer {
-        position: absolute;
         display: flex;
-        bottom: 0;
-        right: 0;
-        width: 100%;
-        height: 150px;
         background-color: #efefef;
       }
       .unitartu {
@@ -99,30 +103,36 @@
         border: none;
       }
 
+    footer, .push {
+      height: 150px;
+    }
+
     </style>
-
-    <header>
-      <div>
-        <h1>Elm-multiselect</h1>
-        <p>A multiselect control built with and for Elm</p>
+    <div class="wrapper">
+      <header>
+        <div>
+          <h1>Elm-multiselect</h1>
+          <p>A multiselect control built with and for Elm</p>
+        </div>
+      </header>
+      <div class="subheader">
+        <a class="github-button" href="https://github.com/inkuzmin/elm-multiselect" data-size="large" data-show-count="true" aria-label="Star inkuzmin/elm-multiselect on GitHub">Star</a>
       </div>
-    </header>
-    <div class="subheader">
-      <a class="github-button" href="https://github.com/inkuzmin/elm-multiselect" data-size="large" data-show-count="true" aria-label="Star inkuzmin/elm-multiselect on GitHub">Star</a>
+
+      <div id="main"></div>
+
+      <div class="push"></div>
+      
+      <!-- Require Elm Code & Regular JS -->
+      <script src="main.js"></script>
+      <script src="app.js"></script>
+
+      <!-- Start Elm app in fullscreen mode -->
+      <script>
+        var node = document.getElementById('main');
+        var app = Elm.Main.embed(node);
+      </script>
     </div>
-
-    <div id="main"></div>
-    
-    <!-- Require Elm Code & Regular JS -->
-    <script src="main.js"></script>
-    <script src="app.js"></script>
-
-    <!-- Start Elm app in fullscreen mode -->
-    <script>
-      var node = document.getElementById('main');
-      var app = Elm.Main.embed(node);
-    </script>
-
     <footer>
       <div class="acknowledgements">
         <a class="image unitartu" href="https://www.ut.ee/en"><img alt="Emblem of the University of Tartu" src="https://inkuzmin.github.io/logos/assets/unitartu.svg" width="100"></a>

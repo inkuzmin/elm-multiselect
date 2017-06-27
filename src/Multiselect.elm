@@ -1,4 +1,4 @@
-module Multiselect exposing (..)
+module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions)
 
 import DOM exposing (..)
 import Dom
@@ -20,20 +20,21 @@ import Keycodes
 
 --
 
-
+-- example data
 values : List ( String, String )
 values =
-    [ ( "elixir-estonia", "ELIXIR Estonia" )
-    , ( "unitartu", "University of Tartu" )
-    , ( "cs", "Institute of Computer Science" )
-    , ( "biit", "BIIT" )
-    , ( "javascript", "JavaScript" )
-    , ( "elm", "Elm" )
-    , ( "multiselect", "Multiselect" )
-    , ( "haskell", "Haskell" )
-    , ( "elixir", "Elixir" )
-    , ( "clojure", "Clojure" )
-    , ( "shen", "Shen" )
+    [ ( "one", "The first option" )
+    , ( "two", "The second option" )
+    , ( "three", "The third option" )
+    , ( "four", "The 4th option" )
+    , ( "five", "The 5th option" )
+    , ( "six", "The 6th option" )
+    , ( "seven", "The 7th option" )
+    , ( "eight", "The 8th option" )
+    , ( "nine", "The 9th option" )
+    , ( "ten", "The 10th option" )
+    , ( "eleven", "The 11th option" )
+    , ( "twelve", "The 12th option" )
     ]
 
 
@@ -49,10 +50,7 @@ invisibleCharacter =
     "\x200C\x200C"
 
 
-
---
-
-
+-- INIT
 main =
     Html.programWithFlags
         { init = init
