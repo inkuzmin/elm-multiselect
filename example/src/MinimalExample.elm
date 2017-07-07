@@ -2,9 +2,12 @@ module Main exposing (..)
 
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
-import Multiselect
-import Mouse
 import Html.Attributes
+
+
+-- Import Multiselect
+
+import Multiselect
 
 
 main =
@@ -17,7 +20,7 @@ main =
 
 
 
--- MODEL
+-- Provide values
 
 
 valuesA : List ( String, String )
@@ -53,6 +56,10 @@ type alias Flags =
     {}
 
 
+
+-- Setup model
+
+
 type alias Model =
     { multiselectA : Multiselect.Model
     , multiselectB : Multiselect.Model
@@ -73,6 +80,7 @@ init flags =
 
 
 -- UPDATE
+-- Setup messages
 
 
 type Msg
@@ -104,6 +112,7 @@ update msg model =
 
 
 -- VIEW
+-- Setup view
 
 
 view : Model -> Html Msg
@@ -117,6 +126,7 @@ view model =
 
 
 -- SUBSCRIPTIONS
+-- Setup subscriptions
 
 
 subscriptions : Model -> Sub Msg

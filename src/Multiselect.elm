@@ -1,4 +1,40 @@
-module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions)
+module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions, getSelectedValues)
+
+{-| An implementation of multiselect control built with and for Elm.
+
+Please, check example/src/MinimalExample.elm for the minimal example on how to use this library.
+
+
+# Helpers
+
+@docs initModel, getSelectedValues
+
+
+# Model
+
+@docs Model
+
+
+# Msg
+
+@docs Msg
+
+
+# View
+
+@docs view
+
+
+# Update
+
+@docs update
+
+
+# Subscriptions
+
+@docs subscriptions
+
+-}
 
 import DOM exposing (..)
 import Dom
@@ -16,11 +52,11 @@ import Task
 import Time
 import Dom.Scroll
 import Keycodes
+import Utils exposing (fst, snd, invisibleCharacter)
 
 
---
-
--- example data
+{-| Example values, also used as default ones to make it simpler to start using this library.
+-}
 values : List ( String, String )
 values =
     [ ( "one", "The first option" )
@@ -38,19 +74,10 @@ values =
     ]
 
 
-fst =
-    Tuple.first
-
-
-snd =
-    Tuple.second
-
-
-invisibleCharacter =
-    "\x200C\x200C"
-
 
 -- INIT
+
+
 main =
     Html.programWithFlags
         { init = init
@@ -75,6 +102,13 @@ type Status
     | Disabled
 
 
+{-| Opaque type that holds the model
+
+    type alias Model =
+        { multiselect : Multiselect.Model
+        }
+
+-}
 type alias Model =
     { status : Status
     , values : List ( String, String )
@@ -96,6 +130,13 @@ init flags =
     )
 
 
+{-| Init model based on the values : List (String, String) and id : String provided by the user.
+
+    model =
+        { multiselect = Multiselect.initModel [ ( "one", "The 1st option" ), ( "two", "The 2nd option" ), ( "three", "The 3rd option" ) ] "id_1"
+        }
+
+-}
 initModel : List ( String, String ) -> String -> Model
 initModel values tag =
     Model
@@ -111,6 +152,13 @@ initModel values tag =
         tag
 
 
+{-| Get selected values : List (String, String)
+-}
+getSelectedValues : Model -> List ( String, String )
+getSelectedValues model =
+    model.selected
+
+
 filter : List ( String, String ) -> List ( String, String ) -> List ( String, String )
 filter selected values =
     List.filter (\value -> not (List.member value selected)) values
@@ -120,6 +168,8 @@ filter selected values =
 -- UPDATE
 
 
+{-| Opaque type for internal library messages
+-}
 type Msg
     = Start
     | Click Mouse.Position
@@ -139,6 +189,16 @@ type Msg
     | ScrollY (Result Dom.Error Float)
 
 
+{-| Update the control state
+
+    MultiselectMsg subMsg ->
+        let
+            ( subModel, subCmd ) =
+                Multiselect.update subMsg model.multiselect
+        in
+            { model | multiselect = subModel } ! [ Cmd.map MultiselectMsg subCmd ]
+
+-}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -568,6 +628,11 @@ onClickNoDefault message =
         Html.Events.onWithOptions "click" config (Json.Decode.succeed message)
 
 
+{-| Render the view
+
+    Html.map MultiselectMsg <| Multiselect.view model.multiselect
+
+-}
 view : Model -> Html Msg
 view model =
     let
@@ -743,13 +808,6 @@ menu model =
                                      else
                                         [ SelectCss.MenuItem ]
                                     )
-
-                                --, id
-                                --    (if name == hovered then
-                                --        "multiselectHovered"
-                                --     else
-                                --        ""
-                                --    )
                                 , onClickNoDefault (OnSelect ( name, value ))
                                 , Html.Events.onMouseOver (OnHover ( name, value ))
                                 ]
@@ -766,6 +824,11 @@ menu model =
 -- SUBSCRIPTIONS
 
 
+{-| Subscribe for messages
+
+    Sub.map MultiselectMsg <| Multiselect.subscriptions model.multiselect
+
+-}
 subscriptions : Model -> Sub Msg
 subscriptions model =
     if model.status == Opened then

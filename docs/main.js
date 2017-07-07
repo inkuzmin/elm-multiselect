@@ -15485,6 +15485,10 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 var _inkuzmin$elm_multiselect$SelectCss$MenuId = {ctor: 'MenuId'};
 var _inkuzmin$elm_multiselect$SelectCss$InputId = {ctor: 'InputId'};
 
+var _inkuzmin$elm_multiselect$Utils$invisibleCharacter = '‌‌';
+var _inkuzmin$elm_multiselect$Utils$snd = _elm_lang$core$Tuple$second;
+var _inkuzmin$elm_multiselect$Utils$fst = _elm_lang$core$Tuple$first;
+
 var _inkuzmin$elm_multiselect$Multiselect$onKeyPress = function (tagger) {
 	return A2(
 		_elm_lang$html$Html_Events$on,
@@ -15677,43 +15681,47 @@ var _inkuzmin$elm_multiselect$Multiselect$filter = F2(
 			},
 			values);
 	});
-var _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter = '‌‌';
-var _inkuzmin$elm_multiselect$Multiselect$snd = _elm_lang$core$Tuple$second;
-var _inkuzmin$elm_multiselect$Multiselect$fst = _elm_lang$core$Tuple$first;
+var _inkuzmin$elm_multiselect$Multiselect$getSelectedValues = function (model) {
+	return model.selected;
+};
 var _inkuzmin$elm_multiselect$Multiselect$values = {
 	ctor: '::',
-	_0: {ctor: '_Tuple2', _0: 'elixir-estonia', _1: 'ELIXIR Estonia'},
+	_0: {ctor: '_Tuple2', _0: 'one', _1: 'The first option'},
 	_1: {
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'unitartu', _1: 'University of Tartu'},
+		_0: {ctor: '_Tuple2', _0: 'two', _1: 'The second option'},
 		_1: {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'cs', _1: 'Institute of Computer Science'},
+			_0: {ctor: '_Tuple2', _0: 'three', _1: 'The third option'},
 			_1: {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'biit', _1: 'BIIT'},
+				_0: {ctor: '_Tuple2', _0: 'four', _1: 'The 4th option'},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'javascript', _1: 'JavaScript'},
+					_0: {ctor: '_Tuple2', _0: 'five', _1: 'The 5th option'},
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'elm', _1: 'Elm'},
+						_0: {ctor: '_Tuple2', _0: 'six', _1: 'The 6th option'},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'multiselect', _1: 'Multiselect'},
+							_0: {ctor: '_Tuple2', _0: 'seven', _1: 'The 7th option'},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'haskell', _1: 'Haskell'},
+								_0: {ctor: '_Tuple2', _0: 'eight', _1: 'The 8th option'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'elixir', _1: 'Elixir'},
+									_0: {ctor: '_Tuple2', _0: 'nine', _1: 'The 9th option'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'clojure', _1: 'Clojure'},
+										_0: {ctor: '_Tuple2', _0: 'ten', _1: 'The 10th option'},
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'shen', _1: 'Shen'},
-											_1: {ctor: '[]'}
+											_0: {ctor: '_Tuple2', _0: 'eleven', _1: 'The 11th option'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'twelve', _1: 'The 12th option'},
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}
@@ -15926,7 +15934,7 @@ var _inkuzmin$elm_multiselect$Multiselect$menu = function (model) {
 			if (_p21.ctor === 'Nothing') {
 				return '';
 			} else {
-				return _inkuzmin$elm_multiselect$Multiselect$fst(_p21._0);
+				return _inkuzmin$elm_multiselect$Utils$fst(_p21._0);
 			}
 		}();
 		return A2(
@@ -16127,7 +16135,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							}),
 						{ctor: '[]'});
 				} else {
-					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter) ? A2(
+					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Utils$invisibleCharacter) ? A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
@@ -16152,7 +16160,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							}),
 						{ctor: '[]'});
 				} else {
-					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter) ? A2(
+					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Utils$invisibleCharacter) ? A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
@@ -16265,7 +16273,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							selected: selected,
 							filtered: filtered,
 							hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p33),
-							input: _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter,
+							input: _inkuzmin$elm_multiselect$Utils$invisibleCharacter,
 							status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 						}),
 					{
@@ -16312,7 +16320,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						{
 							selected: selected,
 							filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-							input: _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter,
+							input: _inkuzmin$elm_multiselect$Utils$invisibleCharacter,
 							status: _inkuzmin$elm_multiselect$Multiselect$Closed
 						}),
 					{
@@ -16503,7 +16511,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 													selected: selected,
 													filtered: filtered,
 													hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p41),
-													input: _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter,
+													input: _inkuzmin$elm_multiselect$Utils$invisibleCharacter,
 													status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 												}),
 											{
@@ -16606,7 +16614,7 @@ var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', options, decoder);
 }();
 var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
-	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect$invisibleCharacter) ? A2(
+	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Utils$invisibleCharacter) ? A2(
 		_elm_lang$html$Html_Attributes$property,
 		'value',
 		_elm_lang$core$Json_Encode$string(model.input)) : A2(

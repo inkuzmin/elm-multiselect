@@ -18,6 +18,9 @@ Styles based on [React Select](https://jedwatson.github.io/react-select/).
 * Run
     * `npm start`
 
+## Examples
+
+See the `example` folder, `src/MinimalExample.elm` provides a minimal example.
 
 ## Acknowledgements
 
