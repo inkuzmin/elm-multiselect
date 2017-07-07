@@ -4,7 +4,8 @@
     "repository": "https://github.com/inkuzmin/elm-multiselect.git",
     "license": "BSD3",
     "source-directories": [
-        "src/"
+        "src/",
+        "src/Multiselect"
     ],
     "exposed-modules": [
         "Multiselect"
