@@ -258,10 +258,12 @@ update msg model =
                         { model | error = Nothing } ! []
 
         ClearInput ->
-            { model | input = "" } ! []
+            Debug.log "123"
+                ({ model | input = "" } ! [])
 
         Adjust value ->
-            { model | inputWidth = value } ! []
+            Debug.log (toString value)
+                ({ model | inputWidth = value } ! [])
 
         Filter value ->
             let
@@ -314,26 +316,28 @@ update msg model =
                                     ! []
 
         OnSelect item ->
-            let
-                selected =
-                    model.selected ++ [ item ]
+            Debug.log "123"
+                (let
+                    selected =
+                        model.selected ++ [ item ]
 
-                filtered =
-                    filter selected model.values
-            in
-                { model
-                    | selected = selected
-                    , filtered = filtered
-                    , hovered = nextSelectedItem model.filtered item
-                    , input = invisibleCharacter
-                    , status =
-                        if List.isEmpty filtered then
-                            Closed
-                        else
-                            Opened
-                }
-                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                      ]
+                    filtered =
+                        filter selected model.values
+                 in
+                    { model
+                        | selected = selected
+                        , filtered = filtered
+                        , hovered = nextSelectedItem model.filtered item
+                        , input = invisibleCharacter
+                        , status =
+                            if List.isEmpty filtered then
+                                Closed
+                            else
+                                Opened
+                    }
+                        ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                          ]
+                )
 
         RemoveItem item ->
             let
@@ -726,7 +730,9 @@ onKeyUp tagger =
 
 onKeyDown : (Float -> msg) -> Html.Attribute msg
 onKeyDown tagger =
-    Html.Events.on "keydown" (Json.Decode.map tagger (DOM.target :> DOM.previousSibling :> DOM.offsetWidth))
+    Html.Events.on
+        "keypress"
+        (Json.Decode.map tagger (DOM.target :> DOM.previousSibling :> DOM.offsetWidth))
 
 
 onKeyPress : (Int -> msg) -> Html.Attribute msg

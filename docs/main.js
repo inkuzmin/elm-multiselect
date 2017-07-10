@@ -15492,7 +15492,7 @@ var _inkuzmin$elm_multiselect$Multiselect_Utils$fst = _elm_lang$core$Tuple$first
 var _inkuzmin$elm_multiselect$Multiselect$onKeyPress = function (tagger) {
 	return A2(
 		_elm_lang$html$Html_Events$on,
-		'keydown',
+		'keypress',
 		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
 };
 var _inkuzmin$elm_multiselect$Multiselect$onKeyUp = function (tagger) {
@@ -16174,31 +16174,38 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 				}
 			case 'ClearInput':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{input: ''}),
-					{ctor: '[]'});
+					_elm_lang$core$Debug$log,
+					'123',
+					A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{input: ''}),
+						{ctor: '[]'}));
 			case 'Adjust':
+				var _p29 = _p26._0;
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{inputWidth: _p26._0}),
-					{ctor: '[]'});
+					_elm_lang$core$Debug$log,
+					_elm_lang$core$Basics$toString(_p29),
+					A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{inputWidth: _p29}),
+						{ctor: '[]'}));
 			case 'Filter':
-				var _p32 = _p26._0;
+				var _p33 = _p26._0;
 				var filtered = A2(
 					_inkuzmin$elm_multiselect$Multiselect$filter,
 					model.selected,
 					A2(
 						_elm_lang$core$List$filter,
-						function (_p29) {
-							var _p30 = _p29;
+						function (_p30) {
+							var _p31 = _p30;
 							return A2(
 								_elm_lang$core$String$contains,
-								_elm_lang$core$String$toLower(_p32),
-								_elm_lang$core$String$toLower(_p30._1));
+								_elm_lang$core$String$toLower(_p33),
+								_elm_lang$core$String$toLower(_p31._1));
 						},
 						model.values));
 				if (model.$protected) {
@@ -16210,15 +16217,15 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p31 = model.hovered;
-					if (_p31.ctor === 'Nothing') {
+					var _p32 = model.hovered;
+					if (_p32.ctor === 'Nothing') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
 									filtered: filtered,
-									input: _p32,
+									input: _p33,
 									hovered: _elm_lang$core$List$head(filtered),
 									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 								}),
@@ -16229,7 +16236,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								A2(
 									_elm_lang$core$List$filter,
 									function (i) {
-										return _elm_lang$core$Native_Utils.eq(i, _p31._0);
+										return _elm_lang$core$Native_Utils.eq(i, _p32._0);
 									},
 									filtered)),
 							0) ? A2(
@@ -16238,7 +16245,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								model,
 								{
 									filtered: filtered,
-									input: _p32,
+									input: _p33,
 									hovered: _elm_lang$core$List$head(filtered),
 									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 								}),
@@ -16248,49 +16255,54 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								model,
 								{
 									filtered: filtered,
-									input: _p32,
+									input: _p33,
 									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 								}),
 							{ctor: '[]'});
 					}
 				}
 			case 'OnSelect':
-				var _p33 = _p26._0;
-				var selected = A2(
-					_elm_lang$core$Basics_ops['++'],
-					model.selected,
-					{
-						ctor: '::',
-						_0: _p33,
-						_1: {ctor: '[]'}
-					});
-				var filtered = A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values);
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							selected: selected,
-							filtered: filtered,
-							hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p33),
-							input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
-							status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
-						}),
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$core$Task$attempt,
-							_inkuzmin$elm_multiselect$Multiselect$FocusResult,
-							_elm_lang$dom$Dom$focus(
-								A2(_elm_lang$core$Basics_ops['++'], 'multiselectInput', model.tag))),
-						_1: {ctor: '[]'}
-					});
-			case 'RemoveItem':
 				var _p34 = _p26._0;
+				return A2(
+					_elm_lang$core$Debug$log,
+					'123',
+					function () {
+						var selected = A2(
+							_elm_lang$core$Basics_ops['++'],
+							model.selected,
+							{
+								ctor: '::',
+								_0: _p34,
+								_1: {ctor: '[]'}
+							});
+						var filtered = A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values);
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									selected: selected,
+									filtered: filtered,
+									hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p34),
+									input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
+									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
+								}),
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$core$Task$attempt,
+									_inkuzmin$elm_multiselect$Multiselect$FocusResult,
+									_elm_lang$dom$Dom$focus(
+										A2(_elm_lang$core$Basics_ops['++'], 'multiselectInput', model.tag))),
+								_1: {ctor: '[]'}
+							});
+					}());
+			case 'RemoveItem':
+				var _p35 = _p26._0;
 				var selected = A2(
 					_elm_lang$core$List$filter,
 					function (value) {
-						return !_elm_lang$core$Native_Utils.eq(value, _p34);
+						return !_elm_lang$core$Native_Utils.eq(value, _p35);
 					},
 					model.selected);
 				return A2(
@@ -16300,7 +16312,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						{
 							selected: selected,
 							filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-							hovered: _elm_lang$core$Maybe$Just(_p34)
+							hovered: _elm_lang$core$Maybe$Just(_p35)
 						}),
 					{
 						ctor: '::',
@@ -16342,35 +16354,35 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						}),
 					{ctor: '[]'});
 			case 'ScrollY':
-				var _p35 = _p26._0;
-				if (_p35.ctor === 'Err') {
+				var _p36 = _p26._0;
+				if (_p36.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
 								error: _elm_lang$core$Maybe$Just(
-									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p35._0._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p36._0._0))
 							}),
 						{ctor: '[]'});
 				} else {
-					var _p36 = model.hovered;
-					if (_p36.ctor === 'Nothing') {
+					var _p37 = model.hovered;
+					if (_p37.ctor === 'Nothing') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							model,
 							{ctor: '[]'});
 					} else {
-						var _p37 = A2(_inkuzmin$elm_multiselect$Multiselect$indexOf, _p36._0, model.filtered);
-						if (_p37.ctor === 'Nothing') {
+						var _p38 = A2(_inkuzmin$elm_multiselect$Multiselect$indexOf, _p37._0, model.filtered);
+						if (_p38.ctor === 'Nothing') {
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								model,
 								{ctor: '[]'});
 						} else {
-							var vpBoundaries = _inkuzmin$elm_multiselect$Multiselect$getViewPortBoundaries(_p35._0);
+							var vpBoundaries = _inkuzmin$elm_multiselect$Multiselect$getViewPortBoundaries(_p36._0);
 							var boundaries = _inkuzmin$elm_multiselect$Multiselect$getBoundaries(
-								_elm_lang$core$Basics$toFloat(_p37._0));
+								_elm_lang$core$Basics$toFloat(_p38._0));
 							var scroll = A2(_inkuzmin$elm_multiselect$Multiselect$fitViewPort, boundaries, vpBoundaries);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16392,10 +16404,10 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 					}
 				}
 			default:
-				var _p44 = _p26._0;
-				if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow)) {
-					var _p38 = model.hovered;
-					if (_p38.ctor === 'Nothing') {
+				var _p45 = _p26._0;
+				if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow)) {
+					var _p39 = model.hovered;
+					if (_p39.ctor === 'Nothing') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -16405,7 +16417,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								}),
 							{ctor: '[]'});
 					} else {
-						var prev = A2(_inkuzmin$elm_multiselect$Multiselect$prevItem, model.filtered, _p38._0);
+						var prev = A2(_inkuzmin$elm_multiselect$Multiselect$prevItem, model.filtered, _p39._0);
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -16422,9 +16434,9 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							});
 					}
 				} else {
-					if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow)) {
-						var _p39 = model.hovered;
-						if (_p39.ctor === 'Nothing') {
+					if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow)) {
+						var _p40 = model.hovered;
+						if (_p40.ctor === 'Nothing') {
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								_elm_lang$core$Native_Utils.update(
@@ -16434,7 +16446,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 									}),
 								{ctor: '[]'});
 						} else {
-							var next = A2(_inkuzmin$elm_multiselect$Multiselect$nextItem, model.filtered, _p39._0);
+							var next = A2(_inkuzmin$elm_multiselect$Multiselect$nextItem, model.filtered, _p40._0);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								_elm_lang$core$Native_Utils.update(
@@ -16451,7 +16463,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								});
 						}
 					} else {
-						if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$home)) {
+						if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp) || _elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$home)) {
 							var first = _elm_lang$core$List$head(model.filtered);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16468,7 +16480,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 									_1: {ctor: '[]'}
 								});
 						} else {
-							if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$end)) {
+							if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown) || _elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$end)) {
 								var last = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.filtered);
 								return A2(
 									_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16485,21 +16497,21 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 										_1: {ctor: '[]'}
 									});
 							} else {
-								if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$return)) {
-									var _p40 = model.hovered;
-									if (_p40.ctor === 'Nothing') {
+								if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$return)) {
+									var _p41 = model.hovered;
+									if (_p41.ctor === 'Nothing') {
 										return A2(
 											_elm_lang$core$Platform_Cmd_ops['!'],
 											model,
 											{ctor: '[]'});
 									} else {
-										var _p41 = _p40._0;
+										var _p42 = _p41._0;
 										var selected = A2(
 											_elm_lang$core$Basics_ops['++'],
 											model.selected,
 											{
 												ctor: '::',
-												_0: _p41,
+												_0: _p42,
 												_1: {ctor: '[]'}
 											});
 										var filtered = A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values);
@@ -16510,7 +16522,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 												{
 													selected: selected,
 													filtered: filtered,
-													hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p41),
+													hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p42),
 													input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
 													status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 												}),
@@ -16525,7 +16537,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 											});
 									}
 								} else {
-									if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape)) {
+									if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape)) {
 										return A2(
 											_elm_lang$core$Platform_Cmd_ops['!'],
 											_elm_lang$core$Native_Utils.update(
@@ -16533,20 +16545,20 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 												{status: _inkuzmin$elm_multiselect$Multiselect$Closed, $protected: true}),
 											{ctor: '[]'});
 									} else {
-										if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
+										if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
 											if (_elm_lang$core$Native_Utils.eq(model.input, '')) {
-												var _p42 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
-												if (_p42.ctor === 'Nothing') {
+												var _p43 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
+												if (_p43.ctor === 'Nothing') {
 													return A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
 														model,
 														{ctor: '[]'});
 												} else {
-													var _p43 = _p42._0;
+													var _p44 = _p43._0;
 													var selected = A2(
 														_elm_lang$core$List$filter,
 														function (value) {
-															return !_elm_lang$core$Native_Utils.eq(value, _p43);
+															return !_elm_lang$core$Native_Utils.eq(value, _p44);
 														},
 														model.selected);
 													return A2(
@@ -16556,7 +16568,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 															{
 																selected: selected,
 																filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-																hovered: _elm_lang$core$Maybe$Just(_p43)
+																hovered: _elm_lang$core$Maybe$Just(_p44)
 															}),
 														{
 															ctor: '::',
@@ -16605,13 +16617,13 @@ var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 		_elm_lang$core$Basics$always(_inkuzmin$elm_multiselect$Multiselect$Start),
 		A2(
 			_elm_lang$core$Json_Decode$andThen,
-			function (_p45) {
+			function (_p46) {
 				return _inkuzmin$elm_multiselect$Multiselect$fromResult(
-					filterKey(_p45));
+					filterKey(_p46));
 			},
 			_elm_lang$html$Html_Events$keyCode));
 	var options = {preventDefault: true, stopPropagation: false};
-	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', options, decoder);
+	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keypress', options, decoder);
 }();
 var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter) ? A2(
