@@ -6,6 +6,17 @@ Styles based on [React Select](http://jedwatson.github.io/react-select/).
 
 Live demo: https://inkuzmin.github.io/elm-multiselect/
 
+## How to use
+
+### Project level
+Add `"inkuzmin/elm-multiselect": "1.0.0 <=v < 2.0.0"` to dependencies section of elm-package.json
+
+### Code level
+See the `example` folder, `src/MinimalExample.elm` provides a minimal example.
+
+### Styles
+To use default styles add `docs/app.css` to page with the control.
+
 ## Getting Started
 
 An implementation of multiselect control built with and for Elm.
