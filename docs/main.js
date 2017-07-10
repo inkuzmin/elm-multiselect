@@ -9503,18 +9503,6 @@ var _elm_lang$mouse$Mouse$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
 
-var _inkuzmin$elm_multiselect$Keycodes$backspace = 8;
-var _inkuzmin$elm_multiselect$Keycodes$end = 35;
-var _inkuzmin$elm_multiselect$Keycodes$home = 36;
-var _inkuzmin$elm_multiselect$Keycodes$pageDown = 34;
-var _inkuzmin$elm_multiselect$Keycodes$pageUp = 33;
-var _inkuzmin$elm_multiselect$Keycodes$downArrow = 40;
-var _inkuzmin$elm_multiselect$Keycodes$upArrow = 38;
-var _inkuzmin$elm_multiselect$Keycodes$rightArrow = 39;
-var _inkuzmin$elm_multiselect$Keycodes$leftArrow = 37;
-var _inkuzmin$elm_multiselect$Keycodes$escape = 27;
-var _inkuzmin$elm_multiselect$Keycodes$return = 13;
-
 var _rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier = function (identifier) {
 	return A4(
 		_elm_lang$core$Regex$replace,
@@ -14685,31 +14673,31 @@ var _rtfeldman$elm_css$Css_Namespace$namespace = F2(
 			snippets);
 	});
 
-var _inkuzmin$elm_multiselect$SelectCss$menuHeight = 200;
-var _inkuzmin$elm_multiselect$SelectCss$itemHeight = 32;
-var _inkuzmin$elm_multiselect$SelectCss$boxShadowCustom = function (p) {
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight = 200;
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight = 32;
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$boxShadowCustom = function (p) {
 	return A2(_rtfeldman$elm_css$Css$property, 'box-shadow', p);
 };
-var _inkuzmin$elm_multiselect$SelectCss$InputMirrow = {ctor: 'InputMirrow'};
-var _inkuzmin$elm_multiselect$SelectCss$Opened = {ctor: 'Opened'};
-var _inkuzmin$elm_multiselect$SelectCss$Focused = {ctor: 'Focused'};
-var _inkuzmin$elm_multiselect$SelectCss$MenuItemHovered = {ctor: 'MenuItemHovered'};
-var _inkuzmin$elm_multiselect$SelectCss$MenuItem = {ctor: 'MenuItem'};
-var _inkuzmin$elm_multiselect$SelectCss$Menu = {ctor: 'Menu'};
-var _inkuzmin$elm_multiselect$SelectCss$ArrowUpside = {ctor: 'ArrowUpside'};
-var _inkuzmin$elm_multiselect$SelectCss$Arrow = {ctor: 'Arrow'};
-var _inkuzmin$elm_multiselect$SelectCss$ArrowWrap = {ctor: 'ArrowWrap'};
-var _inkuzmin$elm_multiselect$SelectCss$Clear = {ctor: 'Clear'};
-var _inkuzmin$elm_multiselect$SelectCss$ClearWrap = {ctor: 'ClearWrap'};
-var _inkuzmin$elm_multiselect$SelectCss$TagLabel = {ctor: 'TagLabel'};
-var _inkuzmin$elm_multiselect$SelectCss$TagIcon = {ctor: 'TagIcon'};
-var _inkuzmin$elm_multiselect$SelectCss$Tag = {ctor: 'Tag'};
-var _inkuzmin$elm_multiselect$SelectCss$TagWrap = {ctor: 'TagWrap'};
-var _inkuzmin$elm_multiselect$SelectCss$Input = {ctor: 'Input'};
-var _inkuzmin$elm_multiselect$SelectCss$InputWrap = {ctor: 'InputWrap'};
-var _inkuzmin$elm_multiselect$SelectCss$Container = {ctor: 'Container'};
-var _inkuzmin$elm_multiselect$SelectCss$Wrap = {ctor: 'Wrap'};
-var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputMirrow = {ctor: 'InputMirrow'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Opened = {ctor: 'Opened'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Focused = {ctor: 'Focused'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItemHovered = {ctor: 'MenuItemHovered'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem = {ctor: 'MenuItem'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Menu = {ctor: 'Menu'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside = {ctor: 'ArrowUpside'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow = {ctor: 'Arrow'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowWrap = {ctor: 'ArrowWrap'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Clear = {ctor: 'Clear'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$ClearWrap = {ctor: 'ClearWrap'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagLabel = {ctor: 'TagLabel'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagIcon = {ctor: 'TagIcon'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Tag = {ctor: 'Tag'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagWrap = {ctor: 'TagWrap'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Input = {ctor: 'Input'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputWrap = {ctor: 'InputWrap'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container = {ctor: 'Container'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Wrap = {ctor: 'Wrap'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$css = function (_p0) {
 	return _rtfeldman$elm_css$Css$stylesheet(
 		A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'multiselect', _p0));
 }(
@@ -14747,7 +14735,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 			ctor: '::',
 			_0: A2(
 				_rtfeldman$elm_css$Css$class,
-				_inkuzmin$elm_multiselect$SelectCss$Wrap,
+				_inkuzmin$elm_multiselect$Multiselect_SelectCss$Wrap,
 				{
 					ctor: '::',
 					_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
@@ -14762,7 +14750,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 				ctor: '::',
 				_0: A2(
 					_rtfeldman$elm_css$Css$class,
-					_inkuzmin$elm_multiselect$SelectCss$Container,
+					_inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
 					{
 						ctor: '::',
 						_0: A3(
@@ -14813,7 +14801,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 					ctor: '::',
 					_0: A2(
 						_rtfeldman$elm_css$Css$class,
-						_inkuzmin$elm_multiselect$SelectCss$InputWrap,
+						_inkuzmin$elm_multiselect$Multiselect_SelectCss$InputWrap,
 						{
 							ctor: '::',
 							_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
@@ -14841,7 +14829,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 						ctor: '::',
 						_0: A2(
 							_rtfeldman$elm_css$Css$class,
-							_inkuzmin$elm_multiselect$SelectCss$Input,
+							_inkuzmin$elm_multiselect$Multiselect_SelectCss$Input,
 							{
 								ctor: '::',
 								_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$none),
@@ -14882,7 +14870,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 							ctor: '::',
 							_0: A2(
 								_rtfeldman$elm_css$Css$class,
-								_inkuzmin$elm_multiselect$SelectCss$InputMirrow,
+								_inkuzmin$elm_multiselect$Multiselect_SelectCss$InputMirrow,
 								{
 									ctor: '::',
 									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
@@ -14927,14 +14915,14 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 								ctor: '::',
 								_0: A2(
 									_rtfeldman$elm_css$Css$class,
-									_inkuzmin$elm_multiselect$SelectCss$Focused,
+									_inkuzmin$elm_multiselect$Multiselect_SelectCss$Focused,
 									{
 										ctor: '::',
 										_0: _rtfeldman$elm_css$Css$borderColor(
 											_rtfeldman$elm_css$Css$hex('#007eff')),
 										_1: {
 											ctor: '::',
-											_0: _inkuzmin$elm_multiselect$SelectCss$boxShadowCustom('inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(0, 126, 255, 0.1)'),
+											_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$boxShadowCustom('inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(0, 126, 255, 0.1)'),
 											_1: {ctor: '[]'}
 										}
 									}),
@@ -14942,7 +14930,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 									ctor: '::',
 									_0: A2(
 										_rtfeldman$elm_css$Css$class,
-										_inkuzmin$elm_multiselect$SelectCss$Opened,
+										_inkuzmin$elm_multiselect$Multiselect_SelectCss$Opened,
 										{
 											ctor: '::',
 											_0: _rtfeldman$elm_css$Css$borderBottomLeftRadius(_rtfeldman$elm_css$Css$zero),
@@ -14956,7 +14944,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 										ctor: '::',
 										_0: A2(
 											_rtfeldman$elm_css$Css$class,
-											_inkuzmin$elm_multiselect$SelectCss$TagWrap,
+											_inkuzmin$elm_multiselect$Multiselect_SelectCss$TagWrap,
 											{
 												ctor: '::',
 												_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inline),
@@ -14966,7 +14954,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 											ctor: '::',
 											_0: A2(
 												_rtfeldman$elm_css$Css$class,
-												_inkuzmin$elm_multiselect$SelectCss$Tag,
+												_inkuzmin$elm_multiselect$Multiselect_SelectCss$Tag,
 												{
 													ctor: '::',
 													_0: _rtfeldman$elm_css$Css$color(
@@ -15027,7 +15015,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 												ctor: '::',
 												_0: A2(
 													_rtfeldman$elm_css$Css$class,
-													_inkuzmin$elm_multiselect$SelectCss$TagIcon,
+													_inkuzmin$elm_multiselect$Multiselect_SelectCss$TagIcon,
 													{
 														ctor: '::',
 														_0: _rtfeldman$elm_css$Css$hover(
@@ -15071,7 +15059,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 													ctor: '::',
 													_0: A2(
 														_rtfeldman$elm_css$Css$class,
-														_inkuzmin$elm_multiselect$SelectCss$TagLabel,
+														_inkuzmin$elm_multiselect$Multiselect_SelectCss$TagLabel,
 														{
 															ctor: '::',
 															_0: A2(
@@ -15092,7 +15080,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 														ctor: '::',
 														_0: A2(
 															_rtfeldman$elm_css$Css$class,
-															_inkuzmin$elm_multiselect$SelectCss$ClearWrap,
+															_inkuzmin$elm_multiselect$Multiselect_SelectCss$ClearWrap,
 															{
 																ctor: '::',
 																_0: _rtfeldman$elm_css$Css$width(
@@ -15132,7 +15120,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																										ctor: '::',
 																										_0: A2(
 																											_rtfeldman$elm_css$Css$class,
-																											_inkuzmin$elm_multiselect$SelectCss$Clear,
+																											_inkuzmin$elm_multiselect$Multiselect_SelectCss$Clear,
 																											{
 																												ctor: '::',
 																												_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
@@ -15164,7 +15152,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 															ctor: '::',
 															_0: A2(
 																_rtfeldman$elm_css$Css$class,
-																_inkuzmin$elm_multiselect$SelectCss$ArrowWrap,
+																_inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowWrap,
 																{
 																	ctor: '::',
 																	_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
@@ -15198,7 +15186,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																												ctor: '::',
 																												_0: A2(
 																													_rtfeldman$elm_css$Css$class,
-																													_inkuzmin$elm_multiselect$SelectCss$Arrow,
+																													_inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow,
 																													{
 																														ctor: '::',
 																														_0: _rtfeldman$elm_css$Css$borderTopColor(
@@ -15209,7 +15197,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																													ctor: '::',
 																													_0: A2(
 																														_rtfeldman$elm_css$Css$class,
-																														_inkuzmin$elm_multiselect$SelectCss$ArrowUpside,
+																														_inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside,
 																														{
 																															ctor: '::',
 																															_0: _rtfeldman$elm_css$Css$borderBottomColor(
@@ -15228,7 +15216,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																											ctor: '::',
 																											_0: A2(
 																												_rtfeldman$elm_css$Css$class,
-																												_inkuzmin$elm_multiselect$SelectCss$Arrow,
+																												_inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow,
 																												{
 																													ctor: '::',
 																													_0: A3(
@@ -15282,7 +15270,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																												ctor: '::',
 																												_0: A2(
 																													_rtfeldman$elm_css$Css$class,
-																													_inkuzmin$elm_multiselect$SelectCss$ArrowUpside,
+																													_inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside,
 																													{
 																														ctor: '::',
 																														_0: A3(
@@ -15354,7 +15342,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																ctor: '::',
 																_0: A2(
 																	_rtfeldman$elm_css$Css$class,
-																	_inkuzmin$elm_multiselect$SelectCss$Menu,
+																	_inkuzmin$elm_multiselect$Multiselect_SelectCss$Menu,
 																	{
 																		ctor: '::',
 																		_0: _rtfeldman$elm_css$Css$borderBottomRightRadius(
@@ -15393,7 +15381,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																								_1: {
 																									ctor: '::',
 																									_0: _rtfeldman$elm_css$Css$maxHeight(
-																										_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$SelectCss$menuHeight)),
+																										_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight)),
 																									_1: {
 																										ctor: '::',
 																										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
@@ -15425,7 +15413,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																	ctor: '::',
 																	_0: A2(
 																		_rtfeldman$elm_css$Css$class,
-																		_inkuzmin$elm_multiselect$SelectCss$MenuItem,
+																		_inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem,
 																		{
 																			ctor: '::',
 																			_0: _rtfeldman$elm_css$Css$color(
@@ -15442,7 +15430,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																					_1: {
 																						ctor: '::',
 																						_0: _rtfeldman$elm_css$Css$maxHeight(
-																							_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$SelectCss$itemHeight)),
+																							_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight)),
 																						_1: {ctor: '[]'}
 																					}
 																				}
@@ -15452,7 +15440,7 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 																		ctor: '::',
 																		_0: A2(
 																			_rtfeldman$elm_css$Css$class,
-																			_inkuzmin$elm_multiselect$SelectCss$MenuItemHovered,
+																			_inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItemHovered,
 																			{
 																				ctor: '::',
 																				_0: _rtfeldman$elm_css$Css$backgroundColor(
@@ -15482,12 +15470,24 @@ var _inkuzmin$elm_multiselect$SelectCss$css = function (_p0) {
 			}
 		}
 	});
-var _inkuzmin$elm_multiselect$SelectCss$MenuId = {ctor: 'MenuId'};
-var _inkuzmin$elm_multiselect$SelectCss$InputId = {ctor: 'InputId'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuId = {ctor: 'MenuId'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputId = {ctor: 'InputId'};
 
-var _inkuzmin$elm_multiselect$Utils$invisibleCharacter = '‌‌';
-var _inkuzmin$elm_multiselect$Utils$snd = _elm_lang$core$Tuple$second;
-var _inkuzmin$elm_multiselect$Utils$fst = _elm_lang$core$Tuple$first;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace = 8;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$end = 35;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$home = 36;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown = 34;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp = 33;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow = 40;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow = 38;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$rightArrow = 39;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$leftArrow = 37;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape = 27;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$return = 13;
+
+var _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter = '‌‌';
+var _inkuzmin$elm_multiselect$Multiselect_Utils$snd = _elm_lang$core$Tuple$second;
+var _inkuzmin$elm_multiselect$Multiselect_Utils$fst = _elm_lang$core$Tuple$first;
 
 var _inkuzmin$elm_multiselect$Multiselect$onKeyPress = function (tagger) {
 	return A2(
@@ -15667,10 +15667,10 @@ var _inkuzmin$elm_multiselect$Multiselect$fitViewPort = F2(
 		return (_elm_lang$core$Native_Utils.cmp(_p17, _p15) < 0) ? _p17 : ((_elm_lang$core$Native_Utils.cmp(_p16, _p14) > 0) ? (_p15 + (_p16 - _p14)) : _p15);
 	});
 var _inkuzmin$elm_multiselect$Multiselect$getBoundaries = function (i) {
-	return {ctor: '_Tuple2', _0: i * _inkuzmin$elm_multiselect$SelectCss$itemHeight, _1: (i * _inkuzmin$elm_multiselect$SelectCss$itemHeight) + _inkuzmin$elm_multiselect$SelectCss$itemHeight};
+	return {ctor: '_Tuple2', _0: i * _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight, _1: (i * _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight) + _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight};
 };
 var _inkuzmin$elm_multiselect$Multiselect$getViewPortBoundaries = function (i) {
-	return {ctor: '_Tuple2', _0: i, _1: i + _inkuzmin$elm_multiselect$SelectCss$menuHeight};
+	return {ctor: '_Tuple2', _0: i, _1: i + _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight};
 };
 var _inkuzmin$elm_multiselect$Multiselect$filter = F2(
 	function (selected, values) {
@@ -15803,7 +15803,7 @@ var _inkuzmin$elm_multiselect$Multiselect$clear = function (model) {
 			_0: _inkuzmin$elm_multiselect$Multiselect$class(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$SelectCss$ClearWrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$ClearWrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -15821,7 +15821,7 @@ var _inkuzmin$elm_multiselect$Multiselect$clear = function (model) {
 					_0: _inkuzmin$elm_multiselect$Multiselect$class(
 						{
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$SelectCss$Clear,
+							_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Clear,
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -15849,7 +15849,7 @@ var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 				_0: _inkuzmin$elm_multiselect$Multiselect$class(
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$SelectCss$Tag,
+						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Tag,
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -15863,7 +15863,7 @@ var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 						_0: _inkuzmin$elm_multiselect$Multiselect$class(
 							{
 								ctor: '::',
-								_0: _inkuzmin$elm_multiselect$SelectCss$TagIcon,
+								_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagIcon,
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -15888,7 +15888,7 @@ var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 							_0: _inkuzmin$elm_multiselect$Multiselect$class(
 								{
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$SelectCss$TagLabel,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagLabel,
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -15910,7 +15910,7 @@ var _inkuzmin$elm_multiselect$Multiselect$tags = function (model) {
 			_0: _inkuzmin$elm_multiselect$Multiselect$class(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$SelectCss$TagWrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagWrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
@@ -15934,7 +15934,7 @@ var _inkuzmin$elm_multiselect$Multiselect$menu = function (model) {
 			if (_p21.ctor === 'Nothing') {
 				return '';
 			} else {
-				return _inkuzmin$elm_multiselect$Utils$fst(_p21._0);
+				return _inkuzmin$elm_multiselect$Multiselect_Utils$fst(_p21._0);
 			}
 		}();
 		return A2(
@@ -15944,7 +15944,7 @@ var _inkuzmin$elm_multiselect$Multiselect$menu = function (model) {
 				_0: _inkuzmin$elm_multiselect$Multiselect$class(
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$SelectCss$Menu,
+						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Menu,
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -15967,15 +15967,15 @@ var _inkuzmin$elm_multiselect$Multiselect$menu = function (model) {
 							_0: _inkuzmin$elm_multiselect$Multiselect$class(
 								_elm_lang$core$Native_Utils.eq(_p24, hovered) ? {
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$SelectCss$MenuItemHovered,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItemHovered,
 									_1: {
 										ctor: '::',
-										_0: _inkuzmin$elm_multiselect$SelectCss$MenuItem,
+										_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem,
 										_1: {ctor: '[]'}
 									}
 								} : {
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$SelectCss$MenuItem,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem,
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -16010,11 +16010,11 @@ var _inkuzmin$elm_multiselect$Multiselect$Toggle = {ctor: 'Toggle'};
 var _inkuzmin$elm_multiselect$Multiselect$arrow = function (model) {
 	var arrowClasses = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$SelectCss$ArrowUpside,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside,
 		_1: {ctor: '[]'}
 	} : {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$SelectCss$Arrow,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow,
 		_1: {ctor: '[]'}
 	};
 	return A2(
@@ -16024,7 +16024,7 @@ var _inkuzmin$elm_multiselect$Multiselect$arrow = function (model) {
 			_0: _inkuzmin$elm_multiselect$Multiselect$class(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$SelectCss$ArrowWrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowWrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16135,7 +16135,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							}),
 						{ctor: '[]'});
 				} else {
-					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Utils$invisibleCharacter) ? A2(
+					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter) ? A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
@@ -16160,7 +16160,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							}),
 						{ctor: '[]'});
 				} else {
-					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Utils$invisibleCharacter) ? A2(
+					return _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter) ? A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
@@ -16273,7 +16273,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							selected: selected,
 							filtered: filtered,
 							hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p33),
-							input: _inkuzmin$elm_multiselect$Utils$invisibleCharacter,
+							input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
 							status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 						}),
 					{
@@ -16320,7 +16320,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						{
 							selected: selected,
 							filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-							input: _inkuzmin$elm_multiselect$Utils$invisibleCharacter,
+							input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
 							status: _inkuzmin$elm_multiselect$Multiselect$Closed
 						}),
 					{
@@ -16393,7 +16393,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 				}
 			default:
 				var _p44 = _p26._0;
-				if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$upArrow)) {
+				if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow)) {
 					var _p38 = model.hovered;
 					if (_p38.ctor === 'Nothing') {
 						return A2(
@@ -16422,7 +16422,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							});
 					}
 				} else {
-					if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$downArrow)) {
+					if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow)) {
 						var _p39 = model.hovered;
 						if (_p39.ctor === 'Nothing') {
 							return A2(
@@ -16451,7 +16451,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								});
 						}
 					} else {
-						if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$pageUp) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$home)) {
+						if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$home)) {
 							var first = _elm_lang$core$List$head(model.filtered);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16468,7 +16468,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 									_1: {ctor: '[]'}
 								});
 						} else {
-							if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$pageDown) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$end)) {
+							if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$end)) {
 								var last = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.filtered);
 								return A2(
 									_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16485,7 +16485,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 										_1: {ctor: '[]'}
 									});
 							} else {
-								if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$return)) {
+								if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$return)) {
 									var _p40 = model.hovered;
 									if (_p40.ctor === 'Nothing') {
 										return A2(
@@ -16511,7 +16511,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 													selected: selected,
 													filtered: filtered,
 													hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p41),
-													input: _inkuzmin$elm_multiselect$Utils$invisibleCharacter,
+													input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
 													status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 												}),
 											{
@@ -16525,7 +16525,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 											});
 									}
 								} else {
-									if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$escape)) {
+									if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape)) {
 										return A2(
 											_elm_lang$core$Platform_Cmd_ops['!'],
 											_elm_lang$core$Native_Utils.update(
@@ -16533,7 +16533,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 												{status: _inkuzmin$elm_multiselect$Multiselect$Closed, $protected: true}),
 											{ctor: '[]'});
 									} else {
-										if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Keycodes$backspace)) {
+										if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
 											if (_elm_lang$core$Native_Utils.eq(model.input, '')) {
 												var _p42 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
 												if (_p42.ctor === 'Nothing') {
@@ -16598,7 +16598,7 @@ var _inkuzmin$elm_multiselect$Multiselect$subscriptions = function (model) {
 var _inkuzmin$elm_multiselect$Multiselect$Start = {ctor: 'Start'};
 var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 	var filterKey = function (code) {
-		return (_elm_lang$core$Native_Utils.eq(code, _inkuzmin$elm_multiselect$Keycodes$upArrow) || _elm_lang$core$Native_Utils.eq(code, _inkuzmin$elm_multiselect$Keycodes$downArrow)) ? _elm_lang$core$Result$Ok(code) : _elm_lang$core$Result$Err('ignored input');
+		return (_elm_lang$core$Native_Utils.eq(code, _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow) || _elm_lang$core$Native_Utils.eq(code, _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow)) ? _elm_lang$core$Result$Ok(code) : _elm_lang$core$Result$Err('ignored input');
 	};
 	var decoder = A2(
 		_elm_lang$core$Json_Decode$map,
@@ -16614,7 +16614,7 @@ var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', options, decoder);
 }();
 var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
-	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Utils$invisibleCharacter) ? A2(
+	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter) ? A2(
 		_elm_lang$html$Html_Attributes$property,
 		'value',
 		_elm_lang$core$Json_Encode$string(model.input)) : A2(
@@ -16642,7 +16642,7 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 				_0: _inkuzmin$elm_multiselect$Multiselect$class(
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$SelectCss$InputWrap,
+						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputWrap,
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -16657,7 +16657,7 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 					_0: _inkuzmin$elm_multiselect$Multiselect$class(
 						{
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$SelectCss$InputMirrow,
+							_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputMirrow,
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -16680,7 +16680,7 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 							_0: _inkuzmin$elm_multiselect$Multiselect$class(
 								{
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$SelectCss$Input,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Input,
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -16714,23 +16714,23 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 var _inkuzmin$elm_multiselect$Multiselect$view = function (model) {
 	var inputClasses = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Focused) ? {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$SelectCss$Container,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
 		_1: {
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$SelectCss$Focused,
+			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Focused,
 			_1: {ctor: '[]'}
 		}
 	} : (_elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$SelectCss$Container,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
 		_1: {
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$SelectCss$Opened,
+			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Opened,
 			_1: {ctor: '[]'}
 		}
 	} : {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$SelectCss$Container,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
 		_1: {ctor: '[]'}
 	});
 	return A2(
@@ -16740,7 +16740,7 @@ var _inkuzmin$elm_multiselect$Multiselect$view = function (model) {
 			_0: _inkuzmin$elm_multiselect$Multiselect$class(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$SelectCss$Wrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Wrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16926,35 +16926,68 @@ var _inkuzmin$elm_multiselect$Main$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$map,
-				_inkuzmin$elm_multiselect$Main$HOI,
-				_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectA)),
+				_elm_lang$html$Html$h3,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Submit on button click'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$style(
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'height', _1: '300px'},
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(''),
-						_1: {ctor: '[]'}
-					}),
+					_elm_lang$html$Html$map,
+					_inkuzmin$elm_multiselect$Main$HOI,
+					_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectA)),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$map,
-						_inkuzmin$elm_multiselect$Main$Nyan,
-						_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectB)),
-					_1: {ctor: '[]'}
+						_elm_lang$html$Html$button,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Select!'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'height', _1: '300px'},
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(''),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h3,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Submit on select'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$map,
+									_inkuzmin$elm_multiselect$Main$Nyan,
+									_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectB)),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
 				}
 			}
 		});

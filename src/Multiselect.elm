@@ -46,13 +46,13 @@ import Json.Decode exposing (Decoder)
 import Json.Encode as Encode
 import Mouse
 import Process
-import SelectCss
+import Multiselect.SelectCss as SelectCss
 import String
 import Task
 import Time
 import Dom.Scroll
-import Keycodes
-import Utils exposing (fst, snd, invisibleCharacter)
+import Multiselect.Keycodes as Keycodes
+import Multiselect.Utils exposing (fst, snd, invisibleCharacter)
 
 
 {-| Example values, also used as default ones to make it simpler to start using this library.

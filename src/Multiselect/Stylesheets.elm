@@ -1,7 +1,7 @@
-port module Stylesheets exposing (..)
+port module Multiselect.Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
-import SelectCss
+import Multiselect.SelectCss
 
 
 port files : CssFileStructure -> Cmd msg

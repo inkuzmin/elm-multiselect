@@ -1,4 +1,4 @@
-module Keycodes exposing (..)
+module Multiselect.Keycodes exposing (..)
 
 
 type alias KeyCode =

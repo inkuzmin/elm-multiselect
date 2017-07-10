@@ -1,4 +1,4 @@
-module SelectCss exposing (..)
+module Multiselect.SelectCss exposing (..)
 
 import Css exposing (..)
 import Css.Elements exposing (body, li)
