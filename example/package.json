@@ -1,12 +1,13 @@
 {
-  "name": "elm-mltiselect",
-  "version": "1.0.0",
+  "name": "elm-multiselect",
+  "version": "1.0.4",
   "description": "A multiselect control built with and for Elm",
   "main": "brunch-config.js",
   "scripts": {
     "postinstall": "elm package install -y",
     "start": "brunch watch --server",
-    "prod": "brunch build --production"
+    "prod": "brunch build --production",
+    "test": "brunch build --production"
   },
   "keywords": [
     "elm",
