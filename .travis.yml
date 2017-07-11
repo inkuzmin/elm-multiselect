@@ -6,6 +6,7 @@ node_js:
   - "7"
 
 before_install:
+  - npm install -g elm
   - cd ./example
 script:
   - npm test
