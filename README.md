@@ -1,5 +1,7 @@
 # Elm-multiselect
 
+[![Build Status](https://travis-ci.org/inkuzmin/elm-multiselect.svg?branch=master)](https://travis-ci.org/inkuzmin/elm-multiselect)
+
 An implementation of multiselect control built with and for Elm.
 
 Styles based on [React Select](http://jedwatson.github.io/react-select/).
