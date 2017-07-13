@@ -4,7 +4,7 @@
 
 An implementation of multiselect control built with and for Elm.
 
-Styles based on [React Select](http://jedwatson.github.io/react-select/).
+Styles based on [React Select](http://jedwatson.github.io/react-select/) and built with [elm-css](https://github.com/rtfeldman/elm-css).
 
 Live demo: https://inkuzmin.github.io/elm-multiselect/
 
