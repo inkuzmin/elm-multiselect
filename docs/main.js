@@ -15492,7 +15492,7 @@ var _inkuzmin$elm_multiselect$Multiselect_Utils$fst = _elm_lang$core$Tuple$first
 var _inkuzmin$elm_multiselect$Multiselect$onKeyPress = function (tagger) {
 	return A2(
 		_elm_lang$html$Html_Events$on,
-		'keypress',
+		'keydown',
 		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
 };
 var _inkuzmin$elm_multiselect$Multiselect$onKeyUp = function (tagger) {
@@ -15527,7 +15527,7 @@ _inkuzmin$elm_multiselect$Multiselect_ops[':>'] = F2(
 var _inkuzmin$elm_multiselect$Multiselect$onKeyDown = function (tagger) {
 	return A2(
 		_elm_lang$html$Html_Events$on,
-		'keydown',
+		'keypress',
 		A2(
 			_elm_lang$core$Json_Decode$map,
 			tagger,
@@ -16623,7 +16623,7 @@ var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 			},
 			_elm_lang$html$Html_Events$keyCode));
 	var options = {preventDefault: true, stopPropagation: false};
-	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keypress', options, decoder);
+	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', options, decoder);
 }();
 var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter) ? A2(

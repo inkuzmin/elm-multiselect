@@ -109,8 +109,13 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ Html.map HOI <| Multiselect.view model.multiselectA
+        [ -- Html.h3 [] [ text "Submit on button click" ]
+          Html.map HOI <| Multiselect.view model.multiselectA
+
+        -- , button [] [ text "Select!" ]
         , div [ Html.Attributes.style [ ( "height", "300px" ) ] ] [ text "" ]
+
+        -- , Html.h3 [] [ text "Submit on select" ]
         , Html.map Nyan <| Multiselect.view model.multiselectB
         ]
 
