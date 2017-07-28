@@ -47,4 +47,3 @@ I would like to thank the [University of Tartu](http://www.ut.ee/et) and the [BI
 
 [<img src="https://inkuzmin.github.io/logos/assets/biit.svg" width="100">](https://biit.cs.ut.ee/)
 
-## Contributions & bugfixes are most welcome!
