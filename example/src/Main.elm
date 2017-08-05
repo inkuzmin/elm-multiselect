@@ -56,6 +56,7 @@ type alias Flags =
 type alias Model =
     { multiselectA : Multiselect.Model
     , multiselectB : Multiselect.Model
+    , selectedA : List ( String, String )
     }
 
 
@@ -63,6 +64,7 @@ model : Model
 model =
     { multiselectA = Multiselect.initModel valuesA "A"
     , multiselectB = Multiselect.initModel valuesB "B"
+    , selectedA = []
     }
 
 
@@ -79,6 +81,7 @@ type Msg
     = NoOp
     | HOI Multiselect.Msg
     | Nyan Multiselect.Msg
+    | SelectA
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,6 +104,9 @@ update msg model =
             in
                 { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
 
+        SelectA ->
+            ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
+
 
 
 -- VIEW
@@ -109,15 +115,20 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ -- Html.h3 [] [ text "Submit on button click" ]
-          Html.map HOI <| Multiselect.view model.multiselectA
-
-        -- , button [] [ text "Select!" ]
+        [ Html.h3 [] [ text "Submit on button click" ]
+        , Html.map HOI <| Multiselect.view model.multiselectA
+        , showSelected model.selectedA
+        , Html.button [ Html.Attributes.class "btn", onClick SelectA ] [ text "Select!" ]
         , div [ Html.Attributes.style [ ( "height", "300px" ) ] ] [ text "" ]
-
-        -- , Html.h3 [] [ text "Submit on select" ]
+        , Html.h3 [] [ text "Submit on select" ]
         , Html.map Nyan <| Multiselect.view model.multiselectB
+        , showSelected (Multiselect.getSelectedValues model.multiselectB)
         ]
+
+
+showSelected : List ( String, String ) -> Html Msg
+showSelected values =
+    Html.ul [] (List.map (\( name, value ) -> Html.li [] [ text value ]) values)
 
 
 

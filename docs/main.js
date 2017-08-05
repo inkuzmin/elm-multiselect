@@ -16799,6 +16799,25 @@ var _inkuzmin$elm_multiselect$Multiselect$main = _elm_lang$html$Html$programWith
 	_elm_lang$core$Json_Decode$succeed(
 		{}));
 
+var _inkuzmin$elm_multiselect$Main$showSelected = function (values) {
+	return A2(
+		_elm_lang$html$Html$ul,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$map,
+			function (_p0) {
+				var _p1 = _p0;
+				return A2(
+					_elm_lang$html$Html$li,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(_p1._1),
+						_1: {ctor: '[]'}
+					});
+			},
+			values));
+};
 var _inkuzmin$elm_multiselect$Main$valuesB = {
 	ctor: '::',
 	_0: {ctor: '_Tuple2', _0: '0', _1: 'AAA'},
@@ -16879,16 +16898,18 @@ var _inkuzmin$elm_multiselect$Main$valuesA = {
 };
 var _inkuzmin$elm_multiselect$Main$model = {
 	multiselectA: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesA, 'A'),
-	multiselectB: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesB, 'B')
+	multiselectB: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesB, 'B'),
+	selectedA: {ctor: '[]'}
 };
 var _inkuzmin$elm_multiselect$Main$init = function (flags) {
 	return {ctor: '_Tuple2', _0: _inkuzmin$elm_multiselect$Main$model, _1: _elm_lang$core$Platform_Cmd$none};
 };
 var _inkuzmin$elm_multiselect$Main$Flags = {};
-var _inkuzmin$elm_multiselect$Main$Model = F2(
-	function (a, b) {
-		return {multiselectA: a, multiselectB: b};
+var _inkuzmin$elm_multiselect$Main$Model = F3(
+	function (a, b, c) {
+		return {multiselectA: a, multiselectB: b, selectedA: c};
 	});
+var _inkuzmin$elm_multiselect$Main$SelectA = {ctor: 'SelectA'};
 var _inkuzmin$elm_multiselect$Main$Nyan = function (a) {
 	return {ctor: 'Nyan', _0: a};
 };
@@ -16897,14 +16918,14 @@ var _inkuzmin$elm_multiselect$Main$HOI = function (a) {
 };
 var _inkuzmin$elm_multiselect$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'HOI':
-				var _p1 = A2(_inkuzmin$elm_multiselect$Multiselect$update, _p0._0, model.multiselectA);
-				var subModel = _p1._0;
-				var subCmd = _p1._1;
+				var _p3 = A2(_inkuzmin$elm_multiselect$Multiselect$update, _p2._0, model.multiselectA);
+				var subModel = _p3._0;
+				var subCmd = _p3._1;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
@@ -16915,10 +16936,10 @@ var _inkuzmin$elm_multiselect$Main$update = F2(
 						_0: A2(_elm_lang$core$Platform_Cmd$map, _inkuzmin$elm_multiselect$Main$HOI, subCmd),
 						_1: {ctor: '[]'}
 					});
-			default:
-				var _p2 = A2(_inkuzmin$elm_multiselect$Multiselect$update, _p0._0, model.multiselectB);
-				var subModel = _p2._0;
-				var subCmd = _p2._1;
+			case 'Nyan':
+				var _p4 = A2(_inkuzmin$elm_multiselect$Multiselect$update, _p2._0, model.multiselectB);
+				var subModel = _p4._0;
+				var subCmd = _p4._1;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
@@ -16929,6 +16950,16 @@ var _inkuzmin$elm_multiselect$Main$update = F2(
 						_0: A2(_elm_lang$core$Platform_Cmd$map, _inkuzmin$elm_multiselect$Main$Nyan, subCmd),
 						_1: {ctor: '[]'}
 					});
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							selectedA: _inkuzmin$elm_multiselect$Multiselect$getSelectedValues(model.multiselectA)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _inkuzmin$elm_multiselect$Main$view = function (model) {
@@ -16953,50 +16984,67 @@ var _inkuzmin$elm_multiselect$Main$view = function (model) {
 					_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectA)),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Select!'),
-							_1: {ctor: '[]'}
-						}),
+					_0: _inkuzmin$elm_multiselect$Main$showSelected(model.selectedA),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$div,
+							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$style(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'height', _1: '300px'},
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$class('btn'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_inkuzmin$elm_multiselect$Main$SelectA),
+									_1: {ctor: '[]'}
+								}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(''),
+								_0: _elm_lang$html$Html$text('Select!'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$h3,
-								{ctor: '[]'},
+								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Submit on select'),
+									_0: _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'height', _1: '300px'},
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(''),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$map,
-									_inkuzmin$elm_multiselect$Main$Nyan,
-									_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectB)),
-								_1: {ctor: '[]'}
+									_elm_lang$html$Html$h3,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Submit on select'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$map,
+										_inkuzmin$elm_multiselect$Main$Nyan,
+										_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectB)),
+									_1: {
+										ctor: '::',
+										_0: _inkuzmin$elm_multiselect$Main$showSelected(
+											_inkuzmin$elm_multiselect$Multiselect$getSelectedValues(model.multiselectB)),
+										_1: {ctor: '[]'}
+									}
+								}
 							}
 						}
 					}
