@@ -258,12 +258,10 @@ update msg model =
                         { model | error = Nothing } ! []
 
         ClearInput ->
-            Debug.log "123"
-                ({ model | input = "" } ! [])
+            ({ model | input = "" } ! [])
 
         Adjust value ->
-            Debug.log (toString value)
-                ({ model | inputWidth = value } ! [])
+            ({ model | inputWidth = value } ! [])
 
         Filter value ->
             let
@@ -316,28 +314,26 @@ update msg model =
                                     ! []
 
         OnSelect item ->
-            Debug.log "123"
-                (let
-                    selected =
-                        model.selected ++ [ item ]
+            let
+                selected =
+                    model.selected ++ [ item ]
 
-                    filtered =
-                        filter selected model.values
-                 in
-                    { model
-                        | selected = selected
-                        , filtered = filtered
-                        , hovered = nextSelectedItem model.filtered item
-                        , input = invisibleCharacter
-                        , status =
-                            if List.isEmpty filtered then
-                                Closed
-                            else
-                                Opened
-                    }
-                        ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                          ]
-                )
+                filtered =
+                    filter selected model.values
+            in
+                { model
+                    | selected = selected
+                    , filtered = filtered
+                    , hovered = nextSelectedItem model.filtered item
+                    , input = invisibleCharacter
+                    , status =
+                        if List.isEmpty filtered then
+                            Closed
+                        else
+                            Opened
+                }
+                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                      ]
 
         RemoveItem item ->
             let
@@ -619,8 +615,6 @@ infixr 5 :>
 
 { id, class, classList } =
     Html.CssHelpers.withNamespace "multiselect"
-
-
 onClickNoDefault : msg -> Html.Attribute msg
 onClickNoDefault message =
     let
