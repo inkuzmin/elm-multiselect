@@ -5,6 +5,20 @@ sudo: false
 node_js:
   - "7"
 
+cache:
+  directories:
+    - sysconfcpus
+install:
+  - |
+    if [ ! -d sysconfcpus/bin ];
+    then
+      git clone https://github.com/obmarg/libsysconfcpus.git; 
+      cd libsysconfcpus;
+      ./configure --prefix=$TRAVIS_BUILD_DIR/sysconfcpus;
+      make && make install;
+      cd ..;
+    fi
+
 before_install:
   - npm install -g elm
   - cd ./example

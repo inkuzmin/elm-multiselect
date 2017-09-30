@@ -9846,6 +9846,11 @@ var _rtfeldman$elm_css$Css_Structure$Stylesheet = F4(
 	function (a, b, c, d) {
 		return {charset: a, imports: b, namespaces: c, declarations: d};
 	});
+var _rtfeldman$elm_css$Css_Structure$MediaExpression = F2(
+	function (a, b) {
+		return {feature: a, value: b};
+	});
+var _rtfeldman$elm_css$Css_Structure$Compatible = {ctor: 'Compatible'};
 var _rtfeldman$elm_css$Css_Structure$FontFeatureValues = function (a) {
 	return {ctor: 'FontFeatureValues', _0: a};
 };
@@ -10071,8 +10076,22 @@ var _rtfeldman$elm_css$Css_Structure$appendToLastSelector = F2(
 			};
 		}
 	});
-var _rtfeldman$elm_css$Css_Structure$MediaQuery = function (a) {
-	return {ctor: 'MediaQuery', _0: a};
+var _rtfeldman$elm_css$Css_Structure$Speech = {ctor: 'Speech'};
+var _rtfeldman$elm_css$Css_Structure$Screen = {ctor: 'Screen'};
+var _rtfeldman$elm_css$Css_Structure$Print = {ctor: 'Print'};
+var _rtfeldman$elm_css$Css_Structure$CustomQuery = function (a) {
+	return {ctor: 'CustomQuery', _0: a};
+};
+var _rtfeldman$elm_css$Css_Structure$NotQuery = F2(
+	function (a, b) {
+		return {ctor: 'NotQuery', _0: a, _1: b};
+	});
+var _rtfeldman$elm_css$Css_Structure$OnlyQuery = F2(
+	function (a, b) {
+		return {ctor: 'OnlyQuery', _0: a, _1: b};
+	});
+var _rtfeldman$elm_css$Css_Structure$AllQuery = function (a) {
+	return {ctor: 'AllQuery', _0: a};
 };
 var _rtfeldman$elm_css$Css_Structure$Selector = F3(
 	function (a, b, c) {
@@ -10374,10 +10393,10 @@ var _rtfeldman$elm_css$Css_Preprocess$propertyToPair = function (property) {
 	var value = property.important ? A2(_elm_lang$core$Basics_ops['++'], property.value, ' !important') : property.value;
 	return {ctor: '_Tuple2', _0: property.key, _1: value};
 };
-var _rtfeldman$elm_css$Css_Preprocess$toPropertyPairs = function (mixins) {
+var _rtfeldman$elm_css$Css_Preprocess$toPropertyPairs = function (styles) {
 	toPropertyPairs:
 	while (true) {
-		var _p0 = mixins;
+		var _p0 = styles;
 		if (_p0.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
@@ -10388,14 +10407,14 @@ var _rtfeldman$elm_css$Css_Preprocess$toPropertyPairs = function (mixins) {
 						_0: _rtfeldman$elm_css$Css_Preprocess$propertyToPair(_p0._0._0),
 						_1: _rtfeldman$elm_css$Css_Preprocess$toPropertyPairs(_p0._1)
 					};
-				case 'ApplyMixins':
+				case 'ApplyStyles':
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						_rtfeldman$elm_css$Css_Preprocess$toPropertyPairs(_p0._0._0),
 						_rtfeldman$elm_css$Css_Preprocess$toPropertyPairs(_p0._1));
 				default:
 					var _v1 = _p0._1;
-					mixins = _v1;
+					styles = _v1;
 					continue toPropertyPairs;
 			}
 		}
@@ -10463,8 +10482,8 @@ var _rtfeldman$elm_css$Css_Preprocess$Stylesheet = F4(
 	function (a, b, c, d) {
 		return {charset: a, imports: b, namespaces: c, snippets: d};
 	});
-var _rtfeldman$elm_css$Css_Preprocess$ApplyMixins = function (a) {
-	return {ctor: 'ApplyMixins', _0: a};
+var _rtfeldman$elm_css$Css_Preprocess$ApplyStyles = function (a) {
+	return {ctor: 'ApplyStyles', _0: a};
 };
 var _rtfeldman$elm_css$Css_Preprocess$WithMedia = F2(
 	function (a, b) {
@@ -10486,8 +10505,8 @@ var _rtfeldman$elm_css$Css_Preprocess$AppendProperty = function (a) {
 	return {ctor: 'AppendProperty', _0: a};
 };
 var _rtfeldman$elm_css$Css_Preprocess$mapLastProperty = F2(
-	function (update, mixin) {
-		var _p4 = mixin;
+	function (update, style) {
+		var _p4 = style;
 		switch (_p4.ctor) {
 			case 'AppendProperty':
 				return _rtfeldman$elm_css$Css_Preprocess$AppendProperty(
@@ -10498,13 +10517,13 @@ var _rtfeldman$elm_css$Css_Preprocess$mapLastProperty = F2(
 					_p4._0,
 					A2(_rtfeldman$elm_css$Css_Preprocess$mapAllLastProperty, update, _p4._1));
 			case 'NestSnippet':
-				return mixin;
+				return style;
 			case 'WithPseudoElement':
-				return mixin;
+				return style;
 			case 'WithMedia':
-				return mixin;
+				return style;
 			default:
-				return _rtfeldman$elm_css$Css_Preprocess$ApplyMixins(
+				return _rtfeldman$elm_css$Css_Preprocess$ApplyStyles(
 					A2(
 						_rtfeldman$elm_css$Css_Structure$mapLast,
 						_rtfeldman$elm_css$Css_Preprocess$mapLastProperty(update),
@@ -10512,10 +10531,10 @@ var _rtfeldman$elm_css$Css_Preprocess$mapLastProperty = F2(
 		}
 	});
 var _rtfeldman$elm_css$Css_Preprocess$mapAllLastProperty = F2(
-	function (update, mixins) {
-		var _p5 = mixins;
+	function (update, styles) {
+		var _p5 = styles;
 		if (_p5.ctor === '[]') {
-			return mixins;
+			return styles;
 		} else {
 			if (_p5._1.ctor === '[]') {
 				return {
@@ -10575,8 +10594,10 @@ var _rtfeldman$elm_css$Css_Preprocess$StyleBlock = F3(
 		return {ctor: 'StyleBlock', _0: a, _1: b, _2: c};
 	});
 
+var _rtfeldman$elm_css$Css_Structure_Output$noIndent = '';
+var _rtfeldman$elm_css$Css_Structure_Output$spaceIndent = '    ';
 var _rtfeldman$elm_css$Css_Structure_Output$indent = function (str) {
-	return A2(_elm_lang$core$Basics_ops['++'], '    ', str);
+	return A2(_elm_lang$core$Basics_ops['++'], _rtfeldman$elm_css$Css_Structure_Output$spaceIndent, str);
 };
 var _rtfeldman$elm_css$Css_Structure_Output$prettyPrintProperty = function (_p0) {
 	var _p1 = _p0;
@@ -10711,42 +10732,124 @@ var _rtfeldman$elm_css$Css_Structure_Output$selectorToString = function (_p11) {
 				},
 				segments)));
 };
-var _rtfeldman$elm_css$Css_Structure_Output$prettyPrintStyleBlock = function (_p14) {
-	var _p15 = _p14;
-	var selectorStr = A2(
-		_elm_lang$core$String$join,
-		', ',
-		A2(
-			_elm_lang$core$List$map,
-			_rtfeldman$elm_css$Css_Structure_Output$selectorToString,
-			{ctor: '::', _0: _p15._0, _1: _p15._1}));
+var _rtfeldman$elm_css$Css_Structure_Output$mediaExpressionToString = function (expression) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		selectorStr,
+		'(',
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			' {\n',
+			expression.feature,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				_rtfeldman$elm_css$Css_Structure_Output$prettyPrintProperties(_p15._2),
-				'\n}')));
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					'',
+					A2(
+						_elm_lang$core$Maybe$map,
+						F2(
+							function (x, y) {
+								return A2(_elm_lang$core$Basics_ops['++'], x, y);
+							})(': '),
+						expression.value)),
+				')')));
 };
+var _rtfeldman$elm_css$Css_Structure_Output$mediaTypeToString = function (mediaType) {
+	var _p14 = mediaType;
+	switch (_p14.ctor) {
+		case 'Print':
+			return 'print';
+		case 'Screen':
+			return 'screen';
+		default:
+			return 'speech';
+	}
+};
+var _rtfeldman$elm_css$Css_Structure_Output$mediaQueryToString = function (mediaQuery) {
+	var prefixWith = F3(
+		function (str, mediaType, expressions) {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				str,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					' ',
+					A2(
+						_elm_lang$core$String$join,
+						' and ',
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css_Structure_Output$mediaTypeToString(mediaType),
+							_1: A2(_elm_lang$core$List$map, _rtfeldman$elm_css$Css_Structure_Output$mediaExpressionToString, expressions)
+						})));
+		});
+	var _p15 = mediaQuery;
+	switch (_p15.ctor) {
+		case 'AllQuery':
+			return A2(
+				_elm_lang$core$String$join,
+				' and ',
+				A2(_elm_lang$core$List$map, _rtfeldman$elm_css$Css_Structure_Output$mediaExpressionToString, _p15._0));
+		case 'OnlyQuery':
+			return A3(prefixWith, 'only', _p15._0, _p15._1);
+		case 'NotQuery':
+			return A3(prefixWith, 'not', _p15._0, _p15._1);
+		default:
+			return _p15._0;
+	}
+};
+var _rtfeldman$elm_css$Css_Structure_Output$prettyPrintStyleBlock = F2(
+	function (indentLevel, _p16) {
+		var _p17 = _p16;
+		var selectorStr = A2(
+			_elm_lang$core$String$join,
+			', ',
+			A2(
+				_elm_lang$core$List$map,
+				_rtfeldman$elm_css$Css_Structure_Output$selectorToString,
+				{ctor: '::', _0: _p17._0, _1: _p17._1}));
+		return A2(
+			_elm_lang$core$String$join,
+			'',
+			{
+				ctor: '::',
+				_0: selectorStr,
+				_1: {
+					ctor: '::',
+					_0: ' {\n',
+					_1: {
+						ctor: '::',
+						_0: indentLevel,
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css_Structure_Output$prettyPrintProperties(_p17._2),
+							_1: {
+								ctor: '::',
+								_0: '\n',
+								_1: {
+									ctor: '::',
+									_0: indentLevel,
+									_1: {
+										ctor: '::',
+										_0: '}',
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+	});
 var _rtfeldman$elm_css$Css_Structure_Output$prettyPrintDeclaration = function (declaration) {
-	var _p16 = declaration;
-	switch (_p16.ctor) {
+	var _p18 = declaration;
+	switch (_p18.ctor) {
 		case 'StyleBlockDeclaration':
-			return _rtfeldman$elm_css$Css_Structure_Output$prettyPrintStyleBlock(_p16._0);
+			return A2(_rtfeldman$elm_css$Css_Structure_Output$prettyPrintStyleBlock, _rtfeldman$elm_css$Css_Structure_Output$noIndent, _p18._0);
 		case 'MediaRule':
 			var query = A2(
 				_elm_lang$core$String$join,
-				' ',
-				A2(
-					_elm_lang$core$List$map,
-					function (_p17) {
-						var _p18 = _p17;
-						return _p18._0;
-					},
-					_p16._0));
+				',\n',
+				A2(_elm_lang$core$List$map, _rtfeldman$elm_css$Css_Structure_Output$mediaQueryToString, _p18._0));
 			var blocks = A2(
 				_elm_lang$core$String$join,
 				'\n\n',
@@ -10754,9 +10857,9 @@ var _rtfeldman$elm_css$Css_Structure_Output$prettyPrintDeclaration = function (d
 					_elm_lang$core$List$map,
 					function (_p19) {
 						return _rtfeldman$elm_css$Css_Structure_Output$indent(
-							_rtfeldman$elm_css$Css_Structure_Output$prettyPrintStyleBlock(_p19));
+							A2(_rtfeldman$elm_css$Css_Structure_Output$prettyPrintStyleBlock, _rtfeldman$elm_css$Css_Structure_Output$spaceIndent, _p19));
 					},
-					_p16._1));
+					_p18._1));
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				'@media ',
@@ -10766,18 +10869,15 @@ var _rtfeldman$elm_css$Css_Structure_Output$prettyPrintDeclaration = function (d
 					A2(
 						_elm_lang$core$Basics_ops['++'],
 						' {\n',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_rtfeldman$elm_css$Css_Structure_Output$indent(blocks),
-							'\n}'))));
+						A2(_elm_lang$core$Basics_ops['++'], blocks, '\n}'))));
 		default:
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Css.Structure.Output',
 				{
-					start: {line: 56, column: 5},
-					end: {line: 73, column: 49}
+					start: {line: 61, column: 5},
+					end: {line: 78, column: 49}
 				},
-				_p16)('not yet implemented :x');
+				_p18)('not yet implemented :x');
 	}
 };
 var _rtfeldman$elm_css$Css_Structure_Output$namespaceToString = function (_p21) {
@@ -11147,7 +11247,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$resolveMediaRule = F2(
 var _rtfeldman$elm_css$Css_Preprocess_Resolve$expandStyleBlock = function (_p19) {
 	var _p20 = _p19;
 	return A2(
-		_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins,
+		_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles,
 		_p20._2,
 		{
 			ctor: '::',
@@ -11160,11 +11260,11 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$expandStyleBlock = function (_p19)
 			_1: {ctor: '[]'}
 		});
 };
-var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
-	function (mixins, declarations) {
-		applyMixins:
+var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles = F2(
+	function (styles, declarations) {
+		applyStyles:
 		while (true) {
-			var _p21 = mixins;
+			var _p21 = styles;
 			if (_p21.ctor === '[]') {
 				return {
 					declarations: declarations,
@@ -11177,7 +11277,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
 						var warnings = _p22._0;
 						var property = _p22._1;
 						var result = A2(
-							_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins,
+							_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles,
 							_p21._1,
 							A2(_rtfeldman$elm_css$Css_Structure$appendProperty, property, declarations));
 						return {
@@ -11186,7 +11286,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
 						};
 					case 'ExtendSelector':
 						return A4(
-							_rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedMixinsToLast,
+							_rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedStylesToLast,
 							_p21._0._1,
 							_p21._1,
 							_rtfeldman$elm_css$Css_Structure$appendRepeatableToLastSelector(_p21._0._0),
@@ -11251,7 +11351,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
 									return _rtfeldman$elm_css$Css_Preprocess_Resolve$concatDeclarationsAndWarnings(
 										{
 											ctor: '::',
-											_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins, _p27._0._2, newDeclarations),
+											_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles, _p27._0._2, newDeclarations),
 											_1: {ctor: '[]'}
 										});
 								case 'MediaRule':
@@ -11282,7 +11382,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
 									}),
 								{
 									ctor: '::',
-									_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins, _p21._1, declarations),
+									_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles, _p21._1, declarations),
 									_1: {ctor: '[]'}
 								},
 								A2(
@@ -11291,7 +11391,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
 									A2(_elm_lang$core$List$concatMap, _rtfeldman$elm_css$Css_Preprocess$unwrapSnippet, _p21._0._1))));
 					case 'WithPseudoElement':
 						return A4(
-							_rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedMixinsToLast,
+							_rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedStylesToLast,
 							_p21._0._1,
 							_p21._1,
 							_rtfeldman$elm_css$Css_Structure$appendPseudoElementToLastSelector(_p21._0._0),
@@ -11323,25 +11423,25 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins = F2(
 						return _rtfeldman$elm_css$Css_Preprocess_Resolve$concatDeclarationsAndWarnings(
 							{
 								ctor: '::',
-								_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins, _p21._1, declarations),
+								_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles, _p21._1, declarations),
 								_1: {
 									ctor: '::',
-									_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins, _p21._0._1, newDeclarations),
+									_0: A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles, _p21._0._1, newDeclarations),
 									_1: {ctor: '[]'}
 								}
 							});
 					default:
 						var _v19 = A2(_elm_lang$core$Basics_ops['++'], _p21._0._0, _p21._1),
 							_v20 = declarations;
-						mixins = _v19;
+						styles = _v19;
 						declarations = _v20;
-						continue applyMixins;
+						continue applyStyles;
 				}
 			}
 		}
 	});
-var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedMixinsToLast = F4(
-	function (nestedMixins, rest, f, declarations) {
+var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedStylesToLast = F4(
+	function (nestedStyles, rest, f, declarations) {
 		var withoutParent = function (decls) {
 			return A2(
 				_elm_lang$core$Maybe$withDefault,
@@ -11349,7 +11449,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedMixinsToLast = F4(
 				_elm_lang$core$List$tail(decls));
 		};
 		var nextResult = A2(
-			_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins,
+			_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles,
 			rest,
 			A2(
 				_elm_lang$core$Maybe$withDefault,
@@ -11381,13 +11481,13 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedMixinsToLast = F4(
 			}
 		}();
 		var handleInitial = function (declarationsAndWarnings) {
-			var result = A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyMixins, nestedMixins, declarationsAndWarnings.declarations);
+			var result = A2(_rtfeldman$elm_css$Css_Preprocess_Resolve$applyStyles, nestedStyles, declarationsAndWarnings.declarations);
 			return {
 				warnings: A2(_elm_lang$core$Basics_ops['++'], declarationsAndWarnings.warnings, result.warnings),
 				declarations: result.declarations
 			};
 		};
-		var insertMixinsToNestedDecl = function (lastDecl) {
+		var insertStylesToNestedDecl = function (lastDecl) {
 			return _rtfeldman$elm_css$Css_Preprocess_Resolve$concatDeclarationsAndWarnings(
 				A2(
 					_rtfeldman$elm_css$Css_Structure$mapLast,
@@ -11414,7 +11514,7 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$applyNestedMixinsToLast = F4(
 			},
 			A2(
 				_elm_lang$core$Maybe$map,
-				insertMixinsToNestedDecl,
+				insertStylesToNestedDecl,
 				_rtfeldman$elm_css$Css_Preprocess_Resolve$lastDeclaration(declarations)));
 		return {
 			warnings: A2(_elm_lang$core$Basics_ops['++'], initialResult.warnings, nextResult.warnings),
@@ -11740,6 +11840,14 @@ var _rtfeldman$hex$Hex$fromString = function (str) {
 	}
 };
 
+var _rtfeldman$elm_css$Css$manipulation = {value: 'manipulation', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$pinchZoom = {value: 'pinch-zoom', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panDown = {value: 'pan-down', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panUp = {value: 'pan-up', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panY = {value: 'pan-y', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panRight = {value: 'pan-right', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panLeft = {value: 'pan-left', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panX = {value: 'pan-x', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$asPairs = _rtfeldman$elm_css$Css_Preprocess$toPropertyPairs;
 var _rtfeldman$elm_css$Css$collectSelectors = function (declarations) {
 	collectSelectors:
@@ -11815,7 +11923,7 @@ var _rtfeldman$elm_css$Css$numericalPercentageToString = function (value) {
 				value)));
 };
 var _rtfeldman$elm_css$Css$each = F2(
-	function (snippetCreators, mixins) {
+	function (snippetCreators, styles) {
 		var selectorsToSnippet = function (selectors) {
 			var _p1 = selectors;
 			if (_p1.ctor === '[]') {
@@ -11826,7 +11934,7 @@ var _rtfeldman$elm_css$Css$each = F2(
 					{
 						ctor: '::',
 						_0: _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
-							A3(_rtfeldman$elm_css$Css_Preprocess$StyleBlock, _p1._0, _p1._1, mixins)),
+							A3(_rtfeldman$elm_css$Css_Preprocess$StyleBlock, _p1._0, _p1._1, styles)),
 						_1: {ctor: '[]'}
 					});
 			}
@@ -11962,7 +12070,7 @@ var _rtfeldman$elm_css$Css$propertyWithWarnings = F3(
 var _rtfeldman$elm_css$Css$property = _rtfeldman$elm_css$Css$propertyWithWarnings(
 	{ctor: '[]'});
 var _rtfeldman$elm_css$Css$makeSnippet = F2(
-	function (mixins, sequence) {
+	function (styles, sequence) {
 		var selector = A3(
 			_rtfeldman$elm_css$Css_Structure$Selector,
 			sequence,
@@ -11976,15 +12084,15 @@ var _rtfeldman$elm_css$Css$makeSnippet = F2(
 						_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
 						selector,
 						{ctor: '[]'},
-						mixins)),
+						styles)),
 				_1: {ctor: '[]'}
 			});
 	});
 var _rtfeldman$elm_css$Css$class = F2(
-	function ($class, mixins) {
+	function ($class, styles) {
 		return A2(
 			_rtfeldman$elm_css$Css$makeSnippet,
-			mixins,
+			styles,
 			_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
 				{
 					ctor: '::',
@@ -11994,27 +12102,27 @@ var _rtfeldman$elm_css$Css$class = F2(
 				}));
 	});
 var _rtfeldman$elm_css$Css$selector = F2(
-	function (selectorStr, mixins) {
+	function (selectorStr, styles) {
 		return A2(
 			_rtfeldman$elm_css$Css$makeSnippet,
-			mixins,
+			styles,
 			A2(
 				_rtfeldman$elm_css$Css_Structure$CustomSelector,
 				selectorStr,
 				{ctor: '[]'}));
 	});
-var _rtfeldman$elm_css$Css$everything = function (mixins) {
+var _rtfeldman$elm_css$Css$everything = function (styles) {
 	return A2(
 		_rtfeldman$elm_css$Css$makeSnippet,
-		mixins,
+		styles,
 		_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
 			{ctor: '[]'}));
 };
 var _rtfeldman$elm_css$Css$id = F2(
-	function (identifier, mixins) {
+	function (identifier, styles) {
 		return A2(
 			_rtfeldman$elm_css$Css$makeSnippet,
-			mixins,
+			styles,
 			_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
 				{
 					ctor: '::',
@@ -12023,7 +12131,7 @@ var _rtfeldman$elm_css$Css$id = F2(
 					_1: {ctor: '[]'}
 				}));
 	});
-var _rtfeldman$elm_css$Css$mixin = _rtfeldman$elm_css$Css_Preprocess$ApplyMixins;
+var _rtfeldman$elm_css$Css$batch = _rtfeldman$elm_css$Css_Preprocess$ApplyStyles;
 var _rtfeldman$elm_css$Css$stylesheet = _rtfeldman$elm_css$Css_Preprocess$stylesheet;
 var _rtfeldman$elm_css$Css$animationNames = function (identifiers) {
 	var value = A2(
@@ -12043,6 +12151,43 @@ var _rtfeldman$elm_css$Css$animationName = function (identifier) {
 			_1: {ctor: '[]'}
 		});
 };
+var _rtfeldman$elm_css$Css$preLine = {value: 'pre-line', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$preWrap = {value: 'pre-wrap', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$pre = {value: 'pre', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$grabbing = {value: 'grabbing', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$grab = {value: 'grab', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$zoomOut = {value: 'zoom-out', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$zoomIn = {value: 'zoom-in', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$allScroll = {value: 'all-scroll', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$rowResize = {value: 'row-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$colResize = {value: 'col-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nwseResize = {value: 'nwse-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$neswResize = {value: 'nesw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nsResize = {value: 'ns-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ewResize = {value: 'ew-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wResize = {value: 'w-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$swResize = {value: 'sw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$seResize = {value: 'se-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sResize = {value: 's-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nwResize = {value: 'nw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$neResize = {value: 'ne-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nResize = {value: 'n-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$eResize = {value: 'e-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$notAllowed = {value: 'not-allowed', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noDrop = {value: 'no-drop', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$move = {value: 'move', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$copy = {value: 'copy', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cursorAlias = {value: 'alias', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$verticalText = {value: 'vertical-text', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$text = {value: 'text', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cell = {value: 'cell', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wait = {value: 'wait', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$progress = {value: 'progress', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$pointer = {value: 'pointer', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$help = {value: 'help', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contextMenu = {value: 'context-menu', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$crosshair = {value: 'crosshair', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$default = {value: 'default', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$fontWeight = function (_p3) {
 	var _p4 = _p3;
 	var _p5 = _p4.value;
@@ -12103,84 +12248,6 @@ var _rtfeldman$elm_css$Css$fontFace = function (value) {
 var _rtfeldman$elm_css$Css$src = function (value) {
 	return _elm_lang$core$Basics$toString(value.value);
 };
-var _rtfeldman$elm_css$Css$withMedia = _rtfeldman$elm_css$Css_Preprocess$WithMedia;
-var _rtfeldman$elm_css$Css$media = F2(
-	function (mediaQueries, snippets) {
-		var nestedMediaRules = function (declarations) {
-			nestedMediaRules:
-			while (true) {
-				var _p8 = declarations;
-				if (_p8.ctor === '[]') {
-					return {ctor: '[]'};
-				} else {
-					switch (_p8._0.ctor) {
-						case 'StyleBlockDeclaration':
-							var _v7 = _p8._1;
-							declarations = _v7;
-							continue nestedMediaRules;
-						case 'MediaRule':
-							return {
-								ctor: '::',
-								_0: A2(
-									_rtfeldman$elm_css$Css_Preprocess$MediaRule,
-									A2(_elm_lang$core$Basics_ops['++'], mediaQueries, _p8._0._0),
-									_p8._0._1),
-								_1: nestedMediaRules(_p8._1)
-							};
-						default:
-							return {
-								ctor: '::',
-								_0: _p8._0,
-								_1: nestedMediaRules(_p8._1)
-							};
-					}
-				}
-			}
-		};
-		var extractStyleBlocks = function (declarations) {
-			extractStyleBlocks:
-			while (true) {
-				var _p9 = declarations;
-				if (_p9.ctor === '[]') {
-					return {ctor: '[]'};
-				} else {
-					if (_p9._0.ctor === 'StyleBlockDeclaration') {
-						return {
-							ctor: '::',
-							_0: _p9._0._0,
-							_1: extractStyleBlocks(_p9._1)
-						};
-					} else {
-						var _v9 = _p9._1;
-						declarations = _v9;
-						continue extractStyleBlocks;
-					}
-				}
-			}
-		};
-		var snippetDeclarations = A2(_elm_lang$core$List$concatMap, _rtfeldman$elm_css$Css_Preprocess$unwrapSnippet, snippets);
-		var mediaRuleFromStyleBlocks = A2(
-			_rtfeldman$elm_css$Css_Preprocess$MediaRule,
-			mediaQueries,
-			extractStyleBlocks(snippetDeclarations));
-		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
-			{
-				ctor: '::',
-				_0: mediaRuleFromStyleBlocks,
-				_1: nestedMediaRules(snippetDeclarations)
-			});
-	});
-var _rtfeldman$elm_css$Css$mediaQuery = F2(
-	function (queryString, snippets) {
-		return A2(
-			_rtfeldman$elm_css$Css$media,
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css_Structure$MediaQuery(queryString),
-				_1: {ctor: '[]'}
-			},
-			snippets);
-	});
 var _rtfeldman$elm_css$Css$color = function (c) {
 	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'color', c.value);
 };
@@ -12289,8 +12356,122 @@ var _rtfeldman$elm_css$Css$borderBottomColor = function (c) {
 var _rtfeldman$elm_css$Css$borderBlockStartColor = function (c) {
 	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-block-start-color', c.value);
 };
+var _rtfeldman$elm_css$Css$featureTag2 = F2(
+	function (tag, value) {
+		var potentialWarnings = {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: !_elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$String$length(tag),
+					4),
+				_1: A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Feature tags must be exactly 4 characters long. ',
+					A2(_elm_lang$core$Basics_ops['++'], tag, ' is invalid.'))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.cmp(value, 0) < 0,
+					_1: A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Feature values cannot be negative. ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(value),
+							' is invalid.'))
+				},
+				_1: {ctor: '[]'}
+			}
+		};
+		var warnings = A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$second,
+			A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$first, potentialWarnings));
+		return {
+			value: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(tag),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					' ',
+					_elm_lang$core$Basics$toString(value))),
+			featureTagValue: _rtfeldman$elm_css$Css_Structure$Compatible,
+			warnings: warnings
+		};
+	});
+var _rtfeldman$elm_css$Css$featureTag = function (tag) {
+	return A2(_rtfeldman$elm_css$Css$featureTag2, tag, 1);
+};
 var _rtfeldman$elm_css$Css$featureOff = 0;
 var _rtfeldman$elm_css$Css$featureOn = 1;
+var _rtfeldman$elm_css$Css$slashedZero = {value: 'slashed-zero', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ordinal = {value: 'ordinal', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$stackedFractions = {value: 'stacked-fractions', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$diagonalFractions = {value: 'diagonal-fractions', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tabularNums = {value: 'tabular-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$proportionalNums = {value: 'proportional-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$oldstyleNums = {value: 'oldstyle-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$liningNums = {value: 'lining-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noContextual = {value: 'no-contextual', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contextual = {value: 'context', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noHistoricalLigatures = {value: 'no-historical-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$historicalLigatures = {value: 'historical-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noDiscretionaryLigatures = {value: 'no-discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$discretionaryLigatures = {value: 'discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noCommonLigatures = {value: 'no-common-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$commonLigatures = {value: 'common-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$titlingCaps = {value: 'titling-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$unicase = {value: 'unicase', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$allPetiteCaps = {value: 'all-petite-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$petiteCaps = {value: 'petite-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$allSmallCaps = {value: 'all-small-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$smallCaps = {value: 'small-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$bolder = {value: 'bolder', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lighter = {value: 'lighter', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$bold = {value: 'bold', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$oblique = {value: 'oblique', fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$italic = {value: 'italic', fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$normal = {
+	value: 'normal',
+	warnings: {ctor: '[]'},
+	fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
+	featureTagValue: _rtfeldman$elm_css$Css_Structure$Compatible,
+	overflowWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
+	whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible
+};
+var _rtfeldman$elm_css$Css$larger = {value: 'larger', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$smaller = {value: 'smaller', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xxLarge = {value: 'xx-large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xLarge = {value: 'x-large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$large = {value: 'large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$medium = {value: 'medium', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$small = {value: 'small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xSmall = {value: 'x-small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xxSmall = {value: 'xx-small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fantasy = {value: 'fantasy', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cursive = {value: 'cursive', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$monospace = {value: 'monospace', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sansSerif = {value: 'sans-serif', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$serif = {value: 'serif', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$absolute = {value: 'absolute', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$relative = {value: 'relative', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sticky = {value: 'sticky', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fixed = {value: 'fixed', position: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$static = {value: 'static', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fillAvailable = {value: 'fill-available', minMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fitContent = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$fillAvailable,
+	{value: 'fit-content'});
+var _rtfeldman$elm_css$Css$minContent = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$fillAvailable,
+	{value: 'min-content'});
+var _rtfeldman$elm_css$Css$maxContent = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$fillAvailable,
+	{value: 'max-content'});
 var _rtfeldman$elm_css$Css$displayFlex = A2(_rtfeldman$elm_css$Css$property, 'display', 'flex');
 var _rtfeldman$elm_css$Css$textEmphasisColor = function (c) {
 	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'text-emphasis-color', c.value);
@@ -12396,6 +12577,7 @@ var _rtfeldman$elm_css$Css$padding4 = _rtfeldman$elm_css$Css$prop4('padding');
 var _rtfeldman$elm_css$Css$margin4 = _rtfeldman$elm_css$Css$prop4('margin');
 var _rtfeldman$elm_css$Css$borderImageOutset4 = _rtfeldman$elm_css$Css$prop4('border-image-outset');
 var _rtfeldman$elm_css$Css$borderImageWidth4 = _rtfeldman$elm_css$Css$prop4('border-image-width');
+var _rtfeldman$elm_css$Css$borderWidth4 = _rtfeldman$elm_css$Css$prop4('border-width');
 var _rtfeldman$elm_css$Css$borderRadius4 = _rtfeldman$elm_css$Css$prop4('border-radius');
 var _rtfeldman$elm_css$Css$prop3 = F4(
 	function (key, argA, argB, argC) {
@@ -12435,16 +12617,17 @@ var _rtfeldman$elm_css$Css$borderInlineStart3 = _rtfeldman$elm_css$Css$prop3('bo
 var _rtfeldman$elm_css$Css$borderInlineEnd3 = _rtfeldman$elm_css$Css$prop3('border-block-end');
 var _rtfeldman$elm_css$Css$borderImageOutset3 = _rtfeldman$elm_css$Css$prop3('border-image-outset');
 var _rtfeldman$elm_css$Css$borderImageWidth3 = _rtfeldman$elm_css$Css$prop3('border-image-width');
+var _rtfeldman$elm_css$Css$borderWidth3 = _rtfeldman$elm_css$Css$prop3('border-width');
 var _rtfeldman$elm_css$Css$borderRadius3 = _rtfeldman$elm_css$Css$prop3('border-radius');
 var _rtfeldman$elm_css$Css$outline3 = _rtfeldman$elm_css$Css$prop3('outline');
 var _rtfeldman$elm_css$Css$fontVariant3 = _rtfeldman$elm_css$Css$prop3('font-variant');
 var _rtfeldman$elm_css$Css$fontVariantNumeric3 = _rtfeldman$elm_css$Css$prop3('font-variant-numeric');
 var _rtfeldman$elm_css$Css$textDecoration3 = _rtfeldman$elm_css$Css$prop3('text-decoration');
-var _rtfeldman$elm_css$Css$textDecorations3 = function (_p10) {
+var _rtfeldman$elm_css$Css$textDecorations3 = function (_p8) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop3,
 		'text-decoration',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p10));
+		_rtfeldman$elm_css$Css$valuesOrNone(_p8));
 };
 var _rtfeldman$elm_css$Css$prop2 = F3(
 	function (key, argA, argB) {
@@ -12480,6 +12663,7 @@ var _rtfeldman$elm_css$Css$borderInlineStart2 = _rtfeldman$elm_css$Css$prop2('bo
 var _rtfeldman$elm_css$Css$borderInlineEnd2 = _rtfeldman$elm_css$Css$prop2('border-block-end');
 var _rtfeldman$elm_css$Css$borderImageOutset2 = _rtfeldman$elm_css$Css$prop2('border-image-outset');
 var _rtfeldman$elm_css$Css$borderImageWidth2 = _rtfeldman$elm_css$Css$prop2('border-image-width');
+var _rtfeldman$elm_css$Css$borderWidth2 = _rtfeldman$elm_css$Css$prop2('border-width');
 var _rtfeldman$elm_css$Css$borderTopWidth2 = _rtfeldman$elm_css$Css$prop2('border-top-width');
 var _rtfeldman$elm_css$Css$borderBottomLeftRadius2 = _rtfeldman$elm_css$Css$prop2('border-bottom-left-radius');
 var _rtfeldman$elm_css$Css$borderBottomRightRadius2 = _rtfeldman$elm_css$Css$prop2('border-bottom-right-radius');
@@ -12493,11 +12677,11 @@ var _rtfeldman$elm_css$Css$backgroundSize2 = _rtfeldman$elm_css$Css$prop2('backg
 var _rtfeldman$elm_css$Css$fontVariant2 = _rtfeldman$elm_css$Css$prop2('font-variant');
 var _rtfeldman$elm_css$Css$fontVariantNumeric2 = _rtfeldman$elm_css$Css$prop2('font-variant-numeric');
 var _rtfeldman$elm_css$Css$textDecoration2 = _rtfeldman$elm_css$Css$prop2('text-decoration');
-var _rtfeldman$elm_css$Css$textDecorations2 = function (_p11) {
+var _rtfeldman$elm_css$Css$textDecorations2 = function (_p9) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop2,
 		'text-decoration',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p11));
+		_rtfeldman$elm_css$Css$valuesOrNone(_p9));
 };
 var _rtfeldman$elm_css$Css$prop1 = F2(
 	function (key, arg) {
@@ -12561,6 +12745,7 @@ var _rtfeldman$elm_css$Css$borderRightStyle = _rtfeldman$elm_css$Css$prop1('bord
 var _rtfeldman$elm_css$Css$borderTopStyle = _rtfeldman$elm_css$Css$prop1('border-top-style');
 var _rtfeldman$elm_css$Css$borderStyle = _rtfeldman$elm_css$Css$prop1('border-style');
 var _rtfeldman$elm_css$Css$borderCollapse = _rtfeldman$elm_css$Css$prop1('border-collapse');
+var _rtfeldman$elm_css$Css$borderWidth = _rtfeldman$elm_css$Css$prop1('border-width');
 var _rtfeldman$elm_css$Css$borderBottomWidth = _rtfeldman$elm_css$Css$prop1('border-bottom-width');
 var _rtfeldman$elm_css$Css$borderInlineEndWidth = _rtfeldman$elm_css$Css$prop1('border-inline-end-width');
 var _rtfeldman$elm_css$Css$borderLeftWidth = _rtfeldman$elm_css$Css$prop1('border-left-width');
@@ -12592,11 +12777,11 @@ var _rtfeldman$elm_css$Css$backgroundSize = _rtfeldman$elm_css$Css$prop1('backgr
 var _rtfeldman$elm_css$Css$lineHeight = _rtfeldman$elm_css$Css$prop1('line-height');
 var _rtfeldman$elm_css$Css$letterSpacing = _rtfeldman$elm_css$Css$prop1('letter-spacing');
 var _rtfeldman$elm_css$Css$fontFamily = _rtfeldman$elm_css$Css$prop1('font-family');
-var _rtfeldman$elm_css$Css$fontFamilies = function (_p12) {
+var _rtfeldman$elm_css$Css$fontFamilies = function (_p10) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop1,
 		'font-family',
-		_rtfeldman$elm_css$Css$stringsToValue(_p12));
+		_rtfeldman$elm_css$Css$stringsToValue(_p10));
 };
 var _rtfeldman$elm_css$Css$fontSize = _rtfeldman$elm_css$Css$prop1('font-size');
 var _rtfeldman$elm_css$Css$fontStyle = _rtfeldman$elm_css$Css$prop1('font-style');
@@ -12604,29 +12789,30 @@ var _rtfeldman$elm_css$Css$fontVariant = _rtfeldman$elm_css$Css$prop1('font-vari
 var _rtfeldman$elm_css$Css$fontVariantLigatures = _rtfeldman$elm_css$Css$prop1('font-variant-ligatures');
 var _rtfeldman$elm_css$Css$fontVariantCaps = _rtfeldman$elm_css$Css$prop1('font-variant-caps');
 var _rtfeldman$elm_css$Css$fontVariantNumeric = _rtfeldman$elm_css$Css$prop1('font-variant-numeric');
-var _rtfeldman$elm_css$Css$fontVariantNumerics = function (_p13) {
+var _rtfeldman$elm_css$Css$fontVariantNumerics = function (_p11) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop1,
 		'font-variant-numeric',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p13));
+		_rtfeldman$elm_css$Css$valuesOrNone(_p11));
 };
 var _rtfeldman$elm_css$Css$cursor = _rtfeldman$elm_css$Css$prop1('cursor');
 var _rtfeldman$elm_css$Css$textDecoration = _rtfeldman$elm_css$Css$prop1('text-decoration');
-var _rtfeldman$elm_css$Css$textDecorations = function (_p14) {
+var _rtfeldman$elm_css$Css$textDecorations = function (_p12) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop1,
 		'text-decoration',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p14));
+		_rtfeldman$elm_css$Css$valuesOrNone(_p12));
 };
 var _rtfeldman$elm_css$Css$textDecorationLine = _rtfeldman$elm_css$Css$prop1('text-decoration-line');
-var _rtfeldman$elm_css$Css$textDecorationLines = function (_p15) {
+var _rtfeldman$elm_css$Css$textDecorationLines = function (_p13) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop1,
 		'text-decoration-line',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p15));
+		_rtfeldman$elm_css$Css$valuesOrNone(_p13));
 };
 var _rtfeldman$elm_css$Css$textDecorationStyle = _rtfeldman$elm_css$Css$prop1('text-decoration-style');
 var _rtfeldman$elm_css$Css$zIndex = _rtfeldman$elm_css$Css$prop1('z-index');
+var _rtfeldman$elm_css$Css$touchAction = _rtfeldman$elm_css$Css$prop1('touch-action');
 var _rtfeldman$elm_css$Css$position = _rtfeldman$elm_css$Css$prop1('position');
 var _rtfeldman$elm_css$Css$textBottom = _rtfeldman$elm_css$Css$prop1('text-bottom');
 var _rtfeldman$elm_css$Css$textTop = _rtfeldman$elm_css$Css$prop1('text-top');
@@ -12634,11 +12820,95 @@ var _rtfeldman$elm_css$Css$super = _rtfeldman$elm_css$Css$prop1('super');
 var _rtfeldman$elm_css$Css$sub = _rtfeldman$elm_css$Css$prop1('sub');
 var _rtfeldman$elm_css$Css$baseline = _rtfeldman$elm_css$Css$prop1('baseline');
 var _rtfeldman$elm_css$Css$middle = _rtfeldman$elm_css$Css$prop1('middle');
+var _rtfeldman$elm_css$Css$noWrap = {value: 'nowrap', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible, flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$auto = {value: 'auto', cursor: _rtfeldman$elm_css$Css_Structure$Compatible, flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, overflow: _rtfeldman$elm_css$Css_Structure$Compatible, textRendering: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, alignItemsOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible, justifyContentOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$none = {value: 'none', cursor: _rtfeldman$elm_css$Css_Structure$Compatible, none: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible, display: _rtfeldman$elm_css$Css_Structure$Compatible, outline: _rtfeldman$elm_css$Css_Structure$Compatible, resize: _rtfeldman$elm_css$Css_Structure$Compatible, transform: _rtfeldman$elm_css$Css_Structure$Compatible, borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible, textTransform: _rtfeldman$elm_css$Css_Structure$Compatible, touchAction: _rtfeldman$elm_css$Css_Structure$Compatible, updateFrequency: _rtfeldman$elm_css$Css_Structure$Compatible, blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, inlineAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, pointerDevice: _rtfeldman$elm_css$Css_Structure$Compatible, hoverCapability: _rtfeldman$elm_css$Css_Structure$Compatible, scriptingSupport: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineListItem = {value: 'inline-list-item', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$listItem = {value: 'list-item', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableFooterGroup = {value: 'table-footer-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableHeaderGroup = {value: 'table-header-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableColumnGroup = {value: 'table-column-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableRowGroup = {value: 'table-row-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableCaption = {value: 'table-caption', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableColumn = {value: 'table-column', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableCell = {value: 'table-cell', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableRow = {value: 'table-row', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineTable = {value: 'inline-table', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$table = {value: 'table', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inline = {value: 'inline', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineFlex = {value: 'inline-flex', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineBlock = {value: 'inline-block', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$block = {value: 'block', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toTopLeft = {value: 'top left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toLeft = {value: 'left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toBottomLeft = {value: 'bottom left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toBottom = {value: 'bottom', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toBottomRight = {value: 'bottom right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toRight = {value: 'right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toTopRight = {value: 'top right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toTop = {value: 'top', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$stop2 = F2(
+	function (c, len) {
+		return {
+			ctor: '_Tuple2',
+			_0: c,
+			_1: _elm_lang$core$Maybe$Just(len)
+		};
+	});
+var _rtfeldman$elm_css$Css$stop = function (c) {
+	return {ctor: '_Tuple2', _0: c, _1: _elm_lang$core$Maybe$Nothing};
+};
+var _rtfeldman$elm_css$Css$collectStops = _elm_lang$core$List$map(
+	function (_p14) {
+		var _p15 = _p14;
+		return A2(
+			_elm_lang$core$String$append,
+			_p15._0.value,
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				'',
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (_p16) {
+						return A2(
+							_elm_lang$core$String$cons,
+							_elm_lang$core$Native_Utils.chr(' '),
+							function (_) {
+								return _.value;
+							}(_p16));
+					},
+					_p15._1)));
+	});
+var _rtfeldman$elm_css$Css$local = {value: 'local', backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noRepeat = {value: 'no-repeat', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$round = {value: 'round', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$space = {value: 'space', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$repeat = {value: 'repeat', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$repeatY = {value: 'repeat-y', backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$repeatX = {value: 'repeat-x', backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lineThrough = {value: 'line-through', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$overline = {value: 'overline', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$underline = {value: 'underline', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$row = {value: 'row', flexDirection: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$rowReverse = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$row,
+	{value: 'row-reverse'});
+var _rtfeldman$elm_css$Css$column = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$row,
+	{value: 'column'});
+var _rtfeldman$elm_css$Css$columnReverse = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$row,
+	{value: 'column-reverse'});
 var _rtfeldman$elm_css$Css$stretch = _rtfeldman$elm_css$Css$prop1('stretch');
 var _rtfeldman$elm_css$Css$spaceBetween = _rtfeldman$elm_css$Css$prop1('space-between');
 var _rtfeldman$elm_css$Css$spaceAround = _rtfeldman$elm_css$Css$prop1('space-around');
 var _rtfeldman$elm_css$Css$flexEnd = _rtfeldman$elm_css$Css$prop1('flex-end');
 var _rtfeldman$elm_css$Css$flexStart = _rtfeldman$elm_css$Css$prop1('flex-start');
+var _rtfeldman$elm_css$Css$wrap = {value: 'wrap', flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wrapReverse = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$wrap,
+	{value: 'wrap-reverse'});
+var _rtfeldman$elm_css$Css$content = {value: 'content', flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$order = _rtfeldman$elm_css$Css$prop1('order');
 var _rtfeldman$elm_css$Css$flexFlow2 = _rtfeldman$elm_css$Css$prop2('flex-flow');
 var _rtfeldman$elm_css$Css$flexFlow1 = _rtfeldman$elm_css$Css$prop1('flex-flow');
@@ -12653,16 +12923,54 @@ var _rtfeldman$elm_css$Css$flex = _rtfeldman$elm_css$Css$prop1('flex');
 var _rtfeldman$elm_css$Css$listStyle3 = _rtfeldman$elm_css$Css$prop3('list-style');
 var _rtfeldman$elm_css$Css$listStyle2 = _rtfeldman$elm_css$Css$prop2('list-style');
 var _rtfeldman$elm_css$Css$listStyle = _rtfeldman$elm_css$Css$prop1('list-style');
+var _rtfeldman$elm_css$Css$thai = {value: 'thai', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$telugu = {value: 'telugu', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$oriya = {value: 'oriya', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$myanmar = {value: 'myanmar', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$malayalam = {value: 'malayalam', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lao = {value: 'lao', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$khmer = {value: 'khmer', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$kannada = {value: 'kannada', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$gurmukhi = {value: 'gurmukhi', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$gujarati = {value: 'gujarati', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$georgian = {value: 'georgian', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$devanagari = {value: 'devanagari', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cjkHeavenlyStem = {value: 'cjk-heavenly-stem', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cjkEarthlyBranch = {value: 'cjk-earthly-branch', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$bengali = {value: 'bengali', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$armenian = {value: 'armenian', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$arabicIndic = {value: 'arabic-indic', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperLatin = {value: 'upper-latin', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerLatin = {value: 'lower-latin', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperAlpha = {value: 'upper-alpha', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerAlpha = {value: 'lower-alpha', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperGreek = {value: 'upper-greek', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerGreek = {value: 'lower-greek', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperRoman = {value: 'upper-roman', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerRoman = {value: 'lower-roman', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$decimalLeadingZero = {value: 'decimal-leading-zero', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$decimal = {value: 'decimal', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$square = {value: 'square', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$circle = {value: 'circle', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$disc = {value: 'disc', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$listStyleType = _rtfeldman$elm_css$Css$prop1('list-style-type');
+var _rtfeldman$elm_css$Css$outside = {value: 'outside', listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inside = {value: 'inside', listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$listStylePosition = _rtfeldman$elm_css$Css$prop1('list-style-position');
 var _rtfeldman$elm_css$Css$transformStyle = _rtfeldman$elm_css$Css$prop1('transform-style');
+var _rtfeldman$elm_css$Css$flat = {value: 'flat', transformStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$preserve3d = {value: 'preserve-3d', transformStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$boxSizing = _rtfeldman$elm_css$Css$prop1('box-sizing');
 var _rtfeldman$elm_css$Css$transformBox = _rtfeldman$elm_css$Css$prop1('transform-box');
-var _rtfeldman$elm_css$Css$transforms = function (_p16) {
+var _rtfeldman$elm_css$Css$viewBox = {value: 'view-box', transformBox: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$borderBox = {value: 'border-box', boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contentBox = {value: 'content-box', boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fillBox = {value: 'fill-box', transformBox: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$transforms = function (_p17) {
 	return A2(
 		_rtfeldman$elm_css$Css$prop1,
 		'transform',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p16));
+		_rtfeldman$elm_css$Css$valuesOrNone(_p17));
 };
 var _rtfeldman$elm_css$Css$transform = function (only) {
 	return _rtfeldman$elm_css$Css$transforms(
@@ -12672,515 +12980,98 @@ var _rtfeldman$elm_css$Css$transform = function (only) {
 			_1: {ctor: '[]'}
 		});
 };
+var _rtfeldman$elm_css$Css$angleConverter = F2(
+	function (suffix, num) {
+		return {
+			value: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rtfeldman$elm_css$Css$numberToString(num),
+				suffix),
+			angle: _rtfeldman$elm_css$Css_Structure$Compatible,
+			angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$deg = _rtfeldman$elm_css$Css$angleConverter('deg');
+var _rtfeldman$elm_css$Css$grad = _rtfeldman$elm_css$Css$angleConverter('grad');
+var _rtfeldman$elm_css$Css$rad = _rtfeldman$elm_css$Css$angleConverter('rad');
+var _rtfeldman$elm_css$Css$turn = _rtfeldman$elm_css$Css$angleConverter('turn');
+var _rtfeldman$elm_css$Css$lengthConverter = F3(
+	function (units, unitLabel, numericValue) {
+		return {
+			value: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rtfeldman$elm_css$Css$numberToString(numericValue),
+				unitLabel),
+			numericValue: numericValue,
+			units: units,
+			unitLabel: unitLabel,
+			length: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+			textIndent: _rtfeldman$elm_css$Css_Structure$Compatible,
+			flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+			fontSize: _rtfeldman$elm_css$Css_Structure$Compatible,
+			absoluteLength: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible,
+			calc: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
 var _rtfeldman$elm_css$Css$true = _rtfeldman$elm_css$Css$prop1('true');
 var _rtfeldman$elm_css$Css$matchParent = _rtfeldman$elm_css$Css$prop1('match-parent');
 var _rtfeldman$elm_css$Css$end = _rtfeldman$elm_css$Css$prop1('end');
 var _rtfeldman$elm_css$Css$start = _rtfeldman$elm_css$Css$prop1('start');
 var _rtfeldman$elm_css$Css$justifyAll = _rtfeldman$elm_css$Css$prop1('justify-all');
-var _rtfeldman$elm_css$Css$textJustify = _rtfeldman$elm_css$Css$prop1('text-justify');
+var _rtfeldman$elm_css$Css$justify = _rtfeldman$elm_css$Css$prop1('justify');
 var _rtfeldman$elm_css$Css$center = _rtfeldman$elm_css$Css$prop1('center');
+var _rtfeldman$elm_css$Css$collapse = {value: 'collapse', borderCollapse: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$separate = {value: 'separate', borderCollapse: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$outset = {value: 'outset', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inset = {value: 'inset', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ridge = {value: 'ridge', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$groove = {value: 'groove', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$double = {value: 'double', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$solid = {value: 'solid', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$dashed = {value: 'dashed', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$dotted = {value: 'dotted', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wavy = {value: 'wavy', textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$clip = {value: 'clip', textOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ellipsis = {value: 'ellipsis', textOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fullWidth = {value: 'full-width', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowercase = {value: 'lowercase', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$uppercase = {value: 'uppercase', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$capitalize = {value: 'capitalize', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sideways = {value: 'sideways', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upright = {value: 'upright', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$mixed = {value: 'mixed', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$eachLine = {value: 'each-line', textIndent: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$hanging = {value: 'hanging', textIndent: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$geometricPrecision = {value: 'geometricPrecision', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$optimizeLegibility = {value: 'optimizeLegibility', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$optimizeSpeed = {value: 'optimizeSpeed', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$hslaToRgba = F6(
+	function (value, warnings, hue, saturation, lightness, hslAlpha) {
+		var _p18 = _elm_lang$core$Color$toRgb(
+			A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, hslAlpha));
+		var red = _p18.red;
+		var green = _p18.green;
+		var blue = _p18.blue;
+		var alpha = _p18.alpha;
+		return {value: value, color: _rtfeldman$elm_css$Css_Structure$Compatible, red: red, green: green, blue: blue, alpha: alpha, warnings: warnings};
+	});
 var _rtfeldman$elm_css$Css$withPrecedingHash = function (str) {
 	return A2(_elm_lang$core$String$startsWith, '#', str) ? str : A2(
 		_elm_lang$core$String$cons,
 		_elm_lang$core$Native_Utils.chr('#'),
 		str);
 };
-var _rtfeldman$elm_css$Css$luminosity = _rtfeldman$elm_css$Css$prop1('luminosity');
-var _rtfeldman$elm_css$Css$saturation = _rtfeldman$elm_css$Css$prop1('saturation');
-var _rtfeldman$elm_css$Css$hue = _rtfeldman$elm_css$Css$prop1('hue');
-var _rtfeldman$elm_css$Css$exclusion = _rtfeldman$elm_css$Css$prop1('exclusion');
-var _rtfeldman$elm_css$Css$difference = _rtfeldman$elm_css$Css$prop1('difference');
-var _rtfeldman$elm_css$Css$softLight = _rtfeldman$elm_css$Css$prop1('soft-light');
-var _rtfeldman$elm_css$Css$hardLight = _rtfeldman$elm_css$Css$prop1('hard-light');
-var _rtfeldman$elm_css$Css$colorBurn = _rtfeldman$elm_css$Css$prop1('color-burn');
-var _rtfeldman$elm_css$Css$colorDodge = _rtfeldman$elm_css$Css$prop1('color-dodge');
-var _rtfeldman$elm_css$Css$lighten = _rtfeldman$elm_css$Css$prop1('lighten');
-var _rtfeldman$elm_css$Css$darken = _rtfeldman$elm_css$Css$prop1('darken');
-var _rtfeldman$elm_css$Css$overlay = _rtfeldman$elm_css$Css$prop1('overlay');
-var _rtfeldman$elm_css$Css$screenBlendMode = _rtfeldman$elm_css$Css$prop1('screen');
-var _rtfeldman$elm_css$Css$multiply = _rtfeldman$elm_css$Css$prop1('multiply');
-var _rtfeldman$elm_css$Css$important = _rtfeldman$elm_css$Css_Preprocess$mapLastProperty(
-	function (property) {
-		return _elm_lang$core$Native_Utils.update(
-			property,
-			{important: true});
-	});
-var _rtfeldman$elm_css$Css$all = _rtfeldman$elm_css$Css$prop1('all');
-var _rtfeldman$elm_css$Css$combineLengths = F3(
-	function (operation, first, second) {
-		var numericValue = A2(operation, first.numericValue, second.numericValue);
-		var value = A2(
-			_elm_lang$core$String$join,
-			'',
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p17) {
-					return !_elm_lang$core$String$isEmpty(_p17);
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$core$Basics$toString(numericValue),
-					_1: {
-						ctor: '::',
-						_0: first.unitLabel,
-						_1: {ctor: '[]'}
-					}
-				}));
-		return _elm_lang$core$Native_Utils.update(
-			first,
-			{value: value, numericValue: numericValue});
-	});
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|*|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x * y;
-		}));
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|/|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x / y;
-		}));
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|-|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x - y;
-		}));
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|+|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x + y;
-		}));
-var _rtfeldman$elm_css$Css$getOverloadedProperty = F3(
-	function (functionName, desiredKey, mixin) {
-		getOverloadedProperty:
-		while (true) {
-			var _p18 = mixin;
-			switch (_p18.ctor) {
-				case 'AppendProperty':
-					return A2(_rtfeldman$elm_css$Css$property, desiredKey, _p18._0.key);
-				case 'ExtendSelector':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable mixin for selector ',
-										_elm_lang$core$Basics$toString(_p18._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				case 'NestSnippet':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable mixin for combinator ',
-										_elm_lang$core$Basics$toString(_p18._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				case 'WithPseudoElement':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable mixin for pseudo-element setter ',
-										_elm_lang$core$Basics$toString(_p18._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				case 'WithMedia':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable mixin for media query ',
-										_elm_lang$core$Basics$toString(_p18._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				default:
-					if (_p18._0.ctor === '[]') {
-						return A3(
-							_rtfeldman$elm_css$Css$propertyWithWarnings,
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$core$Basics_ops['++'],
-									'Cannot apply ',
-									A2(_elm_lang$core$Basics_ops['++'], functionName, ' with empty mixin. ')),
-								_1: {ctor: '[]'}
-							},
-							desiredKey,
-							'');
-					} else {
-						if (_p18._0._1.ctor === '[]') {
-							var _v11 = functionName,
-								_v12 = desiredKey,
-								_v13 = _p18._0._0;
-							functionName = _v11;
-							desiredKey = _v12;
-							mixin = _v13;
-							continue getOverloadedProperty;
-						} else {
-							var _v14 = functionName,
-								_v15 = desiredKey,
-								_v16 = _rtfeldman$elm_css$Css_Preprocess$ApplyMixins(_p18._0._1);
-							functionName = _v14;
-							desiredKey = _v15;
-							mixin = _v16;
-							continue getOverloadedProperty;
-						}
-					}
-			}
-		}
-	});
-var _rtfeldman$elm_css$Css$cssFunction = F2(
-	function (funcName, args) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			funcName,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'(',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(_elm_lang$core$String$join, ', ', args),
-					')')));
-	});
-var _rtfeldman$elm_css$Css$tv = _rtfeldman$elm_css$Css_Structure$MediaQuery('tv');
-var _rtfeldman$elm_css$Css$projection = _rtfeldman$elm_css$Css_Structure$MediaQuery('projection');
-var _rtfeldman$elm_css$Css$print = _rtfeldman$elm_css$Css_Structure$MediaQuery('print');
-var _rtfeldman$elm_css$Css$screen = _rtfeldman$elm_css$Css_Structure$MediaQuery('screen');
-var _rtfeldman$elm_css$Css$ExplicitLength = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return function (n) {
-														return function (o) {
-															return {value: a, numericValue: b, units: c, unitLabel: d, length: e, lengthOrAuto: f, lengthOrNumber: g, lengthOrNone: h, lengthOrMinMaxDimension: i, lengthOrNoneOrMinMaxDimension: j, textIndent: k, flexBasis: l, lengthOrNumberOrAutoOrNoneOrContent: m, fontSize: n, lengthOrAutoOrCoverOrContain: o};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _rtfeldman$elm_css$Css$NonMixable = {};
-var _rtfeldman$elm_css$Css$BasicProperty = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return function (n) {
-														return function (o) {
-															return function (p) {
-																return function (q) {
-																	return function (r) {
-																		return function (s) {
-																			return function (t) {
-																				return function (u) {
-																					return function (v) {
-																						return function (w) {
-																							return function (x) {
-																								return function (y) {
-																									return function (z) {
-																										return function (_1) {
-																											return function (_2) {
-																												return function (_3) {
-																													return function (_4) {
-																														return function (_5) {
-																															return function (_6) {
-																																return function (_7) {
-																																	return function (_8) {
-																																		return function (_9) {
-																																			return function (_10) {
-																																				return function (_11) {
-																																					return function (_12) {
-																																						return function (_13) {
-																																							return function (_14) {
-																																								return function (_15) {
-																																									return function (_16) {
-																																										return function (_17) {
-																																											return function (_18) {
-																																												return function (_19) {
-																																													return function (_20) {
-																																														return function (_21) {
-																																															return function (_22) {
-																																																return {value: a, all: b, alignItems: c, borderStyle: d, boxSizing: e, color: f, cursor: g, display: h, flexBasis: i, flexWrap: j, flexDirection: k, flexDirectionOrWrap: l, justifyContent: m, none: n, number: o, outline: p, overflow: q, textDecorationLine: r, textRendering: s, textIndent: t, textDecorationStyle: u, length: v, lengthOrAuto: w, lengthOrNone: x, lengthOrNumber: y, lengthOrMinMaxDimension: z, lengthOrNoneOrMinMaxDimension: _1, lengthOrNumberOrAutoOrNoneOrContent: _2, listStyleType: _3, listStylePosition: _4, listStyleTypeOrPositionOrImage: _5, fontFamily: _6, fontSize: _7, fontStyle: _8, fontWeight: _9, fontVariant: _10, units: _11, numericValue: _12, unitLabel: _13, warnings: _14, backgroundRepeat: _15, backgroundRepeatShorthand: _16, backgroundAttachment: _17, backgroundBlendMode: _18, backgroundOrigin: _19, backgroundImage: _20, lengthOrAutoOrCoverOrContain: _21, intOrAuto: _22};
-																																															};
-																																														};
-																																													};
-																																												};
-																																											};
-																																										};
-																																									};
-																																								};
-																																							};
-																																						};
-																																					};
-																																				};
-																																			};
-																																		};
-																																	};
-																																};
-																															};
-																														};
-																													};
-																												};
-																											};
-																										};
-																									};
-																								};
-																							};
-																						};
-																					};
-																				};
-																			};
-																		};
-																	};
-																};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _rtfeldman$elm_css$Css$Compatible = {ctor: 'Compatible'};
-var _rtfeldman$elm_css$Css$transparent = {
-	value: 'transparent',
-	color: _rtfeldman$elm_css$Css$Compatible,
-	warnings: {ctor: '[]'}
-};
-var _rtfeldman$elm_css$Css$colorValueForOverloadedProperty = _rtfeldman$elm_css$Css$transparent;
-var _rtfeldman$elm_css$Css$backgroundBlendMode = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'backgroundBlendMode',
-		'background-blend-mode',
-		fn(_rtfeldman$elm_css$Css$colorValueForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$currentColor = {
-	value: 'currentColor',
-	color: _rtfeldman$elm_css$Css$Compatible,
-	warnings: {ctor: '[]'}
-};
-var _rtfeldman$elm_css$Css$visible = {value: 'visible', overflow: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$scroll = {value: 'scroll', overflow: _rtfeldman$elm_css$Css$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$breakWord = {value: 'break-word', overflowWrap: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$both = {value: 'both', resize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$horizontal = {value: 'horizontal', resize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$vertical = {value: 'vertical', resize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$paddingBox = {value: 'padding-box', backgroundClip: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$url = function (urlValue) {
-	return {
-		value: A2(
-			_elm_lang$core$Basics_ops['++'],
-			'url(',
-			A2(_elm_lang$core$Basics_ops['++'], urlValue, ')')),
-		backgroundImage: _rtfeldman$elm_css$Css$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$cover = {value: 'cover', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$contain = {value: 'contain', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$hidden = {value: 'hidden', overflow: _rtfeldman$elm_css$Css$Compatible, borderStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$rgb = F3(
-	function (red, green, blue) {
-		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(blue, 255) > 0)))))) ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'RGB color values must be between 0 and 255. rgb(',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(red),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						', ',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(green),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								', ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(blue),
-									') is not valid.')))))),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'};
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'rgb',
-				A2(
-					_elm_lang$core$List$map,
-					_rtfeldman$elm_css$Css$numberToString,
-					{
-						ctor: '::',
-						_0: red,
-						_1: {
-							ctor: '::',
-							_0: green,
-							_1: {
-								ctor: '::',
-								_0: blue,
-								_1: {ctor: '[]'}
-							}
-						}
-					})),
-			color: _rtfeldman$elm_css$Css$Compatible,
-			warnings: warnings,
-			red: red,
-			green: green,
-			blue: blue,
-			alpha: 1
-		};
-	});
-var _rtfeldman$elm_css$Css$rgba = F4(
-	function (red, green, blue, alpha) {
-		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(alpha, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(alpha, 1) > 0)))))))) ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'RGB color values must be between 0 and 255, and the alpha in RGBA must be between 0 and 1. rgba(',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(red),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						', ',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(green),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								', ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(blue),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										', ',
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Basics$toString(alpha),
-											') is not valid.')))))))),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'};
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'rgba',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css$numberToString,
-						{
-							ctor: '::',
-							_0: red,
-							_1: {
-								ctor: '::',
-								_0: green,
-								_1: {
-									ctor: '::',
-									_0: blue,
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$numberToString(alpha),
-						_1: {ctor: '[]'}
-					})),
-			color: _rtfeldman$elm_css$Css$Compatible,
-			warnings: warnings,
-			red: red,
-			green: green,
-			blue: blue,
-			alpha: alpha
-		};
-	});
 var _rtfeldman$elm_css$Css$erroneousHex = function (str) {
 	return {
 		value: _rtfeldman$elm_css$Css$withPrecedingHash(str),
-		color: _rtfeldman$elm_css$Css$Compatible,
+		color: _rtfeldman$elm_css$Css_Structure$Compatible,
 		red: 0,
 		green: 0,
 		blue: 0,
@@ -13266,7 +13157,7 @@ var _rtfeldman$elm_css$Css$validHex = F5(
 		if (((((_p28.ctor === '_Tuple4') && (_p28._0.ctor === 'Ok')) && (_p28._1.ctor === 'Ok')) && (_p28._2.ctor === 'Ok')) && (_p28._3.ctor === 'Ok')) {
 			return {
 				value: _rtfeldman$elm_css$Css$withPrecedingHash(str),
-				color: _rtfeldman$elm_css$Css$Compatible,
+				color: _rtfeldman$elm_css$Css_Structure$Compatible,
 				red: _p28._0._0,
 				green: _p28._1._0,
 				blue: _p28._2._0,
@@ -13280,7 +13171,7 @@ var _rtfeldman$elm_css$Css$validHex = F5(
 var _rtfeldman$elm_css$Css$hex = function (str) {
 	var withoutHash = A2(_elm_lang$core$String$startsWith, '#', str) ? A2(_elm_lang$core$String$dropLeft, 1, str) : str;
 	var _p29 = _elm_lang$core$String$toList(withoutHash);
-	_v22_4:
+	_v12_4:
 	do {
 		if (((_p29.ctor === '::') && (_p29._1.ctor === '::')) && (_p29._1._1.ctor === '::')) {
 			if (_p29._1._1._1.ctor === '[]') {
@@ -13335,29 +13226,416 @@ var _rtfeldman$elm_css$Css$hex = function (str) {
 									{ctor: '_Tuple2', _0: _p29._1._1._1._1._0, _1: _p29._1._1._1._1._1._0},
 									{ctor: '_Tuple2', _0: _p29._1._1._1._1._1._1._0, _1: _p29._1._1._1._1._1._1._1._0});
 							} else {
-								break _v22_4;
+								break _v12_4;
 							}
 						}
 					} else {
-						break _v22_4;
+						break _v12_4;
 					}
 				}
 			}
 		} else {
-			break _v22_4;
+			break _v12_4;
 		}
 	} while(false);
 	return _rtfeldman$elm_css$Css$erroneousHex(str);
 };
-var _rtfeldman$elm_css$Css$hslaToRgba = F6(
-	function (value, warnings, hue, saturation, lightness, hslAlpha) {
-		var _p37 = _elm_lang$core$Color$toRgb(
-			A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, hslAlpha));
-		var red = _p37.red;
-		var green = _p37.green;
-		var blue = _p37.blue;
-		var alpha = _p37.alpha;
-		return {value: value, color: _rtfeldman$elm_css$Css$Compatible, red: red, green: green, blue: blue, alpha: alpha, warnings: warnings};
+var _rtfeldman$elm_css$Css$hidden = {value: 'hidden', overflow: _rtfeldman$elm_css$Css_Structure$Compatible, borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contain = {value: 'contain', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cover = {value: 'cover', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$url = function (urlValue) {
+	return {
+		value: A2(
+			_elm_lang$core$Basics_ops['++'],
+			'url(',
+			A2(_elm_lang$core$Basics_ops['++'], urlValue, ')')),
+		backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$paddingBox = {value: 'padding-box', backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$luminosity = _rtfeldman$elm_css$Css$prop1('luminosity');
+var _rtfeldman$elm_css$Css$saturation = _rtfeldman$elm_css$Css$prop1('saturation');
+var _rtfeldman$elm_css$Css$hue = _rtfeldman$elm_css$Css$prop1('hue');
+var _rtfeldman$elm_css$Css$exclusion = _rtfeldman$elm_css$Css$prop1('exclusion');
+var _rtfeldman$elm_css$Css$difference = _rtfeldman$elm_css$Css$prop1('difference');
+var _rtfeldman$elm_css$Css$softLight = _rtfeldman$elm_css$Css$prop1('soft-light');
+var _rtfeldman$elm_css$Css$hardLight = _rtfeldman$elm_css$Css$prop1('hard-light');
+var _rtfeldman$elm_css$Css$colorBurn = _rtfeldman$elm_css$Css$prop1('color-burn');
+var _rtfeldman$elm_css$Css$colorDodge = _rtfeldman$elm_css$Css$prop1('color-dodge');
+var _rtfeldman$elm_css$Css$lighten = _rtfeldman$elm_css$Css$prop1('lighten');
+var _rtfeldman$elm_css$Css$darken = _rtfeldman$elm_css$Css$prop1('darken');
+var _rtfeldman$elm_css$Css$overlay = _rtfeldman$elm_css$Css$prop1('overlay');
+var _rtfeldman$elm_css$Css$screenBlendMode = _rtfeldman$elm_css$Css$prop1('screen');
+var _rtfeldman$elm_css$Css$multiply = _rtfeldman$elm_css$Css$prop1('multiply');
+var _rtfeldman$elm_css$Css$vertical = {value: 'vertical', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$horizontal = {value: 'horizontal', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$both = {value: 'both', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$breakWord = {value: 'break-word', overflowWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$scroll = {value: 'scroll', scroll: _rtfeldman$elm_css$Css_Structure$Compatible, overflow: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible, blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, inlineAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$visible = {value: 'visible', overflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$currentColor = {
+	value: 'currentColor',
+	color: _rtfeldman$elm_css$Css_Structure$Compatible,
+	warnings: {ctor: '[]'}
+};
+var _rtfeldman$elm_css$Css$transparent = {
+	value: 'transparent',
+	color: _rtfeldman$elm_css$Css_Structure$Compatible,
+	warnings: {ctor: '[]'}
+};
+var _rtfeldman$elm_css$Css$important = _rtfeldman$elm_css$Css_Preprocess$mapLastProperty(
+	function (property) {
+		return _elm_lang$core$Native_Utils.update(
+			property,
+			{important: true});
+	});
+var _rtfeldman$elm_css$Css$all = _rtfeldman$elm_css$Css$prop1('all');
+var _rtfeldman$elm_css$Css$combineLengths = F3(
+	function (operation, first, second) {
+		var numericValue = A2(operation, first.numericValue, second.numericValue);
+		var value = A2(
+			_elm_lang$core$String$join,
+			'',
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p37) {
+					return !_elm_lang$core$String$isEmpty(_p37);
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$core$Basics$toString(numericValue),
+					_1: {
+						ctor: '::',
+						_0: first.unitLabel,
+						_1: {ctor: '[]'}
+					}
+				}));
+		return _elm_lang$core$Native_Utils.update(
+			first,
+			{value: value, numericValue: numericValue});
+	});
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|*|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x * y;
+		}));
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|/|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x / y;
+		}));
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|-|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x - y;
+		}));
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|+|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x + y;
+		}));
+var _rtfeldman$elm_css$Css$calcExpressionToString = function (expression) {
+	var _p38 = expression;
+	if (_p38.ctor === 'Addition') {
+		return '+';
+	} else {
+		return '-';
+	}
+};
+var _rtfeldman$elm_css$Css$colorValueForOverloadedProperty = _rtfeldman$elm_css$Css$transparent;
+var _rtfeldman$elm_css$Css$getOverloadedProperty = F3(
+	function (functionName, desiredKey, style) {
+		getOverloadedProperty:
+		while (true) {
+			var _p39 = style;
+			switch (_p39.ctor) {
+				case 'AppendProperty':
+					return A2(_rtfeldman$elm_css$Css$property, desiredKey, _p39._0.key);
+				case 'ExtendSelector':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for selector ',
+										_elm_lang$core$Basics$toString(_p39._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				case 'NestSnippet':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for combinator ',
+										_elm_lang$core$Basics$toString(_p39._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				case 'WithPseudoElement':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for pseudo-element setter ',
+										_elm_lang$core$Basics$toString(_p39._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				case 'WithMedia':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for media query ',
+										_elm_lang$core$Basics$toString(_p39._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				default:
+					if (_p39._0.ctor === '[]') {
+						return A3(
+							_rtfeldman$elm_css$Css$propertyWithWarnings,
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Cannot apply ',
+									A2(_elm_lang$core$Basics_ops['++'], functionName, ' with empty Style. ')),
+								_1: {ctor: '[]'}
+							},
+							desiredKey,
+							'');
+					} else {
+						if (_p39._0._1.ctor === '[]') {
+							var _v15 = functionName,
+								_v16 = desiredKey,
+								_v17 = _p39._0._0;
+							functionName = _v15;
+							desiredKey = _v16;
+							style = _v17;
+							continue getOverloadedProperty;
+						} else {
+							var _v18 = functionName,
+								_v19 = desiredKey,
+								_v20 = _rtfeldman$elm_css$Css_Preprocess$ApplyStyles(_p39._0._1);
+							functionName = _v18;
+							desiredKey = _v19;
+							style = _v20;
+							continue getOverloadedProperty;
+						}
+					}
+			}
+		}
+	});
+var _rtfeldman$elm_css$Css$backgroundBlendMode = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'backgroundBlendMode',
+		'background-blend-mode',
+		fn(_rtfeldman$elm_css$Css$colorValueForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$cssFunction = F2(
+	function (funcName, args) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			funcName,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(_elm_lang$core$String$join, ', ', args),
+					')')));
+	});
+var _rtfeldman$elm_css$Css$calc = F3(
+	function (first, expression, second) {
+		var grab = function (l) {
+			return A2(_elm_lang$core$String$startsWith, 'calc(', l.value) ? A2(_elm_lang$core$String$dropLeft, 4, l.value) : l.value;
+		};
+		var calcs = A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: grab(first),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$calcExpressionToString(expression),
+					_1: {
+						ctor: '::',
+						_0: grab(second),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+		var value = A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'calc',
+			{
+				ctor: '::',
+				_0: calcs,
+				_1: {ctor: '[]'}
+			});
+		return {value: value, length: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, textIndent: _rtfeldman$elm_css$Css_Structure$Compatible, flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, fontSize: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible, calc: _rtfeldman$elm_css$Css_Structure$Compatible};
+	});
+var _rtfeldman$elm_css$Css$rgb = F3(
+	function (red, green, blue) {
+		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(blue, 255) > 0)))))) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'RGB color values must be between 0 and 255. rgb(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(red),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						', ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(green),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(blue),
+									') is not valid.')))))),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'rgb',
+				A2(
+					_elm_lang$core$List$map,
+					_rtfeldman$elm_css$Css$numberToString,
+					{
+						ctor: '::',
+						_0: red,
+						_1: {
+							ctor: '::',
+							_0: green,
+							_1: {
+								ctor: '::',
+								_0: blue,
+								_1: {ctor: '[]'}
+							}
+						}
+					})),
+			color: _rtfeldman$elm_css$Css_Structure$Compatible,
+			warnings: warnings,
+			red: red,
+			green: green,
+			blue: blue,
+			alpha: 1
+		};
+	});
+var _rtfeldman$elm_css$Css$rgba = F4(
+	function (red, green, blue, alpha) {
+		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(alpha, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(alpha, 1) > 0)))))))) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'RGB color values must be between 0 and 255, and the alpha in RGBA must be between 0 and 1. rgba(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(red),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						', ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(green),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(blue),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										', ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(alpha),
+											') is not valid.')))))))),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'rgba',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css$numberToString,
+						{
+							ctor: '::',
+							_0: red,
+							_1: {
+								ctor: '::',
+								_0: green,
+								_1: {
+									ctor: '::',
+									_0: blue,
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$numberToString(alpha),
+						_1: {ctor: '[]'}
+					})),
+			color: _rtfeldman$elm_css$Css_Structure$Compatible,
+			warnings: warnings,
+			red: red,
+			green: green,
+			blue: blue,
+			alpha: alpha
+		};
 	});
 var _rtfeldman$elm_css$Css$hsl = F3(
 	function (hue, saturation, lightness) {
@@ -13415,68 +13693,6 @@ var _rtfeldman$elm_css$Css$hsla = F4(
 		} : {ctor: '[]'};
 		return A6(_rtfeldman$elm_css$Css$hslaToRgba, value, warnings, hue, saturation, lightness, alpha);
 	});
-var _rtfeldman$elm_css$Css$optimizeSpeed = {value: 'optimizeSpeed', textRendering: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$optimizeLegibility = {value: 'optimizeLegibility', textRendering: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$geometricPrecision = {value: 'geometricPrecision', textRendering: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$hanging = {value: 'hanging', textIndent: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$eachLine = {value: 'each-line', textIndent: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$mixed = {value: 'mixed', textOrientation: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$upright = {value: 'upright', textOrientation: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$sideways = {value: 'sideways', textOrientation: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$capitalize = {value: 'capitalize', textTransform: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$uppercase = {value: 'uppercase', textTransform: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lowercase = {value: 'lowercase', textTransform: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$fullWidth = {value: 'full-width', textTransform: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$ellipsis = {value: 'ellipsis', textOverflow: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$clip = {value: 'clip', textOverflow: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$wavy = {value: 'wavy', textDecorationStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$dotted = {value: 'dotted', borderStyle: _rtfeldman$elm_css$Css$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$dashed = {value: 'dashed', borderStyle: _rtfeldman$elm_css$Css$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$solid = {value: 'solid', borderStyle: _rtfeldman$elm_css$Css$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$double = {value: 'double', borderStyle: _rtfeldman$elm_css$Css$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$groove = {value: 'groove', borderStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$ridge = {value: 'ridge', borderStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$inset = {value: 'inset', borderStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$outset = {value: 'outset', borderStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$separate = {value: 'separate', borderCollapse: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$collapse = {value: 'collapse', borderCollapse: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lengthConverter = F3(
-	function (units, unitLabel, numericValue) {
-		return {
-			value: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_rtfeldman$elm_css$Css$numberToString(numericValue),
-				unitLabel),
-			numericValue: numericValue,
-			units: units,
-			unitLabel: unitLabel,
-			length: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrAuto: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrNumber: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrNone: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible,
-			textIndent: _rtfeldman$elm_css$Css$Compatible,
-			flexBasis: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible,
-			fontSize: _rtfeldman$elm_css$Css$Compatible,
-			lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$angleConverter = F2(
-	function (suffix, num) {
-		return {
-			value: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_rtfeldman$elm_css$Css$numberToString(num),
-				suffix),
-			angle: _rtfeldman$elm_css$Css$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$deg = _rtfeldman$elm_css$Css$angleConverter('deg');
-var _rtfeldman$elm_css$Css$grad = _rtfeldman$elm_css$Css$angleConverter('grad');
-var _rtfeldman$elm_css$Css$rad = _rtfeldman$elm_css$Css$angleConverter('rad');
-var _rtfeldman$elm_css$Css$turn = _rtfeldman$elm_css$Css$angleConverter('turn');
 var _rtfeldman$elm_css$Css$matrix = F6(
 	function (a, b, c, d, tx, ty) {
 		return {
@@ -13511,7 +13727,7 @@ var _rtfeldman$elm_css$Css$matrix = F6(
 							}
 						}
 					})),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
 var _rtfeldman$elm_css$Css$matrix3d = function (a1) {
@@ -13602,7 +13818,7 @@ var _rtfeldman$elm_css$Css$matrix3d = function (a1) {
 																					}
 																				}
 																			})),
-																	transform: _rtfeldman$elm_css$Css$Compatible
+																	transform: _rtfeldman$elm_css$Css_Structure$Compatible
 																};
 															};
 														};
@@ -13630,68 +13846,68 @@ var _rtfeldman$elm_css$Css$perspective = function (l) {
 				_0: _rtfeldman$elm_css$Css$numberToString(l),
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$rotate = function (_p38) {
-	var _p39 = _p38;
+var _rtfeldman$elm_css$Css$rotate = function (_p40) {
+	var _p41 = _p40;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'rotate',
 			{
 				ctor: '::',
-				_0: _p39.value,
+				_0: _p41.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$rotateX = function (_p40) {
-	var _p41 = _p40;
+var _rtfeldman$elm_css$Css$rotateX = function (_p42) {
+	var _p43 = _p42;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'rotateX',
 			{
 				ctor: '::',
-				_0: _p41.value,
+				_0: _p43.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$rotateY = function (_p42) {
-	var _p43 = _p42;
+var _rtfeldman$elm_css$Css$rotateY = function (_p44) {
+	var _p45 = _p44;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'rotateY',
 			{
 				ctor: '::',
-				_0: _p43.value,
+				_0: _p45.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$rotateZ = function (_p44) {
-	var _p45 = _p44;
+var _rtfeldman$elm_css$Css$rotateZ = function (_p46) {
+	var _p47 = _p46;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'rotateZ',
 			{
 				ctor: '::',
-				_0: _p45.value,
+				_0: _p47.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$rotate3d = F4(
-	function (x, y, z, _p46) {
-		var _p47 = _p46;
+	function (x, y, z, _p48) {
+		var _p49 = _p48;
 		var coordsAsStrings = A2(
 			_elm_lang$core$List$map,
 			_rtfeldman$elm_css$Css$numberToString,
@@ -13717,10 +13933,10 @@ var _rtfeldman$elm_css$Css$rotate3d = F4(
 					coordsAsStrings,
 					{
 						ctor: '::',
-						_0: _p47.value,
+						_0: _p49.value,
 						_1: {ctor: '[]'}
 					})),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
 var _rtfeldman$elm_css$Css$scale = function (x) {
@@ -13733,7 +13949,7 @@ var _rtfeldman$elm_css$Css$scale = function (x) {
 				_0: _rtfeldman$elm_css$Css$numberToString(x),
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$scale2 = F2(
@@ -13754,7 +13970,7 @@ var _rtfeldman$elm_css$Css$scale2 = F2(
 							_1: {ctor: '[]'}
 						}
 					})),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
 var _rtfeldman$elm_css$Css$scaleX = function (x) {
@@ -13767,7 +13983,7 @@ var _rtfeldman$elm_css$Css$scaleX = function (x) {
 				_0: _rtfeldman$elm_css$Css$numberToString(x),
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$scaleY = function (y) {
@@ -13780,7 +13996,7 @@ var _rtfeldman$elm_css$Css$scaleY = function (y) {
 				_0: _rtfeldman$elm_css$Css$numberToString(y),
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$scale3d = F3(
@@ -13805,21 +14021,21 @@ var _rtfeldman$elm_css$Css$scale3d = F3(
 							}
 						}
 					})),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
-var _rtfeldman$elm_css$Css$skew = function (_p48) {
-	var _p49 = _p48;
+var _rtfeldman$elm_css$Css$skew = function (_p50) {
+	var _p51 = _p50;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'skew',
 			{
 				ctor: '::',
-				_0: _p49.value,
+				_0: _p51.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$skew2 = F2(
@@ -13837,49 +14053,49 @@ var _rtfeldman$elm_css$Css$skew2 = F2(
 						_1: {ctor: '[]'}
 					}
 				}),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
-var _rtfeldman$elm_css$Css$skewX = function (_p50) {
-	var _p51 = _p50;
+var _rtfeldman$elm_css$Css$skewX = function (_p52) {
+	var _p53 = _p52;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'skewX',
 			{
 				ctor: '::',
-				_0: _p51.value,
+				_0: _p53.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$skewY = function (_p52) {
-	var _p53 = _p52;
+var _rtfeldman$elm_css$Css$skewY = function (_p54) {
+	var _p55 = _p54;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'skewY',
 			{
 				ctor: '::',
-				_0: _p53.value,
+				_0: _p55.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$translate = function (_p54) {
-	var _p55 = _p54;
+var _rtfeldman$elm_css$Css$translate = function (_p56) {
+	var _p57 = _p56;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'translate',
 			{
 				ctor: '::',
-				_0: _p55.value,
+				_0: _p57.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$translate2 = F2(
@@ -13897,49 +14113,49 @@ var _rtfeldman$elm_css$Css$translate2 = F2(
 						_1: {ctor: '[]'}
 					}
 				}),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
-var _rtfeldman$elm_css$Css$translateX = function (_p56) {
-	var _p57 = _p56;
+var _rtfeldman$elm_css$Css$translateX = function (_p58) {
+	var _p59 = _p58;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'translateX',
 			{
 				ctor: '::',
-				_0: _p57.value,
+				_0: _p59.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$translateY = function (_p58) {
-	var _p59 = _p58;
+var _rtfeldman$elm_css$Css$translateY = function (_p60) {
+	var _p61 = _p60;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'translateY',
 			{
 				ctor: '::',
-				_0: _p59.value,
+				_0: _p61.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
-var _rtfeldman$elm_css$Css$translateZ = function (_p60) {
-	var _p61 = _p60;
+var _rtfeldman$elm_css$Css$translateZ = function (_p62) {
+	var _p63 = _p62;
 	return {
 		value: A2(
 			_rtfeldman$elm_css$Css$cssFunction,
 			'translateZ',
 			{
 				ctor: '::',
-				_0: _p61.value,
+				_0: _p63.value,
 				_1: {ctor: '[]'}
 			}),
-		transform: _rtfeldman$elm_css$Css$Compatible
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
 	};
 };
 var _rtfeldman$elm_css$Css$translate3d = F3(
@@ -13961,237 +14177,231 @@ var _rtfeldman$elm_css$Css$translate3d = F3(
 						}
 					}
 				}),
-			transform: _rtfeldman$elm_css$Css$Compatible
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
-var _rtfeldman$elm_css$Css$fillBox = {value: 'fill-box', transformBox: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$contentBox = {value: 'content-box', boxSizing: _rtfeldman$elm_css$Css$Compatible, backgroundClip: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$borderBox = {value: 'border-box', boxSizing: _rtfeldman$elm_css$Css$Compatible, backgroundClip: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$viewBox = {value: 'view-box', transformBox: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$preserve3d = {value: 'preserve-3d', transformStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$flat = {value: 'flat', transformStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$inside = {value: 'inside', listStylePosition: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$outside = {value: 'outside', listStylePosition: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$disc = {value: 'disc', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$circle = {value: 'circle', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$square = {value: 'square', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$decimal = {value: 'decimal', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$decimalLeadingZero = {value: 'decimal-leading-zero', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lowerRoman = {value: 'lower-roman', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$upperRoman = {value: 'upper-roman', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lowerGreek = {value: 'lower-greek', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$upperGreek = {value: 'upper-greek', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lowerAlpha = {value: 'lower-alpha', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$upperAlpha = {value: 'upper-alpha', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lowerLatin = {value: 'lower-latin', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$upperLatin = {value: 'upper-latin', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$arabicIndic = {value: 'arabic-indic', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$armenian = {value: 'armenian', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$bengali = {value: 'bengali', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$cjkEarthlyBranch = {value: 'cjk-earthly-branch', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$cjkHeavenlyStem = {value: 'cjk-heavenly-stem', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$devanagari = {value: 'devanagari', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$georgian = {value: 'georgian', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$gujarati = {value: 'gujarati', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$gurmukhi = {value: 'gurmukhi', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$kannada = {value: 'kannada', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$khmer = {value: 'khmer', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lao = {value: 'lao', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$malayalam = {value: 'malayalam', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$myanmar = {value: 'myanmar', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$oriya = {value: 'oriya', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$telugu = {value: 'telugu', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$thai = {value: 'thai', listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$content = {value: 'content', flexBasis: _rtfeldman$elm_css$Css$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$wrap = {value: 'wrap', flexWrap: _rtfeldman$elm_css$Css$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$wrapReverse = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$wrap,
-	{value: 'wrap-reverse'});
-var _rtfeldman$elm_css$Css$row = {value: 'row', flexDirection: _rtfeldman$elm_css$Css$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$rowReverse = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$row,
-	{value: 'row-reverse'});
-var _rtfeldman$elm_css$Css$column = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$row,
-	{value: 'column'});
-var _rtfeldman$elm_css$Css$columnReverse = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$row,
-	{value: 'column-reverse'});
-var _rtfeldman$elm_css$Css$underline = {value: 'underline', textDecorationLine: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$overline = {value: 'overline', textDecorationLine: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lineThrough = {value: 'line-through', textDecorationLine: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$repeatX = {value: 'repeat-x', backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$repeatY = {value: 'repeat-y', backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$repeat = {value: 'repeat', backgroundRepeat: _rtfeldman$elm_css$Css$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$space = {value: 'space', backgroundRepeat: _rtfeldman$elm_css$Css$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$round = {value: 'round', backgroundRepeat: _rtfeldman$elm_css$Css$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noRepeat = {value: 'no-repeat', backgroundRepeat: _rtfeldman$elm_css$Css$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$local = {value: 'local', backgroundAttachment: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$block = {value: 'block', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$inlineBlock = {value: 'inline-block', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$inline = {value: 'inline', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$table = {value: 'table', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$inlineTable = {value: 'inline-table', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableRow = {value: 'table-row', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableCell = {value: 'table-cell', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableColumn = {value: 'table-column', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableCaption = {value: 'table-caption', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableRowGroup = {value: 'table-row-group', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableColumnGroup = {value: 'table-column-group', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableHeaderGroup = {value: 'table-header-group', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tableFooterGroup = {value: 'table-footer-group', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$listItem = {value: 'list-item', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$inlineListItem = {value: 'inline-list-item', display: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$none = {value: 'none', cursor: _rtfeldman$elm_css$Css$Compatible, none: _rtfeldman$elm_css$Css$Compatible, lengthOrNone: _rtfeldman$elm_css$Css$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible, textDecorationLine: _rtfeldman$elm_css$Css$Compatible, listStyleType: _rtfeldman$elm_css$Css$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible, display: _rtfeldman$elm_css$Css$Compatible, outline: _rtfeldman$elm_css$Css$Compatible, resize: _rtfeldman$elm_css$Css$Compatible, transform: _rtfeldman$elm_css$Css$Compatible, borderStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$auto = {value: 'auto', cursor: _rtfeldman$elm_css$Css$Compatible, flexBasis: _rtfeldman$elm_css$Css$Compatible, overflow: _rtfeldman$elm_css$Css$Compatible, textRendering: _rtfeldman$elm_css$Css$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible, alignItemsOrAuto: _rtfeldman$elm_css$Css$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css$Compatible, justifyContentOrAuto: _rtfeldman$elm_css$Css$Compatible, intOrAuto: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noWrap = {value: 'nowrap', whiteSpace: _rtfeldman$elm_css$Css$Compatible, flexWrap: _rtfeldman$elm_css$Css$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$fillAvailable = {value: 'fill-available', minMaxDimension: _rtfeldman$elm_css$Css$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$maxContent = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$fillAvailable,
-	{value: 'max-content'});
-var _rtfeldman$elm_css$Css$minContent = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$fillAvailable,
-	{value: 'min-content'});
-var _rtfeldman$elm_css$Css$fitContent = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$fillAvailable,
-	{value: 'fit-content'});
-var _rtfeldman$elm_css$Css$static = {value: 'static', position: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$fixed = {value: 'fixed', position: _rtfeldman$elm_css$Css$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$sticky = {value: 'sticky', position: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$relative = {value: 'relative', position: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$absolute = {value: 'absolute', position: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$serif = {value: 'serif', fontFamily: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$sansSerif = {value: 'sans-serif', fontFamily: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$monospace = {value: 'monospace', fontFamily: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$cursive = {value: 'cursive', fontFamily: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$fantasy = {value: 'fantasy', fontFamily: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$xxSmall = {value: 'xx-small', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$xSmall = {value: 'x-small', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$small = {value: 'small', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$medium = {value: 'medium', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$large = {value: 'large', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$xLarge = {value: 'x-large', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$xxLarge = {value: 'xx-large', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$smaller = {value: 'smaller', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$larger = {value: 'larger', fontSize: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$normal = {
-	value: 'normal',
-	warnings: {ctor: '[]'},
-	fontStyle: _rtfeldman$elm_css$Css$Compatible,
-	fontWeight: _rtfeldman$elm_css$Css$Compatible,
-	featureTagValue: _rtfeldman$elm_css$Css$Compatible,
-	overflowWrap: _rtfeldman$elm_css$Css$Compatible
-};
-var _rtfeldman$elm_css$Css$italic = {value: 'italic', fontStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$oblique = {value: 'oblique', fontStyle: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$bold = {value: 'bold', fontWeight: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$lighter = {value: 'lighter', fontWeight: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$bolder = {value: 'bolder', fontWeight: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$smallCaps = {value: 'small-caps', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$allSmallCaps = {value: 'all-small-caps', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$petiteCaps = {value: 'petite-caps', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$allPetiteCaps = {value: 'all-petite-caps', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$unicase = {value: 'unicase', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$titlingCaps = {value: 'titling-caps', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$commonLigatures = {value: 'common-ligatures', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noCommonLigatures = {value: 'no-common-ligatures', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$discretionaryLigatures = {value: 'discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noDiscretionaryLigatures = {value: 'no-discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$historicalLigatures = {value: 'historical-ligatures', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noHistoricalLigatures = {value: 'no-historical-ligatures', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$contextual = {value: 'context', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noContextual = {value: 'no-contextual', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$liningNums = {value: 'lining-nums', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$oldstyleNums = {value: 'oldstyle-nums', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$proportionalNums = {value: 'proportional-nums', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$tabularNums = {value: 'tabular-nums', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$diagonalFractions = {value: 'diagonal-fractions', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$stackedFractions = {value: 'stacked-fractions', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$ordinal = {value: 'ordinal', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$slashedZero = {value: 'slashed-zero', fontVariant: _rtfeldman$elm_css$Css$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$featureTag2 = F2(
-	function (tag, value) {
-		var potentialWarnings = {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: !_elm_lang$core$Native_Utils.eq(
-					_elm_lang$core$String$length(tag),
-					4),
-				_1: A2(
-					_elm_lang$core$Basics_ops['++'],
-					'Feature tags must be exactly 4 characters long. ',
-					A2(_elm_lang$core$Basics_ops['++'], tag, ' is invalid.'))
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.cmp(value, 0) < 0,
-					_1: A2(
-						_elm_lang$core$Basics_ops['++'],
-						'Feature values cannot be negative. ',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(value),
-							' is invalid.'))
-				},
-				_1: {ctor: '[]'}
-			}
-		};
-		var warnings = A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$second,
-			A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$first, potentialWarnings));
+var _rtfeldman$elm_css$Css$linearGradient = F3(
+	function (stop1, stop2, stops) {
 		return {
 			value: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(tag),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					' ',
-					_elm_lang$core$Basics$toString(value))),
-			featureTagValue: _rtfeldman$elm_css$Css$Compatible,
-			warnings: warnings
+				_rtfeldman$elm_css$Css$cssFunction,
+				'linear-gradient',
+				_rtfeldman$elm_css$Css$collectStops(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
+							ctor: '::',
+							_0: stop1,
+							_1: {
+								ctor: '::',
+								_0: stop2,
+								_1: {ctor: '[]'}
+							}
+						},
+						stops))),
+			backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+			listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
-var _rtfeldman$elm_css$Css$featureTag = function (tag) {
-	return A2(_rtfeldman$elm_css$Css$featureTag2, tag, 1);
+var _rtfeldman$elm_css$Css$linearGradient2 = F4(
+	function (dir, stop1, stop2, stops) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'linear-gradient',
+				A2(
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						}),
+					A2(_elm_lang$core$Basics_ops['++'], 'to ', dir.value),
+					_rtfeldman$elm_css$Css$collectStops(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: stop1,
+								_1: {
+									ctor: '::',
+									_0: stop2,
+									_1: {ctor: '[]'}
+								}
+							},
+							stops)))),
+			backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+			listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$CalculatedLength = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return {value: a, length: b, lengthOrAuto: c, lengthOrNumber: d, lengthOrNone: e, lengthOrMinMaxDimension: f, lengthOrNoneOrMinMaxDimension: g, textIndent: h, flexBasis: i, lengthOrNumberOrAutoOrNoneOrContent: j, fontSize: k, lengthOrAutoOrCoverOrContain: l, calc: m};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
 };
-var _rtfeldman$elm_css$Css$default = {value: 'default', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$crosshair = {value: 'crosshair', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$contextMenu = {value: 'context-menu', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$help = {value: 'help', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$pointer = {value: 'pointer', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$progress = {value: 'progress', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$wait = {value: 'wait', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$cell = {value: 'cell', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$text = {value: 'text', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$verticalText = {value: 'vertical-text', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$cursorAlias = {value: 'alias', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$copy = {value: 'copy', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$move = {value: 'move', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$noDrop = {value: 'no-drop', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$notAllowed = {value: 'not-allowed', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$eResize = {value: 'e-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$nResize = {value: 'n-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$neResize = {value: 'ne-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$nwResize = {value: 'nw-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$sResize = {value: 's-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$seResize = {value: 'se-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$swResize = {value: 'sw-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$wResize = {value: 'w-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$ewResize = {value: 'ew-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$nsResize = {value: 'ns-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$neswResize = {value: 'nesw-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$nwseResize = {value: 'nwse-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$colResize = {value: 'col-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$rowResize = {value: 'row-resize', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$allScroll = {value: 'all-scroll', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$zoomIn = {value: 'zoom-in', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$zoomOut = {value: 'zoom-out', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$grab = {value: 'grab', cursor: _rtfeldman$elm_css$Css$Compatible};
-var _rtfeldman$elm_css$Css$grabbing = {value: 'grabbing', cursor: _rtfeldman$elm_css$Css$Compatible};
+var _rtfeldman$elm_css$Css$ExplicitLength = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return function (q) {
+																	return {value: a, numericValue: b, units: c, unitLabel: d, length: e, lengthOrAuto: f, lengthOrNumber: g, lengthOrNone: h, lengthOrMinMaxDimension: i, lengthOrNoneOrMinMaxDimension: j, textIndent: k, flexBasis: l, absoluteLength: m, lengthOrNumberOrAutoOrNoneOrContent: n, fontSize: o, lengthOrAutoOrCoverOrContain: p, calc: q};
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rtfeldman$elm_css$Css$NonMixable = {};
+var _rtfeldman$elm_css$Css$BasicProperty = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return function (q) {
+																	return function (r) {
+																		return function (s) {
+																			return function (t) {
+																				return function (u) {
+																					return function (v) {
+																						return function (w) {
+																							return function (x) {
+																								return function (y) {
+																									return function (z) {
+																										return function (_1) {
+																											return function (_2) {
+																												return function (_3) {
+																													return function (_4) {
+																														return function (_5) {
+																															return function (_6) {
+																																return function (_7) {
+																																	return function (_8) {
+																																		return function (_9) {
+																																			return function (_10) {
+																																				return function (_11) {
+																																					return function (_12) {
+																																						return function (_13) {
+																																							return function (_14) {
+																																								return function (_15) {
+																																									return function (_16) {
+																																										return function (_17) {
+																																											return function (_18) {
+																																												return function (_19) {
+																																													return function (_20) {
+																																														return function (_21) {
+																																															return function (_22) {
+																																																return function (_23) {
+																																																	return function (_24) {
+																																																		return function (_25) {
+																																																			return {value: a, all: b, alignItems: c, borderStyle: d, boxSizing: e, color: f, cursor: g, display: h, flexBasis: i, flexWrap: j, flexDirection: k, flexDirectionOrWrap: l, justifyContent: m, none: n, number: o, outline: p, overflow: q, textDecorationLine: r, textRendering: s, textIndent: t, textDecorationStyle: u, textTransform: v, length: w, lengthOrAuto: x, lengthOrNone: y, lengthOrNumber: z, lengthOrMinMaxDimension: _1, lengthOrNoneOrMinMaxDimension: _2, lengthOrNumberOrAutoOrNoneOrContent: _3, listStyleType: _4, listStylePosition: _5, listStyleTypeOrPositionOrImage: _6, fontFamily: _7, fontSize: _8, fontStyle: _9, fontWeight: _10, fontVariant: _11, units: _12, numericValue: _13, unitLabel: _14, warnings: _15, backgroundRepeat: _16, backgroundRepeatShorthand: _17, backgroundAttachment: _18, backgroundBlendMode: _19, backgroundOrigin: _20, backgroundImage: _21, lengthOrAutoOrCoverOrContain: _22, intOrAuto: _23, touchAction: _24, whiteSpace: _25};
+																																																		};
+																																																	};
+																																																};
+																																															};
+																																														};
+																																													};
+																																												};
+																																											};
+																																										};
+																																									};
+																																								};
+																																							};
+																																						};
+																																					};
+																																				};
+																																			};
+																																		};
+																																	};
+																																};
+																															};
+																														};
+																													};
+																												};
+																											};
+																										};
+																									};
+																								};
+																							};
+																						};
+																					};
+																				};
+																			};
+																		};
+																	};
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rtfeldman$elm_css$Css$Normal = F7(
+	function (a, b, c, d, e, f, g) {
+		return {value: a, warnings: b, fontStyle: c, fontWeight: d, featureTagValue: e, overflowWrap: f, whiteSpace: g};
+	});
 var _rtfeldman$elm_css$Css$PseudoClass = F2(
 	function (a, b) {
 		return {ctor: 'PseudoClass', _0: a, _1: b};
@@ -14200,6 +14410,10 @@ var _rtfeldman$elm_css$Css$PseudoElement = F2(
 	function (a, b) {
 		return {ctor: 'PseudoElement', _0: a, _1: b};
 	});
+var _rtfeldman$elm_css$Css$Subtraction = {ctor: 'Subtraction'};
+var _rtfeldman$elm_css$Css$minus = _rtfeldman$elm_css$Css$Subtraction;
+var _rtfeldman$elm_css$Css$Addition = {ctor: 'Addition'};
+var _rtfeldman$elm_css$Css$plus = _rtfeldman$elm_css$Css$Addition;
 var _rtfeldman$elm_css$Css$PercentageUnits = {ctor: 'PercentageUnits'};
 var _rtfeldman$elm_css$Css$pct = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PercentageUnits, '%');
 var _rtfeldman$elm_css$Css$EmUnits = {ctor: 'EmUnits'};
@@ -14231,15 +14445,15 @@ var _rtfeldman$elm_css$Css$pt = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfe
 var _rtfeldman$elm_css$Css$PcUnits = {ctor: 'PcUnits'};
 var _rtfeldman$elm_css$Css$pc = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PcUnits, 'pc');
 var _rtfeldman$elm_css$Css$UnitlessInteger = {ctor: 'UnitlessInteger'};
-var _rtfeldman$elm_css$Css$zero = {value: '0', length: _rtfeldman$elm_css$Css$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css$Compatible, lengthOrNone: _rtfeldman$elm_css$Css$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible, number: _rtfeldman$elm_css$Css$Compatible, outline: _rtfeldman$elm_css$Css$Compatible, units: _rtfeldman$elm_css$Css$UnitlessInteger, unitLabel: '', numericValue: 0, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css$Compatible};
+var _rtfeldman$elm_css$Css$zero = {value: '0', length: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, number: _rtfeldman$elm_css$Css_Structure$Compatible, outline: _rtfeldman$elm_css$Css_Structure$Compatible, units: _rtfeldman$elm_css$Css$UnitlessInteger, unitLabel: '', numericValue: 0, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
 var _rtfeldman$elm_css$Css$int = function (val) {
 	return {
 		value: _rtfeldman$elm_css$Css$numberToString(val),
-		lengthOrNumber: _rtfeldman$elm_css$Css$Compatible,
-		number: _rtfeldman$elm_css$Css$Compatible,
-		fontWeight: _rtfeldman$elm_css$Css$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible,
-		intOrAuto: _rtfeldman$elm_css$Css$Compatible,
+		lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+		number: _rtfeldman$elm_css$Css_Structure$Compatible,
+		fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+		intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
 		numericValue: _elm_lang$core$Basics$toFloat(val),
 		unitLabel: '',
 		units: _rtfeldman$elm_css$Css$UnitlessInteger
@@ -14249,9 +14463,9 @@ var _rtfeldman$elm_css$Css$UnitlessFloat = {ctor: 'UnitlessFloat'};
 var _rtfeldman$elm_css$Css$num = function (val) {
 	return {
 		value: _rtfeldman$elm_css$Css$numberToString(val),
-		lengthOrNumber: _rtfeldman$elm_css$Css$Compatible,
-		number: _rtfeldman$elm_css$Css$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible,
+		lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+		number: _rtfeldman$elm_css$Css_Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
 		numericValue: val,
 		unitLabel: '',
 		units: _rtfeldman$elm_css$Css$UnitlessFloat
@@ -14260,53 +14474,56 @@ var _rtfeldman$elm_css$Css$num = function (val) {
 var _rtfeldman$elm_css$Css$IncompatibleUnits = {ctor: 'IncompatibleUnits'};
 var _rtfeldman$elm_css$Css$initial = {
 	value: 'initial',
-	overflow: _rtfeldman$elm_css$Css$Compatible,
-	none: _rtfeldman$elm_css$Css$Compatible,
-	number: _rtfeldman$elm_css$Css$Compatible,
-	textDecorationLine: _rtfeldman$elm_css$Css$Compatible,
-	textRendering: _rtfeldman$elm_css$Css$Compatible,
-	textIndent: _rtfeldman$elm_css$Css$Compatible,
-	textDecorationStyle: _rtfeldman$elm_css$Css$Compatible,
-	borderStyle: _rtfeldman$elm_css$Css$Compatible,
-	boxSizing: _rtfeldman$elm_css$Css$Compatible,
-	color: _rtfeldman$elm_css$Css$Compatible,
-	cursor: _rtfeldman$elm_css$Css$Compatible,
-	display: _rtfeldman$elm_css$Css$Compatible,
-	all: _rtfeldman$elm_css$Css$Compatible,
-	alignItems: _rtfeldman$elm_css$Css$Compatible,
-	justifyContent: _rtfeldman$elm_css$Css$Compatible,
-	length: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrAuto: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrNone: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrNumber: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css$Compatible,
-	listStyleType: _rtfeldman$elm_css$Css$Compatible,
-	listStylePosition: _rtfeldman$elm_css$Css$Compatible,
-	listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css$Compatible,
-	flexBasis: _rtfeldman$elm_css$Css$Compatible,
-	flexWrap: _rtfeldman$elm_css$Css$Compatible,
-	flexDirection: _rtfeldman$elm_css$Css$Compatible,
-	flexDirectionOrWrap: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css$Compatible,
-	fontFamily: _rtfeldman$elm_css$Css$Compatible,
-	fontSize: _rtfeldman$elm_css$Css$Compatible,
-	fontStyle: _rtfeldman$elm_css$Css$Compatible,
-	fontWeight: _rtfeldman$elm_css$Css$Compatible,
-	fontVariant: _rtfeldman$elm_css$Css$Compatible,
-	outline: _rtfeldman$elm_css$Css$Compatible,
+	overflow: _rtfeldman$elm_css$Css_Structure$Compatible,
+	none: _rtfeldman$elm_css$Css_Structure$Compatible,
+	number: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textRendering: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textIndent: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textTransform: _rtfeldman$elm_css$Css_Structure$Compatible,
+	borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible,
+	color: _rtfeldman$elm_css$Css_Structure$Compatible,
+	cursor: _rtfeldman$elm_css$Css_Structure$Compatible,
+	display: _rtfeldman$elm_css$Css_Structure$Compatible,
+	all: _rtfeldman$elm_css$Css_Structure$Compatible,
+	alignItems: _rtfeldman$elm_css$Css_Structure$Compatible,
+	justifyContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+	length: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+	listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible,
+	listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible,
+	listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexDirection: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontSize: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible,
+	outline: _rtfeldman$elm_css$Css_Structure$Compatible,
 	units: _rtfeldman$elm_css$Css$IncompatibleUnits,
 	numericValue: 0,
 	unitLabel: '',
 	warnings: {ctor: '[]'},
-	backgroundRepeat: _rtfeldman$elm_css$Css$Compatible,
-	backgroundRepeatShorthand: _rtfeldman$elm_css$Css$Compatible,
-	backgroundAttachment: _rtfeldman$elm_css$Css$Compatible,
-	backgroundBlendMode: _rtfeldman$elm_css$Css$Compatible,
-	backgroundOrigin: _rtfeldman$elm_css$Css$Compatible,
-	backgroundImage: _rtfeldman$elm_css$Css$Compatible,
-	lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css$Compatible,
-	intOrAuto: _rtfeldman$elm_css$Css$Compatible
+	backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundBlendMode: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundOrigin: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible,
+	intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+	touchAction: _rtfeldman$elm_css$Css_Structure$Compatible,
+	whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible
 };
 var _rtfeldman$elm_css$Css$unset = _elm_lang$core$Native_Utils.update(
 	_rtfeldman$elm_css$Css$initial,
@@ -14379,7 +14596,7 @@ var _rtfeldman$elm_css$Css$thick = _rtfeldman$elm_css$Css$IntentionallyUnsupport
 var _rtfeldman$elm_css$Css$blink = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
 
 var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
-	function (selectorStr, mixins) {
+	function (selectorStr, styles) {
 		var sequence = A2(
 			_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
 			_rtfeldman$elm_css$Css_Structure$TypeSelector(selectorStr),
@@ -14397,7 +14614,7 @@ var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
 						_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
 						selector,
 						{ctor: '[]'},
-						mixins)),
+						styles)),
 				_1: {ctor: '[]'}
 			});
 	});
@@ -14413,7 +14630,10 @@ var _rtfeldman$elm_css$Css_Elements$h4 = _rtfeldman$elm_css$Css_Elements$typeSel
 var _rtfeldman$elm_css$Css_Elements$h5 = _rtfeldman$elm_css$Css_Elements$typeSelector('h5');
 var _rtfeldman$elm_css$Css_Elements$h6 = _rtfeldman$elm_css$Css_Elements$typeSelector('h6');
 var _rtfeldman$elm_css$Css_Elements$nav = _rtfeldman$elm_css$Css_Elements$typeSelector('nav');
+var _rtfeldman$elm_css$Css_Elements$menu = _rtfeldman$elm_css$Css_Elements$typeSelector('menu');
 var _rtfeldman$elm_css$Css_Elements$section = _rtfeldman$elm_css$Css_Elements$typeSelector('section');
+var _rtfeldman$elm_css$Css_Elements$aside = _rtfeldman$elm_css$Css_Elements$typeSelector('aside');
+var _rtfeldman$elm_css$Css_Elements$time = _rtfeldman$elm_css$Css_Elements$typeSelector('time');
 var _rtfeldman$elm_css$Css_Elements$div = _rtfeldman$elm_css$Css_Elements$typeSelector('div');
 var _rtfeldman$elm_css$Css_Elements$hr = _rtfeldman$elm_css$Css_Elements$typeSelector('hr');
 var _rtfeldman$elm_css$Css_Elements$li = _rtfeldman$elm_css$Css_Elements$typeSelector('li');
@@ -14422,6 +14642,9 @@ var _rtfeldman$elm_css$Css_Elements$ol = _rtfeldman$elm_css$Css_Elements$typeSel
 var _rtfeldman$elm_css$Css_Elements$p = _rtfeldman$elm_css$Css_Elements$typeSelector('p');
 var _rtfeldman$elm_css$Css_Elements$ul = _rtfeldman$elm_css$Css_Elements$typeSelector('ul');
 var _rtfeldman$elm_css$Css_Elements$pre = _rtfeldman$elm_css$Css_Elements$typeSelector('pre');
+var _rtfeldman$elm_css$Css_Elements$dl = _rtfeldman$elm_css$Css_Elements$typeSelector('dl');
+var _rtfeldman$elm_css$Css_Elements$dt = _rtfeldman$elm_css$Css_Elements$typeSelector('dt');
+var _rtfeldman$elm_css$Css_Elements$dd = _rtfeldman$elm_css$Css_Elements$typeSelector('dd');
 var _rtfeldman$elm_css$Css_Elements$a = _rtfeldman$elm_css$Css_Elements$typeSelector('a');
 var _rtfeldman$elm_css$Css_Elements$code = _rtfeldman$elm_css$Css_Elements$typeSelector('code');
 var _rtfeldman$elm_css$Css_Elements$small = _rtfeldman$elm_css$Css_Elements$typeSelector('small');
@@ -14429,6 +14652,7 @@ var _rtfeldman$elm_css$Css_Elements$span = _rtfeldman$elm_css$Css_Elements$typeS
 var _rtfeldman$elm_css$Css_Elements$strong = _rtfeldman$elm_css$Css_Elements$typeSelector('strong');
 var _rtfeldman$elm_css$Css_Elements$i = _rtfeldman$elm_css$Css_Elements$typeSelector('i');
 var _rtfeldman$elm_css$Css_Elements$em = _rtfeldman$elm_css$Css_Elements$typeSelector('em');
+var _rtfeldman$elm_css$Css_Elements$q = _rtfeldman$elm_css$Css_Elements$typeSelector('q');
 var _rtfeldman$elm_css$Css_Elements$img = _rtfeldman$elm_css$Css_Elements$typeSelector('img');
 var _rtfeldman$elm_css$Css_Elements$audio = _rtfeldman$elm_css$Css_Elements$typeSelector('audio');
 var _rtfeldman$elm_css$Css_Elements$video = _rtfeldman$elm_css$Css_Elements$typeSelector('video');
@@ -14538,9 +14762,9 @@ var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector = F2(
 				_p4._1),
 			_p4._2);
 	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin = F2(
-	function (name, mixin) {
-		var _p7 = mixin;
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle = F2(
+	function (name, style) {
+		var _p7 = style;
 		switch (_p7.ctor) {
 			case 'AppendProperty':
 				return _rtfeldman$elm_css$Css_Preprocess$AppendProperty(
@@ -14551,7 +14775,7 @@ var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin = F2(
 					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable, name, _p7._0),
 					A2(
 						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
 						_p7._1));
 			case 'NestSnippet':
 				return A2(
@@ -14567,7 +14791,7 @@ var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin = F2(
 					_p7._0,
 					A2(
 						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
 						_p7._1));
 			case 'WithMedia':
 				return A2(
@@ -14575,13 +14799,13 @@ var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin = F2(
 					_p7._0,
 					A2(
 						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
 						_p7._1));
 			default:
-				return _rtfeldman$elm_css$Css_Preprocess$ApplyMixins(
+				return _rtfeldman$elm_css$Css_Preprocess$ApplyStyles(
 					A2(
 						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
 						_p7._0));
 		}
 	});
@@ -14661,7 +14885,7 @@ var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock = F2(
 				_p12._1),
 			A2(
 				_elm_lang$core$List$map,
-				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
 				_p12._2));
 	});
 var _rtfeldman$elm_css$Css_Namespace$namespace = F2(
@@ -16174,38 +16398,31 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 				}
 			case 'ClearInput':
 				return A2(
-					_elm_lang$core$Debug$log,
-					'123',
-					A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{input: ''}),
-						{ctor: '[]'}));
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{input: ''}),
+					{ctor: '[]'});
 			case 'Adjust':
-				var _p29 = _p26._0;
 				return A2(
-					_elm_lang$core$Debug$log,
-					_elm_lang$core$Basics$toString(_p29),
-					A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{inputWidth: _p29}),
-						{ctor: '[]'}));
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{inputWidth: _p26._0}),
+					{ctor: '[]'});
 			case 'Filter':
-				var _p33 = _p26._0;
+				var _p32 = _p26._0;
 				var filtered = A2(
 					_inkuzmin$elm_multiselect$Multiselect$filter,
 					model.selected,
 					A2(
 						_elm_lang$core$List$filter,
-						function (_p30) {
-							var _p31 = _p30;
+						function (_p29) {
+							var _p30 = _p29;
 							return A2(
 								_elm_lang$core$String$contains,
-								_elm_lang$core$String$toLower(_p33),
-								_elm_lang$core$String$toLower(_p31._1));
+								_elm_lang$core$String$toLower(_p32),
+								_elm_lang$core$String$toLower(_p30._1));
 						},
 						model.values));
 				if (model.$protected) {
@@ -16217,15 +16434,15 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p32 = model.hovered;
-					if (_p32.ctor === 'Nothing') {
+					var _p31 = model.hovered;
+					if (_p31.ctor === 'Nothing') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
 									filtered: filtered,
-									input: _p33,
+									input: _p32,
 									hovered: _elm_lang$core$List$head(filtered),
 									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 								}),
@@ -16236,7 +16453,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								A2(
 									_elm_lang$core$List$filter,
 									function (i) {
-										return _elm_lang$core$Native_Utils.eq(i, _p32._0);
+										return _elm_lang$core$Native_Utils.eq(i, _p31._0);
 									},
 									filtered)),
 							0) ? A2(
@@ -16245,7 +16462,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								model,
 								{
 									filtered: filtered,
-									input: _p33,
+									input: _p32,
 									hovered: _elm_lang$core$List$head(filtered),
 									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 								}),
@@ -16255,54 +16472,49 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								model,
 								{
 									filtered: filtered,
-									input: _p33,
+									input: _p32,
 									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 								}),
 							{ctor: '[]'});
 					}
 				}
 			case 'OnSelect':
-				var _p34 = _p26._0;
+				var _p33 = _p26._0;
+				var selected = A2(
+					_elm_lang$core$Basics_ops['++'],
+					model.selected,
+					{
+						ctor: '::',
+						_0: _p33,
+						_1: {ctor: '[]'}
+					});
+				var filtered = A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values);
 				return A2(
-					_elm_lang$core$Debug$log,
-					'123',
-					function () {
-						var selected = A2(
-							_elm_lang$core$Basics_ops['++'],
-							model.selected,
-							{
-								ctor: '::',
-								_0: _p34,
-								_1: {ctor: '[]'}
-							});
-						var filtered = A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values);
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{
-									selected: selected,
-									filtered: filtered,
-									hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p34),
-									input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
-									status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
-								}),
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$core$Task$attempt,
-									_inkuzmin$elm_multiselect$Multiselect$FocusResult,
-									_elm_lang$dom$Dom$focus(
-										A2(_elm_lang$core$Basics_ops['++'], 'multiselectInput', model.tag))),
-								_1: {ctor: '[]'}
-							});
-					}());
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							selected: selected,
+							filtered: filtered,
+							hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p33),
+							input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
+							status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
+						}),
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Task$attempt,
+							_inkuzmin$elm_multiselect$Multiselect$FocusResult,
+							_elm_lang$dom$Dom$focus(
+								A2(_elm_lang$core$Basics_ops['++'], 'multiselectInput', model.tag))),
+						_1: {ctor: '[]'}
+					});
 			case 'RemoveItem':
-				var _p35 = _p26._0;
+				var _p34 = _p26._0;
 				var selected = A2(
 					_elm_lang$core$List$filter,
 					function (value) {
-						return !_elm_lang$core$Native_Utils.eq(value, _p35);
+						return !_elm_lang$core$Native_Utils.eq(value, _p34);
 					},
 					model.selected);
 				return A2(
@@ -16312,7 +16524,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						{
 							selected: selected,
 							filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-							hovered: _elm_lang$core$Maybe$Just(_p35)
+							hovered: _elm_lang$core$Maybe$Just(_p34)
 						}),
 					{
 						ctor: '::',
@@ -16354,35 +16566,35 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						}),
 					{ctor: '[]'});
 			case 'ScrollY':
-				var _p36 = _p26._0;
-				if (_p36.ctor === 'Err') {
+				var _p35 = _p26._0;
+				if (_p35.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
 								error: _elm_lang$core$Maybe$Just(
-									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p36._0._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p35._0._0))
 							}),
 						{ctor: '[]'});
 				} else {
-					var _p37 = model.hovered;
-					if (_p37.ctor === 'Nothing') {
+					var _p36 = model.hovered;
+					if (_p36.ctor === 'Nothing') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							model,
 							{ctor: '[]'});
 					} else {
-						var _p38 = A2(_inkuzmin$elm_multiselect$Multiselect$indexOf, _p37._0, model.filtered);
-						if (_p38.ctor === 'Nothing') {
+						var _p37 = A2(_inkuzmin$elm_multiselect$Multiselect$indexOf, _p36._0, model.filtered);
+						if (_p37.ctor === 'Nothing') {
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								model,
 								{ctor: '[]'});
 						} else {
-							var vpBoundaries = _inkuzmin$elm_multiselect$Multiselect$getViewPortBoundaries(_p36._0);
+							var vpBoundaries = _inkuzmin$elm_multiselect$Multiselect$getViewPortBoundaries(_p35._0);
 							var boundaries = _inkuzmin$elm_multiselect$Multiselect$getBoundaries(
-								_elm_lang$core$Basics$toFloat(_p38._0));
+								_elm_lang$core$Basics$toFloat(_p37._0));
 							var scroll = A2(_inkuzmin$elm_multiselect$Multiselect$fitViewPort, boundaries, vpBoundaries);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16404,10 +16616,10 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 					}
 				}
 			default:
-				var _p45 = _p26._0;
-				if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow)) {
-					var _p39 = model.hovered;
-					if (_p39.ctor === 'Nothing') {
+				var _p44 = _p26._0;
+				if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow)) {
+					var _p38 = model.hovered;
+					if (_p38.ctor === 'Nothing') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -16417,7 +16629,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								}),
 							{ctor: '[]'});
 					} else {
-						var prev = A2(_inkuzmin$elm_multiselect$Multiselect$prevItem, model.filtered, _p39._0);
+						var prev = A2(_inkuzmin$elm_multiselect$Multiselect$prevItem, model.filtered, _p38._0);
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -16434,9 +16646,9 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 							});
 					}
 				} else {
-					if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow)) {
-						var _p40 = model.hovered;
-						if (_p40.ctor === 'Nothing') {
+					if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow)) {
+						var _p39 = model.hovered;
+						if (_p39.ctor === 'Nothing') {
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								_elm_lang$core$Native_Utils.update(
@@ -16446,7 +16658,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 									}),
 								{ctor: '[]'});
 						} else {
-							var next = A2(_inkuzmin$elm_multiselect$Multiselect$nextItem, model.filtered, _p40._0);
+							var next = A2(_inkuzmin$elm_multiselect$Multiselect$nextItem, model.filtered, _p39._0);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								_elm_lang$core$Native_Utils.update(
@@ -16463,7 +16675,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 								});
 						}
 					} else {
-						if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp) || _elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$home)) {
+						if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$home)) {
 							var first = _elm_lang$core$List$head(model.filtered);
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16480,7 +16692,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 									_1: {ctor: '[]'}
 								});
 						} else {
-							if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown) || _elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$end)) {
+							if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown) || _elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$end)) {
 								var last = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.filtered);
 								return A2(
 									_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16497,21 +16709,21 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 										_1: {ctor: '[]'}
 									});
 							} else {
-								if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$return)) {
-									var _p41 = model.hovered;
-									if (_p41.ctor === 'Nothing') {
+								if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$return)) {
+									var _p40 = model.hovered;
+									if (_p40.ctor === 'Nothing') {
 										return A2(
 											_elm_lang$core$Platform_Cmd_ops['!'],
 											model,
 											{ctor: '[]'});
 									} else {
-										var _p42 = _p41._0;
+										var _p41 = _p40._0;
 										var selected = A2(
 											_elm_lang$core$Basics_ops['++'],
 											model.selected,
 											{
 												ctor: '::',
-												_0: _p42,
+												_0: _p41,
 												_1: {ctor: '[]'}
 											});
 										var filtered = A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values);
@@ -16522,7 +16734,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 												{
 													selected: selected,
 													filtered: filtered,
-													hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p42),
+													hovered: A2(_inkuzmin$elm_multiselect$Multiselect$nextSelectedItem, model.filtered, _p41),
 													input: _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter,
 													status: _elm_lang$core$List$isEmpty(filtered) ? _inkuzmin$elm_multiselect$Multiselect$Closed : _inkuzmin$elm_multiselect$Multiselect$Opened
 												}),
@@ -16537,7 +16749,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 											});
 									}
 								} else {
-									if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape)) {
+									if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape)) {
 										return A2(
 											_elm_lang$core$Platform_Cmd_ops['!'],
 											_elm_lang$core$Native_Utils.update(
@@ -16545,20 +16757,20 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 												{status: _inkuzmin$elm_multiselect$Multiselect$Closed, $protected: true}),
 											{ctor: '[]'});
 									} else {
-										if (_elm_lang$core$Native_Utils.eq(_p45, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
+										if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
 											if (_elm_lang$core$Native_Utils.eq(model.input, '')) {
-												var _p43 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
-												if (_p43.ctor === 'Nothing') {
+												var _p42 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
+												if (_p42.ctor === 'Nothing') {
 													return A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
 														model,
 														{ctor: '[]'});
 												} else {
-													var _p44 = _p43._0;
+													var _p43 = _p42._0;
 													var selected = A2(
 														_elm_lang$core$List$filter,
 														function (value) {
-															return !_elm_lang$core$Native_Utils.eq(value, _p44);
+															return !_elm_lang$core$Native_Utils.eq(value, _p43);
 														},
 														model.selected);
 													return A2(
@@ -16568,7 +16780,7 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 															{
 																selected: selected,
 																filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-																hovered: _elm_lang$core$Maybe$Just(_p44)
+																hovered: _elm_lang$core$Maybe$Just(_p43)
 															}),
 														{
 															ctor: '::',
@@ -16617,9 +16829,9 @@ var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 		_elm_lang$core$Basics$always(_inkuzmin$elm_multiselect$Multiselect$Start),
 		A2(
 			_elm_lang$core$Json_Decode$andThen,
-			function (_p46) {
+			function (_p45) {
 				return _inkuzmin$elm_multiselect$Multiselect$fromResult(
-					filterKey(_p46));
+					filterKey(_p45));
 			},
 			_elm_lang$html$Html_Events$keyCode));
 	var options = {preventDefault: true, stopPropagation: false};

@@ -1,13 +1,13 @@
 {
   "name": "elm-multiselect",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A multiselect control built with and for Elm",
   "main": "brunch-config.js",
   "scripts": {
     "postinstall": "elm package install -y",
     "start": "brunch watch --server",
     "prod": "brunch build --production",
-    "test": "brunch build --production"
+    "test": "$TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 brunch build --production"
   },
   "keywords": [
     "elm",

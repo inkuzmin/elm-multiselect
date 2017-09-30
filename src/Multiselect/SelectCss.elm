@@ -32,7 +32,10 @@ type CssIds
     | MenuId
 
 
-boxShadowCustom : String -> Mixin
+
+--boxShadowCustom : String -> Mixin
+
+
 boxShadowCustom p =
     property "box-shadow" <| p
 
