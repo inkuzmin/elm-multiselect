@@ -1,4 +1,4 @@
-module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions, getSelectedValues)
+module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions, getSelectedValues, populateValues)
 
 {-| An implementation of multiselect control built with and for Elm.
 
@@ -7,7 +7,7 @@ Please, check example/src/MinimalExample.elm for the minimal example on how to u
 
 # Helpers
 
-@docs initModel, getSelectedValues
+@docs initModel, getSelectedValues, populateValues
 
 
 # Model
@@ -157,6 +157,20 @@ initModel values tag =
 getSelectedValues : Model -> List ( String, String )
 getSelectedValues model =
     model.selected
+
+
+{-| Populate model with values : List (String, String) and preselect selected : List (String, String).
+-}
+populateValues : Model -> List ( String, String ) -> List ( String, String ) -> Model
+populateValues model values selected =
+    let
+        filtered =
+            if (List.isEmpty selected) then
+                values
+            else
+                filter selected values
+    in
+        { model | values = values, filtered = filtered, selected = selected }
 
 
 filter : List ( String, String ) -> List ( String, String ) -> List ( String, String )
@@ -615,6 +629,8 @@ infixr 5 :>
 
 { id, class, classList } =
     Html.CssHelpers.withNamespace "multiselect"
+
+
 onClickNoDefault : msg -> Html.Attribute msg
 onClickNoDefault message =
     let

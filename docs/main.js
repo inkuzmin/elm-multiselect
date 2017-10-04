@@ -9320,6 +9320,367 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$http$Native_Http = function() {
+
+
+// ENCODING AND DECODING
+
+function encodeUri(string)
+{
+	return encodeURIComponent(string);
+}
+
+function decodeUri(string)
+{
+	try
+	{
+		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch(e)
+	{
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
+
+
+// SEND REQUEST
+
+function toTask(request, maybeProgress)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var xhr = new XMLHttpRequest();
+
+		configureProgress(xhr, maybeProgress);
+
+		xhr.addEventListener('error', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
+		});
+		xhr.addEventListener('timeout', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
+		});
+		xhr.addEventListener('load', function() {
+			callback(handleResponse(xhr, request.expect.responseToResult));
+		});
+
+		try
+		{
+			xhr.open(request.method, request.url, true);
+		}
+		catch (e)
+		{
+			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
+		}
+
+		configureRequest(xhr, request);
+		send(xhr, request.body);
+
+		return function() { xhr.abort(); };
+	});
+}
+
+function configureProgress(xhr, maybeProgress)
+{
+	if (maybeProgress.ctor === 'Nothing')
+	{
+		return;
+	}
+
+	xhr.addEventListener('progress', function(event) {
+		if (!event.lengthComputable)
+		{
+			return;
+		}
+		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
+			bytes: event.loaded,
+			bytesExpected: event.total
+		}));
+	});
+}
+
+function configureRequest(xhr, request)
+{
+	function setHeader(pair)
+	{
+		xhr.setRequestHeader(pair._0, pair._1);
+	}
+
+	A2(_elm_lang$core$List$map, setHeader, request.headers);
+	xhr.responseType = request.expect.responseType;
+	xhr.withCredentials = request.withCredentials;
+
+	if (request.timeout.ctor === 'Just')
+	{
+		xhr.timeout = request.timeout._0;
+	}
+}
+
+function send(xhr, body)
+{
+	switch (body.ctor)
+	{
+		case 'EmptyBody':
+			xhr.send();
+			return;
+
+		case 'StringBody':
+			xhr.setRequestHeader('Content-Type', body._0);
+			xhr.send(body._1);
+			return;
+
+		case 'FormDataBody':
+			xhr.send(body._0);
+			return;
+	}
+}
+
+
+// RESPONSES
+
+function handleResponse(xhr, responseToResult)
+{
+	var response = toResponse(xhr);
+
+	if (xhr.status < 200 || 300 <= xhr.status)
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadStatus',
+			_0: response
+		});
+	}
+
+	var result = responseToResult(response);
+
+	if (result.ctor === 'Ok')
+	{
+		return _elm_lang$core$Native_Scheduler.succeed(result._0);
+	}
+	else
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadPayload',
+			_0: result._0,
+			_1: response
+		});
+	}
+}
+
+function toResponse(xhr)
+{
+	return {
+		status: { code: xhr.status, message: xhr.statusText },
+		headers: parseHeaders(xhr.getAllResponseHeaders()),
+		url: xhr.responseURL,
+		body: xhr.response
+	};
+}
+
+function parseHeaders(rawHeaders)
+{
+	var headers = _elm_lang$core$Dict$empty;
+
+	if (!rawHeaders)
+	{
+		return headers;
+	}
+
+	var headerPairs = rawHeaders.split('\u000d\u000a');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf('\u003a\u0020');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
+				if (oldValue.ctor === 'Just')
+				{
+					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
+				}
+				return _elm_lang$core$Maybe$Just(value);
+			}, headers);
+		}
+	}
+
+	return headers;
+}
+
+
+// EXPECTORS
+
+function expectStringResponse(responseToResult)
+{
+	return {
+		responseType: 'text',
+		responseToResult: responseToResult
+	};
+}
+
+function mapExpect(func, expect)
+{
+	return {
+		responseType: expect.responseType,
+		responseToResult: function(response) {
+			var convertedResponse = expect.responseToResult(response);
+			return A2(_elm_lang$core$Result$map, func, convertedResponse);
+		}
+	};
+}
+
+
+// BODY
+
+function multipart(parts)
+{
+	var formData = new FormData();
+
+	while (parts.ctor !== '[]')
+	{
+		var part = parts._0;
+		formData.append(part._0, part._1);
+		parts = parts._1;
+	}
+
+	return { ctor: 'FormDataBody', _0: formData };
+}
+
+return {
+	toTask: F2(toTask),
+	expectStringResponse: expectStringResponse,
+	mapExpect: F2(mapExpect),
+	multipart: multipart,
+	encodeUri: encodeUri,
+	decodeUri: decodeUri
+};
+
+}();
+
+var _elm_lang$http$Http_Internal$map = F2(
+	function (func, request) {
+		return _elm_lang$core$Native_Utils.update(
+			request,
+			{
+				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
+			});
+	});
+var _elm_lang$http$Http_Internal$RawRequest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
+	});
+var _elm_lang$http$Http_Internal$Request = function (a) {
+	return {ctor: 'Request', _0: a};
+};
+var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
+var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
+var _elm_lang$http$Http_Internal$StringBody = F2(
+	function (a, b) {
+		return {ctor: 'StringBody', _0: a, _1: b};
+	});
+var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
+var _elm_lang$http$Http_Internal$Header = F2(
+	function (a, b) {
+		return {ctor: 'Header', _0: a, _1: b};
+	});
+
+var _elm_lang$http$Http$decodeUri = _elm_lang$http$Native_Http.decodeUri;
+var _elm_lang$http$Http$encodeUri = _elm_lang$http$Native_Http.encodeUri;
+var _elm_lang$http$Http$expectStringResponse = _elm_lang$http$Native_Http.expectStringResponse;
+var _elm_lang$http$Http$expectJson = function (decoder) {
+	return _elm_lang$http$Http$expectStringResponse(
+		function (response) {
+			return A2(_elm_lang$core$Json_Decode$decodeString, decoder, response.body);
+		});
+};
+var _elm_lang$http$Http$expectString = _elm_lang$http$Http$expectStringResponse(
+	function (response) {
+		return _elm_lang$core$Result$Ok(response.body);
+	});
+var _elm_lang$http$Http$multipartBody = _elm_lang$http$Native_Http.multipart;
+var _elm_lang$http$Http$stringBody = _elm_lang$http$Http_Internal$StringBody;
+var _elm_lang$http$Http$jsonBody = function (value) {
+	return A2(
+		_elm_lang$http$Http_Internal$StringBody,
+		'application/json',
+		A2(_elm_lang$core$Json_Encode$encode, 0, value));
+};
+var _elm_lang$http$Http$emptyBody = _elm_lang$http$Http_Internal$EmptyBody;
+var _elm_lang$http$Http$header = _elm_lang$http$Http_Internal$Header;
+var _elm_lang$http$Http$request = _elm_lang$http$Http_Internal$Request;
+var _elm_lang$http$Http$post = F3(
+	function (url, body, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {ctor: '[]'},
+				url: url,
+				body: body,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$get = F2(
+	function (url, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'GET',
+				headers: {ctor: '[]'},
+				url: url,
+				body: _elm_lang$http$Http$emptyBody,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$getString = function (url) {
+	return _elm_lang$http$Http$request(
+		{
+			method: 'GET',
+			headers: {ctor: '[]'},
+			url: url,
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectString,
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
+var _elm_lang$http$Http$toTask = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$http$Native_Http.toTask, _p1._0, _elm_lang$core$Maybe$Nothing);
+};
+var _elm_lang$http$Http$send = F2(
+	function (resultToMessage, request) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			resultToMessage,
+			_elm_lang$http$Http$toTask(request));
+	});
+var _elm_lang$http$Http$Response = F4(
+	function (a, b, c, d) {
+		return {url: a, status: b, headers: c, body: d};
+	});
+var _elm_lang$http$Http$BadPayload = F2(
+	function (a, b) {
+		return {ctor: 'BadPayload', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$BadStatus = function (a) {
+	return {ctor: 'BadStatus', _0: a};
+};
+var _elm_lang$http$Http$NetworkError = {ctor: 'NetworkError'};
+var _elm_lang$http$Http$Timeout = {ctor: 'Timeout'};
+var _elm_lang$http$Http$BadUrl = function (a) {
+	return {ctor: 'BadUrl', _0: a};
+};
+var _elm_lang$http$Http$StringPart = F2(
+	function (a, b) {
+		return {ctor: 'StringPart', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
 var _elm_lang$mouse$Mouse_ops = _elm_lang$mouse$Mouse_ops || {};
 _elm_lang$mouse$Mouse_ops['&>'] = F2(
 	function (t1, t2) {
@@ -15905,6 +16266,13 @@ var _inkuzmin$elm_multiselect$Multiselect$filter = F2(
 			},
 			values);
 	});
+var _inkuzmin$elm_multiselect$Multiselect$populateValues = F3(
+	function (model, values, selected) {
+		var filtered = _elm_lang$core$List$isEmpty(selected) ? values : A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, values);
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{values: values, filtered: filtered, selected: selected});
+	});
 var _inkuzmin$elm_multiselect$Multiselect$getSelectedValues = function (model) {
 	return model.selected;
 };
@@ -17011,6 +17379,8 @@ var _inkuzmin$elm_multiselect$Multiselect$main = _elm_lang$html$Html$programWith
 	_elm_lang$core$Json_Decode$succeed(
 		{}));
 
+var _inkuzmin$elm_multiselect$Main$decodeUrl = _elm_lang$core$Json_Decode$list(
+	A2(_elm_lang$core$Json_Decode$field, 'login', _elm_lang$core$Json_Decode$string));
 var _inkuzmin$elm_multiselect$Main$showSelected = function (values) {
 	return A2(
 		_elm_lang$html$Html$ul,
@@ -17030,6 +17400,7 @@ var _inkuzmin$elm_multiselect$Main$showSelected = function (values) {
 			},
 			values));
 };
+var _inkuzmin$elm_multiselect$Main$valuesC = {ctor: '[]'};
 var _inkuzmin$elm_multiselect$Main$valuesB = {
 	ctor: '::',
 	_0: {ctor: '_Tuple2', _0: '0', _1: 'AAA'},
@@ -17111,17 +17482,29 @@ var _inkuzmin$elm_multiselect$Main$valuesA = {
 var _inkuzmin$elm_multiselect$Main$model = {
 	multiselectA: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesA, 'A'),
 	multiselectB: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesB, 'B'),
+	multiselectC: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Main$valuesC, 'C'),
 	selectedA: {ctor: '[]'}
 };
-var _inkuzmin$elm_multiselect$Main$init = function (flags) {
-	return {ctor: '_Tuple2', _0: _inkuzmin$elm_multiselect$Main$model, _1: _elm_lang$core$Platform_Cmd$none};
-};
 var _inkuzmin$elm_multiselect$Main$Flags = {};
-var _inkuzmin$elm_multiselect$Main$Model = F3(
-	function (a, b, c) {
-		return {multiselectA: a, multiselectB: b, selectedA: c};
+var _inkuzmin$elm_multiselect$Main$Model = F4(
+	function (a, b, c, d) {
+		return {multiselectA: a, multiselectB: b, multiselectC: c, selectedA: d};
 	});
+var _inkuzmin$elm_multiselect$Main$Prepopulate = function (a) {
+	return {ctor: 'Prepopulate', _0: a};
+};
+var _inkuzmin$elm_multiselect$Main$prepopulateValues = function () {
+	var url = 'https://api.github.com/repos/inkuzmin/elm-multiselect/contributors';
+	var request = A2(_elm_lang$http$Http$get, url, _inkuzmin$elm_multiselect$Main$decodeUrl);
+	return A2(_elm_lang$http$Http$send, _inkuzmin$elm_multiselect$Main$Prepopulate, request);
+}();
+var _inkuzmin$elm_multiselect$Main$init = function (flags) {
+	return {ctor: '_Tuple2', _0: _inkuzmin$elm_multiselect$Main$model, _1: _inkuzmin$elm_multiselect$Main$prepopulateValues};
+};
 var _inkuzmin$elm_multiselect$Main$SelectA = {ctor: 'SelectA'};
+var _inkuzmin$elm_multiselect$Main$Yay = function (a) {
+	return {ctor: 'Yay', _0: a};
+};
 var _inkuzmin$elm_multiselect$Main$Nyan = function (a) {
 	return {ctor: 'Nyan', _0: a};
 };
@@ -17162,7 +17545,21 @@ var _inkuzmin$elm_multiselect$Main$update = F2(
 						_0: A2(_elm_lang$core$Platform_Cmd$map, _inkuzmin$elm_multiselect$Main$Nyan, subCmd),
 						_1: {ctor: '[]'}
 					});
-			default:
+			case 'Yay':
+				var _p5 = A2(_inkuzmin$elm_multiselect$Multiselect$update, _p2._0, model.multiselectC);
+				var subModel = _p5._0;
+				var subCmd = _p5._1;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{multiselectC: subModel}),
+					{
+						ctor: '::',
+						_0: A2(_elm_lang$core$Platform_Cmd$map, _inkuzmin$elm_multiselect$Main$Yay, subCmd),
+						_1: {ctor: '[]'}
+					});
+			case 'SelectA':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17172,6 +17569,33 @@ var _inkuzmin$elm_multiselect$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			default:
+				if (_p2._0.ctor === 'Ok') {
+					var values = A2(
+						_elm_lang$core$List$map,
+						function (v) {
+							return {ctor: '_Tuple2', _0: v, _1: v};
+						},
+						_p2._0._0);
+					var multiselectModel = model.multiselectC;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								multiselectC: A3(
+									_inkuzmin$elm_multiselect$Multiselect$populateValues,
+									multiselectModel,
+									values,
+									{ctor: '[]'})
+							}),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Debug$log,
+						'error',
+						{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none});
+				}
 		}
 	});
 var _inkuzmin$elm_multiselect$Main$view = function (model) {
@@ -17254,7 +17678,50 @@ var _inkuzmin$elm_multiselect$Main$view = function (model) {
 										ctor: '::',
 										_0: _inkuzmin$elm_multiselect$Main$showSelected(
 											_inkuzmin$elm_multiselect$Multiselect$getSelectedValues(model.multiselectB)),
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$style(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'height', _1: '300px'},
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(''),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$h3,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Contributors (dynamic fetching of values)'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$map,
+														_inkuzmin$elm_multiselect$Main$Yay,
+														_inkuzmin$elm_multiselect$Multiselect$view(model.multiselectC)),
+													_1: {
+														ctor: '::',
+														_0: _inkuzmin$elm_multiselect$Main$showSelected(
+															_inkuzmin$elm_multiselect$Multiselect$getSelectedValues(model.multiselectC)),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
 									}
 								}
 							}
@@ -17278,7 +17745,14 @@ var _inkuzmin$elm_multiselect$Main$subscriptions = function (model) {
 					_elm_lang$core$Platform_Sub$map,
 					_inkuzmin$elm_multiselect$Main$Nyan,
 					_inkuzmin$elm_multiselect$Multiselect$subscriptions(model.multiselectB)),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Platform_Sub$map,
+						_inkuzmin$elm_multiselect$Main$Yay,
+						_inkuzmin$elm_multiselect$Multiselect$subscriptions(model.multiselectC)),
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };

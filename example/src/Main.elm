@@ -5,6 +5,8 @@ import Html.Events exposing (onClick)
 import Multiselect
 import Mouse
 import Html.Attributes
+import Json.Decode as Decode
+import Http
 
 
 main =
@@ -49,6 +51,11 @@ valuesB =
     ]
 
 
+valuesC : List ( String, String )
+valuesC =
+    []
+
+
 type alias Flags =
     {}
 
@@ -56,6 +63,7 @@ type alias Flags =
 type alias Model =
     { multiselectA : Multiselect.Model
     , multiselectB : Multiselect.Model
+    , multiselectC : Multiselect.Model
     , selectedA : List ( String, String )
     }
 
@@ -64,13 +72,14 @@ model : Model
 model =
     { multiselectA = Multiselect.initModel valuesA "A"
     , multiselectB = Multiselect.initModel valuesB "B"
+    , multiselectC = Multiselect.initModel valuesC "C"
     , selectedA = []
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( model, Cmd.none )
+    ( model, prepopulateValues )
 
 
 
@@ -81,7 +90,9 @@ type Msg
     = NoOp
     | HOI Multiselect.Msg
     | Nyan Multiselect.Msg
+    | Yay Multiselect.Msg
     | SelectA
+    | Prepopulate (Result Http.Error (List String))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -104,8 +115,28 @@ update msg model =
             in
                 { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
 
+        Yay sub ->
+            let
+                ( subModel, subCmd ) =
+                    Multiselect.update sub model.multiselectC
+            in
+                { model | multiselectC = subModel } ! [ Cmd.map Yay subCmd ]
+
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
+
+        Prepopulate (Ok vs) ->
+            let
+                multiselectModel =
+                    model.multiselectC
+
+                values =
+                    List.map (\v -> ( v, v )) vs
+            in
+                { model | multiselectC = Multiselect.populateValues multiselectModel values [] } ! []
+
+        Prepopulate (Err _) ->
+            Debug.log "error" ( model, Cmd.none )
 
 
 
@@ -123,6 +154,10 @@ view model =
         , Html.h3 [] [ text "Submit on select" ]
         , Html.map Nyan <| Multiselect.view model.multiselectB
         , showSelected (Multiselect.getSelectedValues model.multiselectB)
+        , div [ Html.Attributes.style [ ( "height", "300px" ) ] ] [ text "" ]
+        , Html.h3 [] [ text "Contributors (dynamic fetching of values)" ]
+        , Html.map Yay <| Multiselect.view model.multiselectC
+        , showSelected (Multiselect.getSelectedValues model.multiselectC)
         ]
 
 
@@ -140,4 +175,25 @@ subscriptions model =
     Sub.batch
         [ Sub.map HOI <| Multiselect.subscriptions model.multiselectA
         , Sub.map Nyan <| Multiselect.subscriptions model.multiselectB
+        , Sub.map Yay <| Multiselect.subscriptions model.multiselectC
         ]
+
+
+
+-- HELPERS
+
+
+prepopulateValues =
+    let
+        url =
+            "https://api.github.com/repos/inkuzmin/elm-multiselect/contributors"
+
+        request =
+            Http.get url decodeUrl
+    in
+        Http.send Prepopulate request
+
+
+decodeUrl : Decode.Decoder (List String)
+decodeUrl =
+    Decode.list (Decode.field "login" Decode.string)
