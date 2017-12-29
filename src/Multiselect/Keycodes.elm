@@ -58,3 +58,8 @@ end =
 backspace : KeyCode
 backspace =
     8
+
+
+tab : KeyCode
+tab =
+    9
