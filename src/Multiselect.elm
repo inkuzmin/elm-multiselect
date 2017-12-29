@@ -472,8 +472,10 @@ update msg model =
                             }
                                 ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
                                   ]
-            else if key == Keycodes.escape || key == Keycodes.tab then
+            else if key == Keycodes.escape then
                 { model | status = Closed, protected = True } ! []
+            else if key == Keycodes.tab then
+                { model | status = Closed } ! []
             else if key == Keycodes.backspace then
                 if model.input == "" then
                     case lastElem model.selected of

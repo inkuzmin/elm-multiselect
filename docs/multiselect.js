@@ -15697,6 +15697,7 @@ var _inkuzmin$elm_multiselect$Multiselect_SelectCss$css = function (_p0) {
 var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuId = {ctor: 'MenuId'};
 var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputId = {ctor: 'InputId'};
 
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$tab = 9;
 var _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace = 8;
 var _inkuzmin$elm_multiselect$Multiselect_Keycodes$end = 35;
 var _inkuzmin$elm_multiselect$Multiselect_Keycodes$home = 36;
@@ -16764,40 +16765,54 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 												{status: _inkuzmin$elm_multiselect$Multiselect$Closed, $protected: true}),
 											{ctor: '[]'});
 									} else {
-										if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
-											if (_elm_lang$core$Native_Utils.eq(model.input, '')) {
-												var _p42 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
-												if (_p42.ctor === 'Nothing') {
+										if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$tab)) {
+											return A2(
+												_elm_lang$core$Platform_Cmd_ops['!'],
+												_elm_lang$core$Native_Utils.update(
+													model,
+													{status: _inkuzmin$elm_multiselect$Multiselect$Closed}),
+												{ctor: '[]'});
+										} else {
+											if (_elm_lang$core$Native_Utils.eq(_p44, _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace)) {
+												if (_elm_lang$core$Native_Utils.eq(model.input, '')) {
+													var _p42 = _inkuzmin$elm_multiselect$Multiselect$lastElem(model.selected);
+													if (_p42.ctor === 'Nothing') {
+														return A2(
+															_elm_lang$core$Platform_Cmd_ops['!'],
+															model,
+															{ctor: '[]'});
+													} else {
+														var _p43 = _p42._0;
+														var selected = A2(
+															_elm_lang$core$List$filter,
+															function (value) {
+																return !_elm_lang$core$Native_Utils.eq(value, _p43);
+															},
+															model.selected);
+														return A2(
+															_elm_lang$core$Platform_Cmd_ops['!'],
+															_elm_lang$core$Native_Utils.update(
+																model,
+																{
+																	selected: selected,
+																	filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
+																	hovered: _elm_lang$core$Maybe$Just(_p43)
+																}),
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$core$Task$attempt,
+																	_inkuzmin$elm_multiselect$Multiselect$ScrollY,
+																	_elm_lang$dom$Dom_Scroll$y(
+																		A2(_elm_lang$core$Basics_ops['++'], 'multiselectMenu', model.tag))),
+																_1: {ctor: '[]'}
+															});
+													}
+												} else {
 													return A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
 														model,
 														{ctor: '[]'});
-												} else {
-													var _p43 = _p42._0;
-													var selected = A2(
-														_elm_lang$core$List$filter,
-														function (value) {
-															return !_elm_lang$core$Native_Utils.eq(value, _p43);
-														},
-														model.selected);
-													return A2(
-														_elm_lang$core$Platform_Cmd_ops['!'],
-														_elm_lang$core$Native_Utils.update(
-															model,
-															{
-																selected: selected,
-																filtered: A2(_inkuzmin$elm_multiselect$Multiselect$filter, selected, model.values),
-																hovered: _elm_lang$core$Maybe$Just(_p43)
-															}),
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$core$Task$attempt,
-																_inkuzmin$elm_multiselect$Multiselect$ScrollY,
-																_elm_lang$dom$Dom_Scroll$y(
-																	A2(_elm_lang$core$Basics_ops['++'], 'multiselectMenu', model.tag))),
-															_1: {ctor: '[]'}
-														});
 												}
 											} else {
 												return A2(
@@ -16805,11 +16820,6 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 													model,
 													{ctor: '[]'});
 											}
-										} else {
-											return A2(
-												_elm_lang$core$Platform_Cmd_ops['!'],
-												model,
-												{ctor: '[]'});
 										}
 									}
 								}
