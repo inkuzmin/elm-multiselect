@@ -1,12 +1,12 @@
 module Main exposing (..)
 
 import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
-import Multiselect
-import Mouse
 import Html.Attributes
-import Json.Decode as Decode
+import Html.Events exposing (onClick)
 import Http
+import Json.Decode as Decode
+import Mouse
+import Multiselect
 
 
 main =
@@ -103,24 +103,35 @@ update msg model =
 
         HOI sub ->
             let
-                ( subModel, subCmd ) =
+                ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectA
             in
-                { model | multiselectA = subModel } ! [ Cmd.map HOI subCmd ]
+            { model | multiselectA = subModel } ! [ Cmd.map HOI subCmd ]
 
         Nyan sub ->
             let
-                ( subModel, subCmd ) =
+                ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectB
             in
-                { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
+            { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
 
         Yay sub ->
             let
-                ( subModel, subCmd ) =
+                ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectC
+
+                newModel =
+                    { model | multiselectC = subModel }
+
+                ( newerModel, outCommands ) =
+                    case outMsg of
+                        Just m ->
+                            updateOutMsg m newModel
+
+                        Nothing ->
+                            ( newModel, Cmd.none )
             in
-                { model | multiselectC = subModel } ! [ Cmd.map Yay subCmd ]
+            newerModel ! [ Cmd.map Yay subCmd, outCommands ]
 
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
@@ -133,10 +144,39 @@ update msg model =
                 values =
                     List.map (\v -> ( v, v )) vs
             in
-                { model | multiselectC = Multiselect.populateValues multiselectModel values [] } ! []
+            { model | multiselectC = Multiselect.populateValues multiselectModel values [] } ! []
 
         Prepopulate (Err _) ->
             Debug.log "error" ( model, Cmd.none )
+
+
+updateOutMsg : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
+updateOutMsg msg model =
+    case msg of
+        Multiselect.Selected ( k, v ) ->
+            let
+                _ =
+                    ( Debug.log "Received Selected msg from Multiselect, key" k
+                    , Debug.log "value" v
+                    )
+            in
+            ( model, Cmd.none )
+
+        Multiselect.Unselected ( k, v ) ->
+            let
+                _ =
+                    ( Debug.log "Received Unselected msg from Multiselect, key" k
+                    , Debug.log "value" v
+                    )
+            in
+            ( model, Cmd.none )
+
+        Multiselect.Cleared ->
+            let
+                _ =
+                    Debug.log "Received Cleared msg from Multiselect" ""
+            in
+            ( model, Cmd.none )
 
 
 
@@ -191,7 +231,7 @@ prepopulateValues =
         request =
             Http.get url decodeUrl
     in
-        Http.send Prepopulate request
+    Http.send Prepopulate request
 
 
 decodeUrl : Decode.Decoder (List String)
