@@ -20,6 +20,11 @@ Please, check example/src/MinimalExample.elm for the minimal example on how to u
 @docs Msg
 
 
+# OutMsg
+
+@docs OutMsg
+
+
 # View
 
 @docs view
