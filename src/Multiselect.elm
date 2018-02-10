@@ -512,7 +512,7 @@ update msg model =
                         , Cmd.batch
                             [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
                             ]
-                        , Nothing
+                        , Just (Selected item)
                         )
             else if key == Keycodes.escape then
                 ( { model | status = Closed, protected = True }, Cmd.none, Nothing )
@@ -535,7 +535,7 @@ update msg model =
                                 , hovered = Just item
                               }
                             , Cmd.batch [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
-                            , Nothing
+                            , Just (Unselected item)
                             )
                 else
                     ( model, Cmd.none, Nothing )

@@ -17017,7 +17017,8 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 															A2(_elm_lang$core$Basics_ops['++'], 'multiselectInput', model.tag))),
 													_1: {ctor: '[]'}
 												}),
-											_2: _elm_lang$core$Maybe$Nothing
+											_2: _elm_lang$core$Maybe$Just(
+												_inkuzmin$elm_multiselect$Multiselect$Selected(_p42))
 										};
 									}
 								} else {
@@ -17073,7 +17074,8 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 																			A2(_elm_lang$core$Basics_ops['++'], 'multiselectMenu', model.tag))),
 																	_1: {ctor: '[]'}
 																}),
-															_2: _elm_lang$core$Maybe$Nothing
+															_2: _elm_lang$core$Maybe$Just(
+																_inkuzmin$elm_multiselect$Multiselect$Unselected(_p44))
 														};
 													}
 												} else {
