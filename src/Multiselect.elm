@@ -1,4 +1,4 @@
-module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions, getSelectedValues, populateValues)
+module Multiselect exposing (Model, initModel, Msg, update, view, subscriptions, getSelectedValues, populateValues, OutMsg(..))
 
 {-| An implementation of multiselect control built with and for Elm.
 
@@ -55,46 +55,6 @@ import Multiselect.Keycodes as Keycodes
 import Multiselect.Utils exposing (fst, snd, invisibleCharacter)
 
 
-{-| Example values, also used as default ones to make it simpler to start using this library.
--}
-values : List ( String, String )
-values =
-    [ ( "one", "The first option" )
-    , ( "two", "The second option" )
-    , ( "three", "The third option" )
-    , ( "four", "The 4th option" )
-    , ( "five", "The 5th option" )
-    , ( "six", "The 6th option" )
-    , ( "seven", "The 7th option" )
-    , ( "eight", "The 8th option" )
-    , ( "nine", "The 9th option" )
-    , ( "ten", "The 10th option" )
-    , ( "eleven", "The 11th option" )
-    , ( "twelve", "The 12th option" )
-    ]
-
-
-
--- INIT
-
-
-main =
-    Html.programWithFlags
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-
--- MODEL
-
-
-type alias Flags =
-    {}
-
-
 type Status
     = Closed
     | Focused
@@ -121,13 +81,6 @@ type alias Model =
     , hovered : Maybe ( String, String )
     , tag : String
     }
-
-
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    ( initModel values "A"
-    , Cmd.none
-    )
 
 
 {-| Init model based on the values : List (String, String) and id : String provided by the user.
@@ -203,6 +156,12 @@ type Msg
     | ScrollY (Result Dom.Error Float)
 
 
+type OutMsg
+    = NoOp
+    | Select String String
+    | Unselect String String
+
+
 {-| Update the control state
 
     MultiselectMsg subMsg ->
@@ -213,69 +172,73 @@ type Msg
             { model | multiselect = subModel } ! [ Cmd.map MultiselectMsg subCmd ]
 
 -}
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, OutMsg )
 update msg model =
     case msg of
         Start ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, NoOp )
 
         Toggle ->
             if model.status == Opened then
-                ({ model | status = Closed }
-                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                      ]
+                ( { model | status = Closed }
+                , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                , NoOp
                 )
             else
-                ({ model | status = Opened }
-                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                      ]
+                ( { model | status = Opened }
+                , Dom.focus ("multiselectInput" ++ model.tag)
+                    |> Task.attempt FocusResult
+                , NoOp
                 )
 
         Click _ ->
             if model.protected then
-                ( { model | protected = False }, Cmd.none )
+                ( { model | protected = False }, Cmd.none, NoOp )
             else
-                ( { model | status = Closed }, Cmd.none )
+                ( { model | status = Closed }, Cmd.none, NoOp )
 
         DisableProtection ->
-            ( { model | protected = False }, Cmd.none )
+            ( { model | protected = False }, Cmd.none, NoOp )
 
         ClickOnComponent ->
             if model.protected then
-                ( model, Cmd.none )
+                ( model, Cmd.none, NoOp )
             else
-                { model | status = Opened, protected = True }
-                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                      , delay (Time.millisecond * 100) <| DisableProtection
-                      ]
+                ( { model | status = Opened, protected = True }
+                , Cmd.batch
+                    [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                    , delay (Time.millisecond * 100) <| DisableProtection
+                    ]
+                , NoOp
+                )
 
         ScrollResult result ->
             case result of
                 Err (Dom.NotFound id) ->
-                    { model | error = Just ("Could not find dom id: " ++ id) } ! []
+                    ( { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, NoOp )
 
                 Ok () ->
                     if model.input == invisibleCharacter then
-                        { model | input = "" } ! []
+                        ( { model | input = "" }, Cmd.none, NoOp )
                     else
-                        { model | error = Nothing } ! []
+                        ( { model | error = Nothing }, Cmd.none, NoOp )
 
         FocusResult result ->
             case result of
                 Err (Dom.NotFound id) ->
-                    { model | error = Just ("Could not find dom id: " ++ id) } ! []
+                    ( { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, NoOp )
 
                 Ok () ->
                     if model.input == invisibleCharacter then
-                        { model | input = "" } ! []
+                        ( { model | input = "" }, Cmd.none, NoOp )
                     else
-                        { model | error = Nothing } ! []
+                        ( { model | error = Nothing }, Cmd.none, NoOp )
 
         ClearInput ->
-            ({ model | input = "" } ! [])
+            ( { model | input = "" }, Cmd.none, NoOp )
 
         Adjust value ->
-            ({ model | inputWidth = value } ! [])
+            ( { model | inputWidth = value }, Cmd.none, NoOp )
 
         Filter value ->
             let
@@ -286,11 +249,11 @@ update msg model =
                         )
             in
                 if model.protected then
-                    ( { model | protected = False }, Cmd.none )
+                    ( { model | protected = False }, Cmd.none, NoOp )
                 else
                     case model.hovered of
                         Nothing ->
-                            { model
+                            ( { model
                                 | filtered = filtered
                                 , input = value
                                 , hovered = List.head filtered
@@ -299,12 +262,14 @@ update msg model =
                                         Closed
                                     else
                                         Opened
-                            }
-                                ! []
+                              }
+                            , Cmd.none
+                            , NoOp
+                            )
 
                         Just item ->
                             if List.length (List.filter (\i -> i == item) filtered) == 0 then
-                                { model
+                                ( { model
                                     | filtered = filtered
                                     , input = value
                                     , hovered = List.head filtered
@@ -313,10 +278,12 @@ update msg model =
                                             Closed
                                         else
                                             Opened
-                                }
-                                    ! []
+                                  }
+                                , Cmd.none
+                                , NoOp
+                                )
                             else
-                                { model
+                                ( { model
                                     | filtered = filtered
                                     , input = value
                                     , status =
@@ -324,10 +291,12 @@ update msg model =
                                             Closed
                                         else
                                             Opened
-                                }
-                                    ! []
+                                  }
+                                , Cmd.none
+                                , NoOp
+                                )
 
-        OnSelect item ->
+        OnSelect (( code, label ) as item) ->
             let
                 selected =
                     model.selected ++ [ item ]
@@ -335,7 +304,7 @@ update msg model =
                 filtered =
                     filter selected model.values
             in
-                { model
+                ( { model
                     | selected = selected
                     , filtered = filtered
                     , hovered = nextSelectedItem model.filtered item
@@ -345,53 +314,58 @@ update msg model =
                             Closed
                         else
                             Opened
-                }
-                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                      ]
+                  }
+                , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                , Select code label
+                )
 
-        RemoveItem item ->
+        RemoveItem (( code, label ) as item) ->
             let
                 selected =
                     List.filter (\value -> value /= item) model.selected
             in
-                { model
+                ( { model
                     | selected = selected
                     , filtered = filter selected model.values
                     , hovered = Just item
-                }
-                    ! [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                  }
+                , Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY
+                , Unselect code label
+                )
 
         Clear ->
             let
                 selected =
                     []
             in
-                { model
+                ( { model
                     | selected = selected
                     , filtered = filter selected model.values
                     , input = invisibleCharacter
                     , status = Closed
-                }
-                    ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                      ]
+                  }
+                , Dom.focus ("multiselectInput" ++ model.tag)
+                    |> Task.attempt FocusResult
+                , NoOp
+                )
 
         OnHover item ->
-            { model | hovered = Just item } ! []
+            ( { model | hovered = Just item }, Cmd.none, NoOp )
 
         ScrollY result ->
             case result of
                 Err (Dom.NotFound id) ->
-                    { model | error = Just ("Could not find dom id: " ++ id) } ! []
+                    ( { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, NoOp )
 
                 Ok y ->
                     case model.hovered of
                         Nothing ->
-                            model ! []
+                            ( model, Cmd.none, NoOp )
 
                         Just item ->
                             case indexOf item model.filtered of
                                 Nothing ->
-                                    model ! []
+                                    ( model, Cmd.none, NoOp )
 
                                 Just idx ->
                                     let
@@ -404,54 +378,64 @@ update msg model =
                                         scroll =
                                             fitViewPort boundaries vpBoundaries
                                     in
-                                        { model | error = Nothing }
-                                            ! [ Dom.Scroll.toY ("multiselectMenu" ++ model.tag) scroll |> Task.attempt ScrollResult ]
+                                        ( { model | error = Nothing }
+                                        , Dom.Scroll.toY ("multiselectMenu" ++ model.tag) scroll |> Task.attempt ScrollResult
+                                        , NoOp
+                                        )
 
         Shortcut key ->
             if key == Keycodes.upArrow then
                 case model.hovered of
                     Nothing ->
-                        { model | hovered = List.head model.filtered } ! []
+                        ( { model | hovered = List.head model.filtered }, Cmd.none, NoOp )
 
                     Just item ->
                         let
                             prev =
                                 prevItem (model.filtered) item
                         in
-                            { model | hovered = prev }
-                                ! [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                            ( { model | hovered = prev }
+                            , Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY
+                            , NoOp
+                            )
             else if key == Keycodes.downArrow then
                 case model.hovered of
                     Nothing ->
-                        { model | hovered = List.head model.filtered } ! []
+                        ( { model | hovered = List.head model.filtered }, Cmd.none, NoOp )
 
                     Just item ->
                         let
                             next =
                                 nextItem (model.filtered) item
                         in
-                            { model | hovered = next }
-                                ! [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                            ( { model | hovered = next }
+                            , Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY
+                            , NoOp
+                            )
             else if key == Keycodes.pageUp || key == Keycodes.home then
                 let
                     first =
                         List.head (model.filtered)
                 in
-                    { model | hovered = first }
-                        ! [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                    ( { model | hovered = first }
+                    , Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY
+                    , NoOp
+                    )
             else if key == Keycodes.pageDown || key == Keycodes.end then
                 let
                     last =
                         lastElem (model.filtered)
                 in
-                    { model | hovered = last }
-                        ! [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                    ( { model | hovered = last }
+                    , Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY
+                    , NoOp
+                    )
             else if key == Keycodes.return then
                 case model.hovered of
                     Nothing ->
-                        model ! []
+                        ( model, Cmd.none, NoOp )
 
-                    Just item ->
+                    Just (( code, label ) as item) ->
                         let
                             selected =
                                 model.selected ++ [ item ]
@@ -459,7 +443,7 @@ update msg model =
                             filtered =
                                 filter selected model.values
                         in
-                            { model
+                            ( { model
                                 | selected = selected
                                 , filtered = filtered
                                 , hovered = nextSelectedItem model.filtered item
@@ -469,34 +453,38 @@ update msg model =
                                         Closed
                                     else
                                         Opened
-                            }
-                                ! [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                                  ]
+                              }
+                            , Dom.focus ("multiselectInput" ++ model.tag)
+                                |> Task.attempt FocusResult
+                            , Select code label
+                            )
             else if key == Keycodes.escape then
-                { model | status = Closed, protected = True } ! []
+                ( { model | status = Closed, protected = True }, Cmd.none, NoOp )
             else if key == Keycodes.tab then
-                { model | status = Closed } ! []
+                ( { model | status = Closed }, Cmd.none, NoOp )
             else if key == Keycodes.backspace then
                 if model.input == "" then
                     case lastElem model.selected of
                         Nothing ->
-                            model ! []
+                            ( model, Cmd.none, NoOp )
 
-                        Just item ->
+                        Just (( code, label ) as item) ->
                             let
                                 selected =
                                     List.filter (\value -> value /= item) model.selected
                             in
-                                { model
+                                ( { model
                                     | selected = selected
                                     , filtered = filter selected model.values
                                     , hovered = Just item
-                                }
-                                    ! [ Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                                  }
+                                , Dom.Scroll.y ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY
+                                , Unselect code label
+                                )
                 else
-                    model ! []
+                    ( model, Cmd.none, NoOp )
             else
-                model ! []
+                ( model, Cmd.none, NoOp )
 
 
 getViewPortBoundaries : Float -> ( Float, Float )
