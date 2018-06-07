@@ -1,4 +1,16 @@
-module Multiselect.Keycodes exposing (..)
+module Multiselect.Keycodes
+    exposing
+        ( return
+        , downArrow
+        , upArrow
+        , backspace
+        , tab
+        , escape
+        , end
+        , pageDown
+        , home
+        , pageUp
+        )
 
 
 type alias KeyCode =
@@ -13,16 +25,6 @@ return =
 escape : KeyCode
 escape =
     27
-
-
-leftArrow : KeyCode
-leftArrow =
-    37
-
-
-rightArrow : KeyCode
-rightArrow =
-    39
 
 
 upArrow : KeyCode

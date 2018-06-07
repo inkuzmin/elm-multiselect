@@ -159,10 +159,6 @@ require.register("src/Multiselect.elm", function(exports, require, module) {
 
 });
 
-;require.register("src/Multiselect/Stylesheets.elm", function(exports, require, module) {
-
-});
-
 ;require.register("src/Multiselect/Utils.elm", function(exports, require, module) {
 
 });
