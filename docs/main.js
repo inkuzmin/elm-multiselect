@@ -135,6 +135,3175 @@ function A9(fun, a, b, c, d, e, f, g, h, i)
     : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
 }
 
+var _elm_lang$core$Native_Bitwise = function() {
+
+return {
+	and: F2(function and(a, b) { return a & b; }),
+	or: F2(function or(a, b) { return a | b; }),
+	xor: F2(function xor(a, b) { return a ^ b; }),
+	complement: function complement(a) { return ~a; },
+	shiftLeftBy: F2(function(offset, a) { return a << offset; }),
+	shiftRightBy: F2(function(offset, a) { return a >> offset; }),
+	shiftRightZfBy: F2(function(offset, a) { return a >>> offset; })
+};
+
+}();
+
+var _elm_lang$core$Bitwise$shiftRightZfBy = _elm_lang$core$Native_Bitwise.shiftRightZfBy;
+var _elm_lang$core$Bitwise$shiftRightBy = _elm_lang$core$Native_Bitwise.shiftRightBy;
+var _elm_lang$core$Bitwise$shiftLeftBy = _elm_lang$core$Native_Bitwise.shiftLeftBy;
+var _elm_lang$core$Bitwise$complement = _elm_lang$core$Native_Bitwise.complement;
+var _elm_lang$core$Bitwise$xor = _elm_lang$core$Native_Bitwise.xor;
+var _elm_lang$core$Bitwise$or = _elm_lang$core$Native_Bitwise.or;
+var _elm_lang$core$Bitwise$and = _elm_lang$core$Native_Bitwise.and;
+
+//import Native.Utils //
+
+var _elm_lang$core$Native_Char = function() {
+
+return {
+	fromCode: function(c) { return _elm_lang$core$Native_Utils.chr(String.fromCharCode(c)); },
+	toCode: function(c) { return c.charCodeAt(0); },
+	toUpper: function(c) { return _elm_lang$core$Native_Utils.chr(c.toUpperCase()); },
+	toLower: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLowerCase()); },
+	toLocaleUpper: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLocaleUpperCase()); },
+	toLocaleLower: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLocaleLowerCase()); }
+};
+
+}();
+//import Native.Utils //
+
+var _elm_lang$core$Native_Basics = function() {
+
+function div(a, b)
+{
+	return (a / b) | 0;
+}
+function rem(a, b)
+{
+	return a % b;
+}
+function mod(a, b)
+{
+	if (b === 0)
+	{
+		throw new Error('Cannot perform mod 0. Division by zero error.');
+	}
+	var r = a % b;
+	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -mod(-a, -b));
+
+	return m === b ? 0 : m;
+}
+function logBase(base, n)
+{
+	return Math.log(n) / Math.log(base);
+}
+function negate(n)
+{
+	return -n;
+}
+function abs(n)
+{
+	return n < 0 ? -n : n;
+}
+
+function min(a, b)
+{
+	return _elm_lang$core$Native_Utils.cmp(a, b) < 0 ? a : b;
+}
+function max(a, b)
+{
+	return _elm_lang$core$Native_Utils.cmp(a, b) > 0 ? a : b;
+}
+function clamp(lo, hi, n)
+{
+	return _elm_lang$core$Native_Utils.cmp(n, lo) < 0
+		? lo
+		: _elm_lang$core$Native_Utils.cmp(n, hi) > 0
+			? hi
+			: n;
+}
+
+var ord = ['LT', 'EQ', 'GT'];
+
+function compare(x, y)
+{
+	return { ctor: ord[_elm_lang$core$Native_Utils.cmp(x, y) + 1] };
+}
+
+function xor(a, b)
+{
+	return a !== b;
+}
+function not(b)
+{
+	return !b;
+}
+function isInfinite(n)
+{
+	return n === Infinity || n === -Infinity;
+}
+
+function truncate(n)
+{
+	return n | 0;
+}
+
+function degrees(d)
+{
+	return d * Math.PI / 180;
+}
+function turns(t)
+{
+	return 2 * Math.PI * t;
+}
+function fromPolar(point)
+{
+	var r = point._0;
+	var t = point._1;
+	return _elm_lang$core$Native_Utils.Tuple2(r * Math.cos(t), r * Math.sin(t));
+}
+function toPolar(point)
+{
+	var x = point._0;
+	var y = point._1;
+	return _elm_lang$core$Native_Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
+}
+
+return {
+	div: F2(div),
+	rem: F2(rem),
+	mod: F2(mod),
+
+	pi: Math.PI,
+	e: Math.E,
+	cos: Math.cos,
+	sin: Math.sin,
+	tan: Math.tan,
+	acos: Math.acos,
+	asin: Math.asin,
+	atan: Math.atan,
+	atan2: F2(Math.atan2),
+
+	degrees: degrees,
+	turns: turns,
+	fromPolar: fromPolar,
+	toPolar: toPolar,
+
+	sqrt: Math.sqrt,
+	logBase: F2(logBase),
+	negate: negate,
+	abs: abs,
+	min: F2(min),
+	max: F2(max),
+	clamp: F3(clamp),
+	compare: F2(compare),
+
+	xor: F2(xor),
+	not: not,
+
+	truncate: truncate,
+	ceiling: Math.ceil,
+	floor: Math.floor,
+	round: Math.round,
+	toFloat: function(x) { return x; },
+	isNaN: isNaN,
+	isInfinite: isInfinite
+};
+
+}();
+//import //
+
+var _elm_lang$core$Native_Utils = function() {
+
+// COMPARISONS
+
+function eq(x, y)
+{
+	var stack = [];
+	var isEqual = eqHelp(x, y, 0, stack);
+	var pair;
+	while (isEqual && (pair = stack.pop()))
+	{
+		isEqual = eqHelp(pair.x, pair.y, 0, stack);
+	}
+	return isEqual;
+}
+
+
+function eqHelp(x, y, depth, stack)
+{
+	if (depth > 100)
+	{
+		stack.push({ x: x, y: y });
+		return true;
+	}
+
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object')
+	{
+		if (typeof x === 'function')
+		{
+			throw new Error(
+				'Trying to use `(==)` on functions. There is no way to know if functions are "the same" in the Elm sense.'
+				+ ' Read more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#=='
+				+ ' which describes why it is this way and what the better version will look like.'
+			);
+		}
+		return false;
+	}
+
+	if (x === null || y === null)
+	{
+		return false
+	}
+
+	if (x instanceof Date)
+	{
+		return x.getTime() === y.getTime();
+	}
+
+	if (!('ctor' in x))
+	{
+		for (var key in x)
+		{
+			if (!eqHelp(x[key], y[key], depth + 1, stack))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// convert Dicts and Sets to lists
+	if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
+	{
+		x = _elm_lang$core$Dict$toList(x);
+		y = _elm_lang$core$Dict$toList(y);
+	}
+	if (x.ctor === 'Set_elm_builtin')
+	{
+		x = _elm_lang$core$Set$toList(x);
+		y = _elm_lang$core$Set$toList(y);
+	}
+
+	// check if lists are equal without recursion
+	if (x.ctor === '::')
+	{
+		var a = x;
+		var b = y;
+		while (a.ctor === '::' && b.ctor === '::')
+		{
+			if (!eqHelp(a._0, b._0, depth + 1, stack))
+			{
+				return false;
+			}
+			a = a._1;
+			b = b._1;
+		}
+		return a.ctor === b.ctor;
+	}
+
+	// check if Arrays are equal
+	if (x.ctor === '_Array')
+	{
+		var xs = _elm_lang$core$Native_Array.toJSArray(x);
+		var ys = _elm_lang$core$Native_Array.toJSArray(y);
+		if (xs.length !== ys.length)
+		{
+			return false;
+		}
+		for (var i = 0; i < xs.length; i++)
+		{
+			if (!eqHelp(xs[i], ys[i], depth + 1, stack))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	if (!eqHelp(x.ctor, y.ctor, depth + 1, stack))
+	{
+		return false;
+	}
+
+	for (var key in x)
+	{
+		if (!eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+var LT = -1, EQ = 0, GT = 1;
+
+function cmp(x, y)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? EQ : x < y ? LT : GT;
+	}
+
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? EQ : a < b ? LT : GT;
+	}
+
+	if (x.ctor === '::' || x.ctor === '[]')
+	{
+		while (x.ctor === '::' && y.ctor === '::')
+		{
+			var ord = cmp(x._0, y._0);
+			if (ord !== EQ)
+			{
+				return ord;
+			}
+			x = x._1;
+			y = y._1;
+		}
+		return x.ctor === y.ctor ? EQ : x.ctor === '[]' ? LT : GT;
+	}
+
+	if (x.ctor.slice(0, 6) === '_Tuple')
+	{
+		var ord;
+		var n = x.ctor.slice(6) - 0;
+		var err = 'cannot compare tuples with more than 6 elements.';
+		if (n === 0) return EQ;
+		if (n >= 1) { ord = cmp(x._0, y._0); if (ord !== EQ) return ord;
+		if (n >= 2) { ord = cmp(x._1, y._1); if (ord !== EQ) return ord;
+		if (n >= 3) { ord = cmp(x._2, y._2); if (ord !== EQ) return ord;
+		if (n >= 4) { ord = cmp(x._3, y._3); if (ord !== EQ) return ord;
+		if (n >= 5) { ord = cmp(x._4, y._4); if (ord !== EQ) return ord;
+		if (n >= 6) { ord = cmp(x._5, y._5); if (ord !== EQ) return ord;
+		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
+		return EQ;
+	}
+
+	throw new Error(
+		'Comparison error: comparison is only defined on ints, '
+		+ 'floats, times, chars, strings, lists of comparable values, '
+		+ 'and tuples of comparable values.'
+	);
+}
+
+
+// COMMON VALUES
+
+var Tuple0 = {
+	ctor: '_Tuple0'
+};
+
+function Tuple2(x, y)
+{
+	return {
+		ctor: '_Tuple2',
+		_0: x,
+		_1: y
+	};
+}
+
+function chr(c)
+{
+	return new String(c);
+}
+
+
+// GUID
+
+var count = 0;
+function guid(_)
+{
+	return count++;
+}
+
+
+// RECORDS
+
+function update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+//// LIST STUFF ////
+
+var Nil = { ctor: '[]' };
+
+function Cons(hd, tl)
+{
+	return {
+		ctor: '::',
+		_0: hd,
+		_1: tl
+	};
+}
+
+function append(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (xs.ctor === '[]')
+	{
+		return ys;
+	}
+	var root = Cons(xs._0, Nil);
+	var curr = root;
+	xs = xs._1;
+	while (xs.ctor !== '[]')
+	{
+		curr._1 = Cons(xs._0, Nil);
+		xs = xs._1;
+		curr = curr._1;
+	}
+	curr._1 = ys;
+	return root;
+}
+
+
+// CRASHES
+
+function crash(moduleName, region)
+{
+	return function(message) {
+		throw new Error(
+			'Ran into a `Debug.crash` in module `' + moduleName + '` ' + regionToString(region) + '\n'
+			+ 'The message provided by the code author is:\n\n    '
+			+ message
+		);
+	};
+}
+
+function crashCase(moduleName, region, value)
+{
+	return function(message) {
+		throw new Error(
+			'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
+			+ 'This was caused by the `case` expression ' + regionToString(region) + '.\n'
+			+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + toString(value) + '\n\n'
+			+ 'The message provided by the code author is:\n\n    '
+			+ message
+		);
+	};
+}
+
+function regionToString(region)
+{
+	if (region.start.line == region.end.line)
+	{
+		return 'on line ' + region.start.line;
+	}
+	return 'between lines ' + region.start.line + ' and ' + region.end.line;
+}
+
+
+// TO STRING
+
+function toString(v)
+{
+	var type = typeof v;
+	if (type === 'function')
+	{
+		return '<function>';
+	}
+
+	if (type === 'boolean')
+	{
+		return v ? 'True' : 'False';
+	}
+
+	if (type === 'number')
+	{
+		return v + '';
+	}
+
+	if (v instanceof String)
+	{
+		return '\'' + addSlashes(v, true) + '\'';
+	}
+
+	if (type === 'string')
+	{
+		return '"' + addSlashes(v, false) + '"';
+	}
+
+	if (v === null)
+	{
+		return 'null';
+	}
+
+	if (type === 'object' && 'ctor' in v)
+	{
+		var ctorStarter = v.ctor.substring(0, 5);
+
+		if (ctorStarter === '_Tupl')
+		{
+			var output = [];
+			for (var k in v)
+			{
+				if (k === 'ctor') continue;
+				output.push(toString(v[k]));
+			}
+			return '(' + output.join(',') + ')';
+		}
+
+		if (ctorStarter === '_Task')
+		{
+			return '<task>'
+		}
+
+		if (v.ctor === '_Array')
+		{
+			var list = _elm_lang$core$Array$toList(v);
+			return 'Array.fromList ' + toString(list);
+		}
+
+		if (v.ctor === '<decoder>')
+		{
+			return '<decoder>';
+		}
+
+		if (v.ctor === '_Process')
+		{
+			return '<process:' + v.id + '>';
+		}
+
+		if (v.ctor === '::')
+		{
+			var output = '[' + toString(v._0);
+			v = v._1;
+			while (v.ctor === '::')
+			{
+				output += ',' + toString(v._0);
+				v = v._1;
+			}
+			return output + ']';
+		}
+
+		if (v.ctor === '[]')
+		{
+			return '[]';
+		}
+
+		if (v.ctor === 'Set_elm_builtin')
+		{
+			return 'Set.fromList ' + toString(_elm_lang$core$Set$toList(v));
+		}
+
+		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin')
+		{
+			return 'Dict.fromList ' + toString(_elm_lang$core$Dict$toList(v));
+		}
+
+		var output = '';
+		for (var i in v)
+		{
+			if (i === 'ctor') continue;
+			var str = toString(v[i]);
+			var c0 = str[0];
+			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
+			output += ' ' + (parenless ? str : '(' + str + ')');
+		}
+		return v.ctor + output;
+	}
+
+	if (type === 'object')
+	{
+		if (v instanceof Date)
+		{
+			return '<' + v.toString() + '>';
+		}
+
+		if (v.elm_web_socket)
+		{
+			return '<websocket>';
+		}
+
+		var output = [];
+		for (var k in v)
+		{
+			output.push(k + ' = ' + toString(v[k]));
+		}
+		if (output.length === 0)
+		{
+			return '{}';
+		}
+		return '{ ' + output.join(', ') + ' }';
+	}
+
+	return '<internal structure>';
+}
+
+function addSlashes(str, isChar)
+{
+	var s = str.replace(/\\/g, '\\\\')
+			  .replace(/\n/g, '\\n')
+			  .replace(/\t/g, '\\t')
+			  .replace(/\r/g, '\\r')
+			  .replace(/\v/g, '\\v')
+			  .replace(/\0/g, '\\0');
+	if (isChar)
+	{
+		return s.replace(/\'/g, '\\\'');
+	}
+	else
+	{
+		return s.replace(/\"/g, '\\"');
+	}
+}
+
+
+return {
+	eq: eq,
+	cmp: cmp,
+	Tuple0: Tuple0,
+	Tuple2: Tuple2,
+	chr: chr,
+	update: update,
+	guid: guid,
+
+	append: F2(append),
+
+	crash: crash,
+	crashCase: crashCase,
+
+	toString: toString
+};
+
+}();
+var _elm_lang$core$Basics$never = function (_p0) {
+	never:
+	while (true) {
+		var _p1 = _p0;
+		var _v1 = _p1._0;
+		_p0 = _v1;
+		continue never;
+	}
+};
+var _elm_lang$core$Basics$uncurry = F2(
+	function (f, _p2) {
+		var _p3 = _p2;
+		return A2(f, _p3._0, _p3._1);
+	});
+var _elm_lang$core$Basics$curry = F3(
+	function (f, a, b) {
+		return f(
+			{ctor: '_Tuple2', _0: a, _1: b});
+	});
+var _elm_lang$core$Basics$flip = F3(
+	function (f, b, a) {
+		return A2(f, a, b);
+	});
+var _elm_lang$core$Basics$always = F2(
+	function (a, _p4) {
+		return a;
+	});
+var _elm_lang$core$Basics$identity = function (x) {
+	return x;
+};
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['<|'] = F2(
+	function (f, x) {
+		return f(x);
+	});
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['|>'] = F2(
+	function (x, f) {
+		return f(x);
+	});
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['>>'] = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['<<'] = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['++'] = _elm_lang$core$Native_Utils.append;
+var _elm_lang$core$Basics$toString = _elm_lang$core$Native_Utils.toString;
+var _elm_lang$core$Basics$isInfinite = _elm_lang$core$Native_Basics.isInfinite;
+var _elm_lang$core$Basics$isNaN = _elm_lang$core$Native_Basics.isNaN;
+var _elm_lang$core$Basics$toFloat = _elm_lang$core$Native_Basics.toFloat;
+var _elm_lang$core$Basics$ceiling = _elm_lang$core$Native_Basics.ceiling;
+var _elm_lang$core$Basics$floor = _elm_lang$core$Native_Basics.floor;
+var _elm_lang$core$Basics$truncate = _elm_lang$core$Native_Basics.truncate;
+var _elm_lang$core$Basics$round = _elm_lang$core$Native_Basics.round;
+var _elm_lang$core$Basics$not = _elm_lang$core$Native_Basics.not;
+var _elm_lang$core$Basics$xor = _elm_lang$core$Native_Basics.xor;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['||'] = _elm_lang$core$Native_Basics.or;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['&&'] = _elm_lang$core$Native_Basics.and;
+var _elm_lang$core$Basics$max = _elm_lang$core$Native_Basics.max;
+var _elm_lang$core$Basics$min = _elm_lang$core$Native_Basics.min;
+var _elm_lang$core$Basics$compare = _elm_lang$core$Native_Basics.compare;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['>='] = _elm_lang$core$Native_Basics.ge;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['<='] = _elm_lang$core$Native_Basics.le;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['>'] = _elm_lang$core$Native_Basics.gt;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['<'] = _elm_lang$core$Native_Basics.lt;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['/='] = _elm_lang$core$Native_Basics.neq;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['=='] = _elm_lang$core$Native_Basics.eq;
+var _elm_lang$core$Basics$e = _elm_lang$core$Native_Basics.e;
+var _elm_lang$core$Basics$pi = _elm_lang$core$Native_Basics.pi;
+var _elm_lang$core$Basics$clamp = _elm_lang$core$Native_Basics.clamp;
+var _elm_lang$core$Basics$logBase = _elm_lang$core$Native_Basics.logBase;
+var _elm_lang$core$Basics$abs = _elm_lang$core$Native_Basics.abs;
+var _elm_lang$core$Basics$negate = _elm_lang$core$Native_Basics.negate;
+var _elm_lang$core$Basics$sqrt = _elm_lang$core$Native_Basics.sqrt;
+var _elm_lang$core$Basics$atan2 = _elm_lang$core$Native_Basics.atan2;
+var _elm_lang$core$Basics$atan = _elm_lang$core$Native_Basics.atan;
+var _elm_lang$core$Basics$asin = _elm_lang$core$Native_Basics.asin;
+var _elm_lang$core$Basics$acos = _elm_lang$core$Native_Basics.acos;
+var _elm_lang$core$Basics$tan = _elm_lang$core$Native_Basics.tan;
+var _elm_lang$core$Basics$sin = _elm_lang$core$Native_Basics.sin;
+var _elm_lang$core$Basics$cos = _elm_lang$core$Native_Basics.cos;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['^'] = _elm_lang$core$Native_Basics.exp;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['%'] = _elm_lang$core$Native_Basics.mod;
+var _elm_lang$core$Basics$rem = _elm_lang$core$Native_Basics.rem;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['//'] = _elm_lang$core$Native_Basics.div;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['/'] = _elm_lang$core$Native_Basics.floatDiv;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['*'] = _elm_lang$core$Native_Basics.mul;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['-'] = _elm_lang$core$Native_Basics.sub;
+var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
+_elm_lang$core$Basics_ops['+'] = _elm_lang$core$Native_Basics.add;
+var _elm_lang$core$Basics$toPolar = _elm_lang$core$Native_Basics.toPolar;
+var _elm_lang$core$Basics$fromPolar = _elm_lang$core$Native_Basics.fromPolar;
+var _elm_lang$core$Basics$turns = _elm_lang$core$Native_Basics.turns;
+var _elm_lang$core$Basics$degrees = _elm_lang$core$Native_Basics.degrees;
+var _elm_lang$core$Basics$radians = function (t) {
+	return t;
+};
+var _elm_lang$core$Basics$GT = {ctor: 'GT'};
+var _elm_lang$core$Basics$EQ = {ctor: 'EQ'};
+var _elm_lang$core$Basics$LT = {ctor: 'LT'};
+var _elm_lang$core$Basics$JustOneMore = function (a) {
+	return {ctor: 'JustOneMore', _0: a};
+};
+
+var _elm_lang$core$Char$fromCode = _elm_lang$core$Native_Char.fromCode;
+var _elm_lang$core$Char$toCode = _elm_lang$core$Native_Char.toCode;
+var _elm_lang$core$Char$toLocaleLower = _elm_lang$core$Native_Char.toLocaleLower;
+var _elm_lang$core$Char$toLocaleUpper = _elm_lang$core$Native_Char.toLocaleUpper;
+var _elm_lang$core$Char$toLower = _elm_lang$core$Native_Char.toLower;
+var _elm_lang$core$Char$toUpper = _elm_lang$core$Native_Char.toUpper;
+var _elm_lang$core$Char$isBetween = F3(
+	function (low, high, $char) {
+		var code = _elm_lang$core$Char$toCode($char);
+		return (_elm_lang$core$Native_Utils.cmp(
+			code,
+			_elm_lang$core$Char$toCode(low)) > -1) && (_elm_lang$core$Native_Utils.cmp(
+			code,
+			_elm_lang$core$Char$toCode(high)) < 1);
+	});
+var _elm_lang$core$Char$isUpper = A2(
+	_elm_lang$core$Char$isBetween,
+	_elm_lang$core$Native_Utils.chr('A'),
+	_elm_lang$core$Native_Utils.chr('Z'));
+var _elm_lang$core$Char$isLower = A2(
+	_elm_lang$core$Char$isBetween,
+	_elm_lang$core$Native_Utils.chr('a'),
+	_elm_lang$core$Native_Utils.chr('z'));
+var _elm_lang$core$Char$isDigit = A2(
+	_elm_lang$core$Char$isBetween,
+	_elm_lang$core$Native_Utils.chr('0'),
+	_elm_lang$core$Native_Utils.chr('9'));
+var _elm_lang$core$Char$isOctDigit = A2(
+	_elm_lang$core$Char$isBetween,
+	_elm_lang$core$Native_Utils.chr('0'),
+	_elm_lang$core$Native_Utils.chr('7'));
+var _elm_lang$core$Char$isHexDigit = function ($char) {
+	return _elm_lang$core$Char$isDigit($char) || (A3(
+		_elm_lang$core$Char$isBetween,
+		_elm_lang$core$Native_Utils.chr('a'),
+		_elm_lang$core$Native_Utils.chr('f'),
+		$char) || A3(
+		_elm_lang$core$Char$isBetween,
+		_elm_lang$core$Native_Utils.chr('A'),
+		_elm_lang$core$Native_Utils.chr('F'),
+		$char));
+};
+
+//import Native.Utils //
+
+var _elm_lang$core$Native_Debug = function() {
+
+function log(tag, value)
+{
+	var msg = tag + ': ' + _elm_lang$core$Native_Utils.toString(value);
+	var process = process || {};
+	if (process.stdout)
+	{
+		process.stdout.write(msg);
+	}
+	else
+	{
+		console.log(msg);
+	}
+	return value;
+}
+
+function crash(message)
+{
+	throw new Error(message);
+}
+
+return {
+	crash: crash,
+	log: F2(log)
+};
+
+}();
+var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
+var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
+
+var _elm_lang$core$Maybe$withDefault = F2(
+	function ($default, maybe) {
+		var _p0 = maybe;
+		if (_p0.ctor === 'Just') {
+			return _p0._0;
+		} else {
+			return $default;
+		}
+	});
+var _elm_lang$core$Maybe$Nothing = {ctor: 'Nothing'};
+var _elm_lang$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		var _p1 = maybeValue;
+		if (_p1.ctor === 'Just') {
+			return callback(_p1._0);
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_lang$core$Maybe$Just = function (a) {
+	return {ctor: 'Just', _0: a};
+};
+var _elm_lang$core$Maybe$map = F2(
+	function (f, maybe) {
+		var _p2 = maybe;
+		if (_p2.ctor === 'Just') {
+			return _elm_lang$core$Maybe$Just(
+				f(_p2._0));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_lang$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		var _p3 = {ctor: '_Tuple2', _0: ma, _1: mb};
+		if (((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Just')) && (_p3._1.ctor === 'Just')) {
+			return _elm_lang$core$Maybe$Just(
+				A2(func, _p3._0._0, _p3._1._0));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_lang$core$Maybe$map3 = F4(
+	function (func, ma, mb, mc) {
+		var _p4 = {ctor: '_Tuple3', _0: ma, _1: mb, _2: mc};
+		if ((((_p4.ctor === '_Tuple3') && (_p4._0.ctor === 'Just')) && (_p4._1.ctor === 'Just')) && (_p4._2.ctor === 'Just')) {
+			return _elm_lang$core$Maybe$Just(
+				A3(func, _p4._0._0, _p4._1._0, _p4._2._0));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_lang$core$Maybe$map4 = F5(
+	function (func, ma, mb, mc, md) {
+		var _p5 = {ctor: '_Tuple4', _0: ma, _1: mb, _2: mc, _3: md};
+		if (((((_p5.ctor === '_Tuple4') && (_p5._0.ctor === 'Just')) && (_p5._1.ctor === 'Just')) && (_p5._2.ctor === 'Just')) && (_p5._3.ctor === 'Just')) {
+			return _elm_lang$core$Maybe$Just(
+				A4(func, _p5._0._0, _p5._1._0, _p5._2._0, _p5._3._0));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_lang$core$Maybe$map5 = F6(
+	function (func, ma, mb, mc, md, me) {
+		var _p6 = {ctor: '_Tuple5', _0: ma, _1: mb, _2: mc, _3: md, _4: me};
+		if ((((((_p6.ctor === '_Tuple5') && (_p6._0.ctor === 'Just')) && (_p6._1.ctor === 'Just')) && (_p6._2.ctor === 'Just')) && (_p6._3.ctor === 'Just')) && (_p6._4.ctor === 'Just')) {
+			return _elm_lang$core$Maybe$Just(
+				A5(func, _p6._0._0, _p6._1._0, _p6._2._0, _p6._3._0, _p6._4._0));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+
+//import Native.Utils //
+
+var _elm_lang$core$Native_List = function() {
+
+var Nil = { ctor: '[]' };
+
+function Cons(hd, tl)
+{
+	return { ctor: '::', _0: hd, _1: tl };
+}
+
+function fromArray(arr)
+{
+	var out = Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = Cons(arr[i], out);
+	}
+	return out;
+}
+
+function toArray(xs)
+{
+	var out = [];
+	while (xs.ctor !== '[]')
+	{
+		out.push(xs._0);
+		xs = xs._1;
+	}
+	return out;
+}
+
+function foldr(f, b, xs)
+{
+	var arr = toArray(xs);
+	var acc = b;
+	for (var i = arr.length; i--; )
+	{
+		acc = A2(f, arr[i], acc);
+	}
+	return acc;
+}
+
+function map2(f, xs, ys)
+{
+	var arr = [];
+	while (xs.ctor !== '[]' && ys.ctor !== '[]')
+	{
+		arr.push(A2(f, xs._0, ys._0));
+		xs = xs._1;
+		ys = ys._1;
+	}
+	return fromArray(arr);
+}
+
+function map3(f, xs, ys, zs)
+{
+	var arr = [];
+	while (xs.ctor !== '[]' && ys.ctor !== '[]' && zs.ctor !== '[]')
+	{
+		arr.push(A3(f, xs._0, ys._0, zs._0));
+		xs = xs._1;
+		ys = ys._1;
+		zs = zs._1;
+	}
+	return fromArray(arr);
+}
+
+function map4(f, ws, xs, ys, zs)
+{
+	var arr = [];
+	while (   ws.ctor !== '[]'
+		   && xs.ctor !== '[]'
+		   && ys.ctor !== '[]'
+		   && zs.ctor !== '[]')
+	{
+		arr.push(A4(f, ws._0, xs._0, ys._0, zs._0));
+		ws = ws._1;
+		xs = xs._1;
+		ys = ys._1;
+		zs = zs._1;
+	}
+	return fromArray(arr);
+}
+
+function map5(f, vs, ws, xs, ys, zs)
+{
+	var arr = [];
+	while (   vs.ctor !== '[]'
+		   && ws.ctor !== '[]'
+		   && xs.ctor !== '[]'
+		   && ys.ctor !== '[]'
+		   && zs.ctor !== '[]')
+	{
+		arr.push(A5(f, vs._0, ws._0, xs._0, ys._0, zs._0));
+		vs = vs._1;
+		ws = ws._1;
+		xs = xs._1;
+		ys = ys._1;
+		zs = zs._1;
+	}
+	return fromArray(arr);
+}
+
+function sortBy(f, xs)
+{
+	return fromArray(toArray(xs).sort(function(a, b) {
+		return _elm_lang$core$Native_Utils.cmp(f(a), f(b));
+	}));
+}
+
+function sortWith(f, xs)
+{
+	return fromArray(toArray(xs).sort(function(a, b) {
+		var ord = f(a)(b).ctor;
+		return ord === 'EQ' ? 0 : ord === 'LT' ? -1 : 1;
+	}));
+}
+
+return {
+	Nil: Nil,
+	Cons: Cons,
+	cons: F2(Cons),
+	toArray: toArray,
+	fromArray: fromArray,
+
+	foldr: F3(foldr),
+
+	map2: F3(map2),
+	map3: F4(map3),
+	map4: F5(map4),
+	map5: F6(map5),
+	sortBy: F2(sortBy),
+	sortWith: F2(sortWith)
+};
+
+}();
+var _elm_lang$core$List$sortWith = _elm_lang$core$Native_List.sortWith;
+var _elm_lang$core$List$sortBy = _elm_lang$core$Native_List.sortBy;
+var _elm_lang$core$List$sort = function (xs) {
+	return A2(_elm_lang$core$List$sortBy, _elm_lang$core$Basics$identity, xs);
+};
+var _elm_lang$core$List$singleton = function (value) {
+	return {
+		ctor: '::',
+		_0: value,
+		_1: {ctor: '[]'}
+	};
+};
+var _elm_lang$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+				return list;
+			} else {
+				var _p0 = list;
+				if (_p0.ctor === '[]') {
+					return list;
+				} else {
+					var _v1 = n - 1,
+						_v2 = _p0._1;
+					n = _v1;
+					list = _v2;
+					continue drop;
+				}
+			}
+		}
+	});
+var _elm_lang$core$List$map5 = _elm_lang$core$Native_List.map5;
+var _elm_lang$core$List$map4 = _elm_lang$core$Native_List.map4;
+var _elm_lang$core$List$map3 = _elm_lang$core$Native_List.map3;
+var _elm_lang$core$List$map2 = _elm_lang$core$Native_List.map2;
+var _elm_lang$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			var _p1 = list;
+			if (_p1.ctor === '[]') {
+				return false;
+			} else {
+				if (isOkay(_p1._0)) {
+					return true;
+				} else {
+					var _v4 = isOkay,
+						_v5 = _p1._1;
+					isOkay = _v4;
+					list = _v5;
+					continue any;
+				}
+			}
+		}
+	});
+var _elm_lang$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			_elm_lang$core$List$any,
+			function (_p2) {
+				return !isOkay(_p2);
+			},
+			list);
+	});
+var _elm_lang$core$List$foldr = _elm_lang$core$Native_List.foldr;
+var _elm_lang$core$List$foldl = F3(
+	function (func, acc, list) {
+		foldl:
+		while (true) {
+			var _p3 = list;
+			if (_p3.ctor === '[]') {
+				return acc;
+			} else {
+				var _v7 = func,
+					_v8 = A2(func, _p3._0, acc),
+					_v9 = _p3._1;
+				func = _v7;
+				acc = _v8;
+				list = _v9;
+				continue foldl;
+			}
+		}
+	});
+var _elm_lang$core$List$length = function (xs) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (_p4, i) {
+				return i + 1;
+			}),
+		0,
+		xs);
+};
+var _elm_lang$core$List$sum = function (numbers) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (x, y) {
+				return x + y;
+			}),
+		0,
+		numbers);
+};
+var _elm_lang$core$List$product = function (numbers) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (x, y) {
+				return x * y;
+			}),
+		1,
+		numbers);
+};
+var _elm_lang$core$List$maximum = function (list) {
+	var _p5 = list;
+	if (_p5.ctor === '::') {
+		return _elm_lang$core$Maybe$Just(
+			A3(_elm_lang$core$List$foldl, _elm_lang$core$Basics$max, _p5._0, _p5._1));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_lang$core$List$minimum = function (list) {
+	var _p6 = list;
+	if (_p6.ctor === '::') {
+		return _elm_lang$core$Maybe$Just(
+			A3(_elm_lang$core$List$foldl, _elm_lang$core$Basics$min, _p6._0, _p6._1));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_lang$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			_elm_lang$core$List$any,
+			function (a) {
+				return _elm_lang$core$Native_Utils.eq(a, x);
+			},
+			xs);
+	});
+var _elm_lang$core$List$isEmpty = function (xs) {
+	var _p7 = xs;
+	if (_p7.ctor === '[]') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _elm_lang$core$List$tail = function (list) {
+	var _p8 = list;
+	if (_p8.ctor === '::') {
+		return _elm_lang$core$Maybe$Just(_p8._1);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_lang$core$List$head = function (list) {
+	var _p9 = list;
+	if (_p9.ctor === '::') {
+		return _elm_lang$core$Maybe$Just(_p9._0);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_lang$core$List_ops = _elm_lang$core$List_ops || {};
+_elm_lang$core$List_ops['::'] = _elm_lang$core$Native_List.cons;
+var _elm_lang$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			_elm_lang$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return {
+						ctor: '::',
+						_0: f(x),
+						_1: acc
+					};
+				}),
+			{ctor: '[]'},
+			xs);
+	});
+var _elm_lang$core$List$filter = F2(
+	function (pred, xs) {
+		var conditionalCons = F2(
+			function (front, back) {
+				return pred(front) ? {ctor: '::', _0: front, _1: back} : back;
+			});
+		return A3(
+			_elm_lang$core$List$foldr,
+			conditionalCons,
+			{ctor: '[]'},
+			xs);
+	});
+var _elm_lang$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _p10 = f(mx);
+		if (_p10.ctor === 'Just') {
+			return {ctor: '::', _0: _p10._0, _1: xs};
+		} else {
+			return xs;
+		}
+	});
+var _elm_lang$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			_elm_lang$core$List$foldr,
+			_elm_lang$core$List$maybeCons(f),
+			{ctor: '[]'},
+			xs);
+	});
+var _elm_lang$core$List$reverse = function (list) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (x, y) {
+				return {ctor: '::', _0: x, _1: y};
+			}),
+		{ctor: '[]'},
+		list);
+};
+var _elm_lang$core$List$scanl = F3(
+	function (f, b, xs) {
+		var scan1 = F2(
+			function (x, accAcc) {
+				var _p11 = accAcc;
+				if (_p11.ctor === '::') {
+					return {
+						ctor: '::',
+						_0: A2(f, x, _p11._0),
+						_1: accAcc
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			});
+		return _elm_lang$core$List$reverse(
+			A3(
+				_elm_lang$core$List$foldl,
+				scan1,
+				{
+					ctor: '::',
+					_0: b,
+					_1: {ctor: '[]'}
+				},
+				xs));
+	});
+var _elm_lang$core$List$append = F2(
+	function (xs, ys) {
+		var _p12 = ys;
+		if (_p12.ctor === '[]') {
+			return xs;
+		} else {
+			return A3(
+				_elm_lang$core$List$foldr,
+				F2(
+					function (x, y) {
+						return {ctor: '::', _0: x, _1: y};
+					}),
+				ys,
+				xs);
+		}
+	});
+var _elm_lang$core$List$concat = function (lists) {
+	return A3(
+		_elm_lang$core$List$foldr,
+		_elm_lang$core$List$append,
+		{ctor: '[]'},
+		lists);
+};
+var _elm_lang$core$List$concatMap = F2(
+	function (f, list) {
+		return _elm_lang$core$List$concat(
+			A2(_elm_lang$core$List$map, f, list));
+	});
+var _elm_lang$core$List$partition = F2(
+	function (pred, list) {
+		var step = F2(
+			function (x, _p13) {
+				var _p14 = _p13;
+				var _p16 = _p14._0;
+				var _p15 = _p14._1;
+				return pred(x) ? {
+					ctor: '_Tuple2',
+					_0: {ctor: '::', _0: x, _1: _p16},
+					_1: _p15
+				} : {
+					ctor: '_Tuple2',
+					_0: _p16,
+					_1: {ctor: '::', _0: x, _1: _p15}
+				};
+			});
+		return A3(
+			_elm_lang$core$List$foldr,
+			step,
+			{
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: {ctor: '[]'}
+			},
+			list);
+	});
+var _elm_lang$core$List$unzip = function (pairs) {
+	var step = F2(
+		function (_p18, _p17) {
+			var _p19 = _p18;
+			var _p20 = _p17;
+			return {
+				ctor: '_Tuple2',
+				_0: {ctor: '::', _0: _p19._0, _1: _p20._0},
+				_1: {ctor: '::', _0: _p19._1, _1: _p20._1}
+			};
+		});
+	return A3(
+		_elm_lang$core$List$foldr,
+		step,
+		{
+			ctor: '_Tuple2',
+			_0: {ctor: '[]'},
+			_1: {ctor: '[]'}
+		},
+		pairs);
+};
+var _elm_lang$core$List$intersperse = F2(
+	function (sep, xs) {
+		var _p21 = xs;
+		if (_p21.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var step = F2(
+				function (x, rest) {
+					return {
+						ctor: '::',
+						_0: sep,
+						_1: {ctor: '::', _0: x, _1: rest}
+					};
+				});
+			var spersed = A3(
+				_elm_lang$core$List$foldr,
+				step,
+				{ctor: '[]'},
+				_p21._1);
+			return {ctor: '::', _0: _p21._0, _1: spersed};
+		}
+	});
+var _elm_lang$core$List$takeReverse = F3(
+	function (n, list, taken) {
+		takeReverse:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+				return taken;
+			} else {
+				var _p22 = list;
+				if (_p22.ctor === '[]') {
+					return taken;
+				} else {
+					var _v23 = n - 1,
+						_v24 = _p22._1,
+						_v25 = {ctor: '::', _0: _p22._0, _1: taken};
+					n = _v23;
+					list = _v24;
+					taken = _v25;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var _elm_lang$core$List$takeTailRec = F2(
+	function (n, list) {
+		return _elm_lang$core$List$reverse(
+			A3(
+				_elm_lang$core$List$takeReverse,
+				n,
+				list,
+				{ctor: '[]'}));
+	});
+var _elm_lang$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+			return {ctor: '[]'};
+		} else {
+			var _p23 = {ctor: '_Tuple2', _0: n, _1: list};
+			_v26_5:
+			do {
+				_v26_1:
+				do {
+					if (_p23.ctor === '_Tuple2') {
+						if (_p23._1.ctor === '[]') {
+							return list;
+						} else {
+							if (_p23._1._1.ctor === '::') {
+								switch (_p23._0) {
+									case 1:
+										break _v26_1;
+									case 2:
+										return {
+											ctor: '::',
+											_0: _p23._1._0,
+											_1: {
+												ctor: '::',
+												_0: _p23._1._1._0,
+												_1: {ctor: '[]'}
+											}
+										};
+									case 3:
+										if (_p23._1._1._1.ctor === '::') {
+											return {
+												ctor: '::',
+												_0: _p23._1._0,
+												_1: {
+													ctor: '::',
+													_0: _p23._1._1._0,
+													_1: {
+														ctor: '::',
+														_0: _p23._1._1._1._0,
+														_1: {ctor: '[]'}
+													}
+												}
+											};
+										} else {
+											break _v26_5;
+										}
+									default:
+										if ((_p23._1._1._1.ctor === '::') && (_p23._1._1._1._1.ctor === '::')) {
+											var _p28 = _p23._1._1._1._0;
+											var _p27 = _p23._1._1._0;
+											var _p26 = _p23._1._0;
+											var _p25 = _p23._1._1._1._1._0;
+											var _p24 = _p23._1._1._1._1._1;
+											return (_elm_lang$core$Native_Utils.cmp(ctr, 1000) > 0) ? {
+												ctor: '::',
+												_0: _p26,
+												_1: {
+													ctor: '::',
+													_0: _p27,
+													_1: {
+														ctor: '::',
+														_0: _p28,
+														_1: {
+															ctor: '::',
+															_0: _p25,
+															_1: A2(_elm_lang$core$List$takeTailRec, n - 4, _p24)
+														}
+													}
+												}
+											} : {
+												ctor: '::',
+												_0: _p26,
+												_1: {
+													ctor: '::',
+													_0: _p27,
+													_1: {
+														ctor: '::',
+														_0: _p28,
+														_1: {
+															ctor: '::',
+															_0: _p25,
+															_1: A3(_elm_lang$core$List$takeFast, ctr + 1, n - 4, _p24)
+														}
+													}
+												}
+											};
+										} else {
+											break _v26_5;
+										}
+								}
+							} else {
+								if (_p23._0 === 1) {
+									break _v26_1;
+								} else {
+									break _v26_5;
+								}
+							}
+						}
+					} else {
+						break _v26_5;
+					}
+				} while(false);
+				return {
+					ctor: '::',
+					_0: _p23._1._0,
+					_1: {ctor: '[]'}
+				};
+			} while(false);
+			return list;
+		}
+	});
+var _elm_lang$core$List$take = F2(
+	function (n, list) {
+		return A3(_elm_lang$core$List$takeFast, 0, n, list);
+	});
+var _elm_lang$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+				return result;
+			} else {
+				var _v27 = {ctor: '::', _0: value, _1: result},
+					_v28 = n - 1,
+					_v29 = value;
+				result = _v27;
+				n = _v28;
+				value = _v29;
+				continue repeatHelp;
+			}
+		}
+	});
+var _elm_lang$core$List$repeat = F2(
+	function (n, value) {
+		return A3(
+			_elm_lang$core$List$repeatHelp,
+			{ctor: '[]'},
+			n,
+			value);
+	});
+var _elm_lang$core$List$rangeHelp = F3(
+	function (lo, hi, list) {
+		rangeHelp:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(lo, hi) < 1) {
+				var _v30 = lo,
+					_v31 = hi - 1,
+					_v32 = {ctor: '::', _0: hi, _1: list};
+				lo = _v30;
+				hi = _v31;
+				list = _v32;
+				continue rangeHelp;
+			} else {
+				return list;
+			}
+		}
+	});
+var _elm_lang$core$List$range = F2(
+	function (lo, hi) {
+		return A3(
+			_elm_lang$core$List$rangeHelp,
+			lo,
+			hi,
+			{ctor: '[]'});
+	});
+var _elm_lang$core$List$indexedMap = F2(
+	function (f, xs) {
+		return A3(
+			_elm_lang$core$List$map2,
+			f,
+			A2(
+				_elm_lang$core$List$range,
+				0,
+				_elm_lang$core$List$length(xs) - 1),
+			xs);
+	});
+
+var _elm_lang$core$Result$toMaybe = function (result) {
+	var _p0 = result;
+	if (_p0.ctor === 'Ok') {
+		return _elm_lang$core$Maybe$Just(_p0._0);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_lang$core$Result$withDefault = F2(
+	function (def, result) {
+		var _p1 = result;
+		if (_p1.ctor === 'Ok') {
+			return _p1._0;
+		} else {
+			return def;
+		}
+	});
+var _elm_lang$core$Result$Err = function (a) {
+	return {ctor: 'Err', _0: a};
+};
+var _elm_lang$core$Result$andThen = F2(
+	function (callback, result) {
+		var _p2 = result;
+		if (_p2.ctor === 'Ok') {
+			return callback(_p2._0);
+		} else {
+			return _elm_lang$core$Result$Err(_p2._0);
+		}
+	});
+var _elm_lang$core$Result$Ok = function (a) {
+	return {ctor: 'Ok', _0: a};
+};
+var _elm_lang$core$Result$map = F2(
+	function (func, ra) {
+		var _p3 = ra;
+		if (_p3.ctor === 'Ok') {
+			return _elm_lang$core$Result$Ok(
+				func(_p3._0));
+		} else {
+			return _elm_lang$core$Result$Err(_p3._0);
+		}
+	});
+var _elm_lang$core$Result$map2 = F3(
+	function (func, ra, rb) {
+		var _p4 = {ctor: '_Tuple2', _0: ra, _1: rb};
+		if (_p4._0.ctor === 'Ok') {
+			if (_p4._1.ctor === 'Ok') {
+				return _elm_lang$core$Result$Ok(
+					A2(func, _p4._0._0, _p4._1._0));
+			} else {
+				return _elm_lang$core$Result$Err(_p4._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p4._0._0);
+		}
+	});
+var _elm_lang$core$Result$map3 = F4(
+	function (func, ra, rb, rc) {
+		var _p5 = {ctor: '_Tuple3', _0: ra, _1: rb, _2: rc};
+		if (_p5._0.ctor === 'Ok') {
+			if (_p5._1.ctor === 'Ok') {
+				if (_p5._2.ctor === 'Ok') {
+					return _elm_lang$core$Result$Ok(
+						A3(func, _p5._0._0, _p5._1._0, _p5._2._0));
+				} else {
+					return _elm_lang$core$Result$Err(_p5._2._0);
+				}
+			} else {
+				return _elm_lang$core$Result$Err(_p5._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p5._0._0);
+		}
+	});
+var _elm_lang$core$Result$map4 = F5(
+	function (func, ra, rb, rc, rd) {
+		var _p6 = {ctor: '_Tuple4', _0: ra, _1: rb, _2: rc, _3: rd};
+		if (_p6._0.ctor === 'Ok') {
+			if (_p6._1.ctor === 'Ok') {
+				if (_p6._2.ctor === 'Ok') {
+					if (_p6._3.ctor === 'Ok') {
+						return _elm_lang$core$Result$Ok(
+							A4(func, _p6._0._0, _p6._1._0, _p6._2._0, _p6._3._0));
+					} else {
+						return _elm_lang$core$Result$Err(_p6._3._0);
+					}
+				} else {
+					return _elm_lang$core$Result$Err(_p6._2._0);
+				}
+			} else {
+				return _elm_lang$core$Result$Err(_p6._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p6._0._0);
+		}
+	});
+var _elm_lang$core$Result$map5 = F6(
+	function (func, ra, rb, rc, rd, re) {
+		var _p7 = {ctor: '_Tuple5', _0: ra, _1: rb, _2: rc, _3: rd, _4: re};
+		if (_p7._0.ctor === 'Ok') {
+			if (_p7._1.ctor === 'Ok') {
+				if (_p7._2.ctor === 'Ok') {
+					if (_p7._3.ctor === 'Ok') {
+						if (_p7._4.ctor === 'Ok') {
+							return _elm_lang$core$Result$Ok(
+								A5(func, _p7._0._0, _p7._1._0, _p7._2._0, _p7._3._0, _p7._4._0));
+						} else {
+							return _elm_lang$core$Result$Err(_p7._4._0);
+						}
+					} else {
+						return _elm_lang$core$Result$Err(_p7._3._0);
+					}
+				} else {
+					return _elm_lang$core$Result$Err(_p7._2._0);
+				}
+			} else {
+				return _elm_lang$core$Result$Err(_p7._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p7._0._0);
+		}
+	});
+var _elm_lang$core$Result$mapError = F2(
+	function (f, result) {
+		var _p8 = result;
+		if (_p8.ctor === 'Ok') {
+			return _elm_lang$core$Result$Ok(_p8._0);
+		} else {
+			return _elm_lang$core$Result$Err(
+				f(_p8._0));
+		}
+	});
+var _elm_lang$core$Result$fromMaybe = F2(
+	function (err, maybe) {
+		var _p9 = maybe;
+		if (_p9.ctor === 'Just') {
+			return _elm_lang$core$Result$Ok(_p9._0);
+		} else {
+			return _elm_lang$core$Result$Err(err);
+		}
+	});
+
+//import Maybe, Native.List, Native.Utils, Result //
+
+var _elm_lang$core$Native_String = function() {
+
+function isEmpty(str)
+{
+	return str.length === 0;
+}
+function cons(chr, str)
+{
+	return chr + str;
+}
+function uncons(str)
+{
+	var hd = str[0];
+	if (hd)
+	{
+		return _elm_lang$core$Maybe$Just(_elm_lang$core$Native_Utils.Tuple2(_elm_lang$core$Native_Utils.chr(hd), str.slice(1)));
+	}
+	return _elm_lang$core$Maybe$Nothing;
+}
+function append(a, b)
+{
+	return a + b;
+}
+function concat(strs)
+{
+	return _elm_lang$core$Native_List.toArray(strs).join('');
+}
+function length(str)
+{
+	return str.length;
+}
+function map(f, str)
+{
+	var out = str.split('');
+	for (var i = out.length; i--; )
+	{
+		out[i] = f(_elm_lang$core$Native_Utils.chr(out[i]));
+	}
+	return out.join('');
+}
+function filter(pred, str)
+{
+	return str.split('').map(_elm_lang$core$Native_Utils.chr).filter(pred).join('');
+}
+function reverse(str)
+{
+	return str.split('').reverse().join('');
+}
+function foldl(f, b, str)
+{
+	var len = str.length;
+	for (var i = 0; i < len; ++i)
+	{
+		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
+	}
+	return b;
+}
+function foldr(f, b, str)
+{
+	for (var i = str.length; i--; )
+	{
+		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
+	}
+	return b;
+}
+function split(sep, str)
+{
+	return _elm_lang$core$Native_List.fromArray(str.split(sep));
+}
+function join(sep, strs)
+{
+	return _elm_lang$core$Native_List.toArray(strs).join(sep);
+}
+function repeat(n, str)
+{
+	var result = '';
+	while (n > 0)
+	{
+		if (n & 1)
+		{
+			result += str;
+		}
+		n >>= 1, str += str;
+	}
+	return result;
+}
+function slice(start, end, str)
+{
+	return str.slice(start, end);
+}
+function left(n, str)
+{
+	return n < 1 ? '' : str.slice(0, n);
+}
+function right(n, str)
+{
+	return n < 1 ? '' : str.slice(-n);
+}
+function dropLeft(n, str)
+{
+	return n < 1 ? str : str.slice(n);
+}
+function dropRight(n, str)
+{
+	return n < 1 ? str : str.slice(0, -n);
+}
+function pad(n, chr, str)
+{
+	var half = (n - str.length) / 2;
+	return repeat(Math.ceil(half), chr) + str + repeat(half | 0, chr);
+}
+function padRight(n, chr, str)
+{
+	return str + repeat(n - str.length, chr);
+}
+function padLeft(n, chr, str)
+{
+	return repeat(n - str.length, chr) + str;
+}
+
+function trim(str)
+{
+	return str.trim();
+}
+function trimLeft(str)
+{
+	return str.replace(/^\s+/, '');
+}
+function trimRight(str)
+{
+	return str.replace(/\s+$/, '');
+}
+
+function words(str)
+{
+	return _elm_lang$core$Native_List.fromArray(str.trim().split(/\s+/g));
+}
+function lines(str)
+{
+	return _elm_lang$core$Native_List.fromArray(str.split(/\r\n|\r|\n/g));
+}
+
+function toUpper(str)
+{
+	return str.toUpperCase();
+}
+function toLower(str)
+{
+	return str.toLowerCase();
+}
+
+function any(pred, str)
+{
+	for (var i = str.length; i--; )
+	{
+		if (pred(_elm_lang$core$Native_Utils.chr(str[i])))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+function all(pred, str)
+{
+	for (var i = str.length; i--; )
+	{
+		if (!pred(_elm_lang$core$Native_Utils.chr(str[i])))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+function contains(sub, str)
+{
+	return str.indexOf(sub) > -1;
+}
+function startsWith(sub, str)
+{
+	return str.indexOf(sub) === 0;
+}
+function endsWith(sub, str)
+{
+	return str.length >= sub.length &&
+		str.lastIndexOf(sub) === str.length - sub.length;
+}
+function indexes(sub, str)
+{
+	var subLen = sub.length;
+
+	if (subLen < 1)
+	{
+		return _elm_lang$core$Native_List.Nil;
+	}
+
+	var i = 0;
+	var is = [];
+
+	while ((i = str.indexOf(sub, i)) > -1)
+	{
+		is.push(i);
+		i = i + subLen;
+	}
+
+	return _elm_lang$core$Native_List.fromArray(is);
+}
+
+
+function toInt(s)
+{
+	var len = s.length;
+
+	// if empty
+	if (len === 0)
+	{
+		return intErr(s);
+	}
+
+	// if hex
+	var c = s[0];
+	if (c === '0' && s[1] === 'x')
+	{
+		for (var i = 2; i < len; ++i)
+		{
+			var c = s[i];
+			if (('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'))
+			{
+				continue;
+			}
+			return intErr(s);
+		}
+		return _elm_lang$core$Result$Ok(parseInt(s, 16));
+	}
+
+	// is decimal
+	if (c > '9' || (c < '0' && c !== '-' && c !== '+'))
+	{
+		return intErr(s);
+	}
+	for (var i = 1; i < len; ++i)
+	{
+		var c = s[i];
+		if (c < '0' || '9' < c)
+		{
+			return intErr(s);
+		}
+	}
+
+	return _elm_lang$core$Result$Ok(parseInt(s, 10));
+}
+
+function intErr(s)
+{
+	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int");
+}
+
+
+function toFloat(s)
+{
+	// check if it is a hex, octal, or binary number
+	if (s.length === 0 || /[\sxbo]/.test(s))
+	{
+		return floatErr(s);
+	}
+	var n = +s;
+	// faster isNaN check
+	return n === n ? _elm_lang$core$Result$Ok(n) : floatErr(s);
+}
+
+function floatErr(s)
+{
+	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float");
+}
+
+
+function toList(str)
+{
+	return _elm_lang$core$Native_List.fromArray(str.split('').map(_elm_lang$core$Native_Utils.chr));
+}
+function fromList(chars)
+{
+	return _elm_lang$core$Native_List.toArray(chars).join('');
+}
+
+return {
+	isEmpty: isEmpty,
+	cons: F2(cons),
+	uncons: uncons,
+	append: F2(append),
+	concat: concat,
+	length: length,
+	map: F2(map),
+	filter: F2(filter),
+	reverse: reverse,
+	foldl: F3(foldl),
+	foldr: F3(foldr),
+
+	split: F2(split),
+	join: F2(join),
+	repeat: F2(repeat),
+
+	slice: F3(slice),
+	left: F2(left),
+	right: F2(right),
+	dropLeft: F2(dropLeft),
+	dropRight: F2(dropRight),
+
+	pad: F3(pad),
+	padLeft: F3(padLeft),
+	padRight: F3(padRight),
+
+	trim: trim,
+	trimLeft: trimLeft,
+	trimRight: trimRight,
+
+	words: words,
+	lines: lines,
+
+	toUpper: toUpper,
+	toLower: toLower,
+
+	any: F2(any),
+	all: F2(all),
+
+	contains: F2(contains),
+	startsWith: F2(startsWith),
+	endsWith: F2(endsWith),
+	indexes: F2(indexes),
+
+	toInt: toInt,
+	toFloat: toFloat,
+	toList: toList,
+	fromList: fromList
+};
+
+}();
+
+var _elm_lang$core$String$fromList = _elm_lang$core$Native_String.fromList;
+var _elm_lang$core$String$toList = _elm_lang$core$Native_String.toList;
+var _elm_lang$core$String$toFloat = _elm_lang$core$Native_String.toFloat;
+var _elm_lang$core$String$toInt = _elm_lang$core$Native_String.toInt;
+var _elm_lang$core$String$indices = _elm_lang$core$Native_String.indexes;
+var _elm_lang$core$String$indexes = _elm_lang$core$Native_String.indexes;
+var _elm_lang$core$String$endsWith = _elm_lang$core$Native_String.endsWith;
+var _elm_lang$core$String$startsWith = _elm_lang$core$Native_String.startsWith;
+var _elm_lang$core$String$contains = _elm_lang$core$Native_String.contains;
+var _elm_lang$core$String$all = _elm_lang$core$Native_String.all;
+var _elm_lang$core$String$any = _elm_lang$core$Native_String.any;
+var _elm_lang$core$String$toLower = _elm_lang$core$Native_String.toLower;
+var _elm_lang$core$String$toUpper = _elm_lang$core$Native_String.toUpper;
+var _elm_lang$core$String$lines = _elm_lang$core$Native_String.lines;
+var _elm_lang$core$String$words = _elm_lang$core$Native_String.words;
+var _elm_lang$core$String$trimRight = _elm_lang$core$Native_String.trimRight;
+var _elm_lang$core$String$trimLeft = _elm_lang$core$Native_String.trimLeft;
+var _elm_lang$core$String$trim = _elm_lang$core$Native_String.trim;
+var _elm_lang$core$String$padRight = _elm_lang$core$Native_String.padRight;
+var _elm_lang$core$String$padLeft = _elm_lang$core$Native_String.padLeft;
+var _elm_lang$core$String$pad = _elm_lang$core$Native_String.pad;
+var _elm_lang$core$String$dropRight = _elm_lang$core$Native_String.dropRight;
+var _elm_lang$core$String$dropLeft = _elm_lang$core$Native_String.dropLeft;
+var _elm_lang$core$String$right = _elm_lang$core$Native_String.right;
+var _elm_lang$core$String$left = _elm_lang$core$Native_String.left;
+var _elm_lang$core$String$slice = _elm_lang$core$Native_String.slice;
+var _elm_lang$core$String$repeat = _elm_lang$core$Native_String.repeat;
+var _elm_lang$core$String$join = _elm_lang$core$Native_String.join;
+var _elm_lang$core$String$split = _elm_lang$core$Native_String.split;
+var _elm_lang$core$String$foldr = _elm_lang$core$Native_String.foldr;
+var _elm_lang$core$String$foldl = _elm_lang$core$Native_String.foldl;
+var _elm_lang$core$String$reverse = _elm_lang$core$Native_String.reverse;
+var _elm_lang$core$String$filter = _elm_lang$core$Native_String.filter;
+var _elm_lang$core$String$map = _elm_lang$core$Native_String.map;
+var _elm_lang$core$String$length = _elm_lang$core$Native_String.length;
+var _elm_lang$core$String$concat = _elm_lang$core$Native_String.concat;
+var _elm_lang$core$String$append = _elm_lang$core$Native_String.append;
+var _elm_lang$core$String$uncons = _elm_lang$core$Native_String.uncons;
+var _elm_lang$core$String$cons = _elm_lang$core$Native_String.cons;
+var _elm_lang$core$String$fromChar = function ($char) {
+	return A2(_elm_lang$core$String$cons, $char, '');
+};
+var _elm_lang$core$String$isEmpty = _elm_lang$core$Native_String.isEmpty;
+
+var _elm_lang$core$Tuple$mapSecond = F2(
+	function (func, _p0) {
+		var _p1 = _p0;
+		return {
+			ctor: '_Tuple2',
+			_0: _p1._0,
+			_1: func(_p1._1)
+		};
+	});
+var _elm_lang$core$Tuple$mapFirst = F2(
+	function (func, _p2) {
+		var _p3 = _p2;
+		return {
+			ctor: '_Tuple2',
+			_0: func(_p3._0),
+			_1: _p3._1
+		};
+	});
+var _elm_lang$core$Tuple$second = function (_p4) {
+	var _p5 = _p4;
+	return _p5._1;
+};
+var _elm_lang$core$Tuple$first = function (_p6) {
+	var _p7 = _p6;
+	return _p7._0;
+};
+
+//import //
+
+var _elm_lang$core$Native_Platform = function() {
+
+
+// PROGRAMS
+
+function program(impl)
+{
+	return function(flagDecoder)
+	{
+		return function(object, moduleName)
+		{
+			object['worker'] = function worker(flags)
+			{
+				if (typeof flags !== 'undefined')
+				{
+					throw new Error(
+						'The `' + moduleName + '` module does not need flags.\n'
+						+ 'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
+					);
+				}
+
+				return initialize(
+					impl.init,
+					impl.update,
+					impl.subscriptions,
+					renderer
+				);
+			};
+		};
+	};
+}
+
+function programWithFlags(impl)
+{
+	return function(flagDecoder)
+	{
+		return function(object, moduleName)
+		{
+			object['worker'] = function worker(flags)
+			{
+				if (typeof flagDecoder === 'undefined')
+				{
+					throw new Error(
+						'Are you trying to sneak a Never value into Elm? Trickster!\n'
+						+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
+						+ 'Use `program` instead if you do not want flags.'
+					);
+				}
+
+				var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+				if (result.ctor === 'Err')
+				{
+					throw new Error(
+						moduleName + '.worker(...) was called with an unexpected argument.\n'
+						+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
+						+ result._0
+					);
+				}
+
+				return initialize(
+					impl.init(result._0),
+					impl.update,
+					impl.subscriptions,
+					renderer
+				);
+			};
+		};
+	};
+}
+
+function renderer(enqueue, _)
+{
+	return function(_) {};
+}
+
+
+// HTML TO PROGRAM
+
+function htmlToProgram(vnode)
+{
+	var emptyBag = batch(_elm_lang$core$Native_List.Nil);
+	var noChange = _elm_lang$core$Native_Utils.Tuple2(
+		_elm_lang$core$Native_Utils.Tuple0,
+		emptyBag
+	);
+
+	return _elm_lang$virtual_dom$VirtualDom$program({
+		init: noChange,
+		view: function(model) { return main; },
+		update: F2(function(msg, model) { return noChange; }),
+		subscriptions: function (model) { return emptyBag; }
+	});
+}
+
+
+// INITIALIZE A PROGRAM
+
+function initialize(init, update, subscriptions, renderer)
+{
+	// ambient state
+	var managers = {};
+	var updateView;
+
+	// init and update state in main process
+	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+		var model = init._0;
+		updateView = renderer(enqueue, model);
+		var cmds = init._1;
+		var subs = subscriptions(model);
+		dispatchEffects(managers, cmds, subs);
+		callback(_elm_lang$core$Native_Scheduler.succeed(model));
+	});
+
+	function onMessage(msg, model)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+			var results = A2(update, msg, model);
+			model = results._0;
+			updateView(model);
+			var cmds = results._1;
+			var subs = subscriptions(model);
+			dispatchEffects(managers, cmds, subs);
+			callback(_elm_lang$core$Native_Scheduler.succeed(model));
+		});
+	}
+
+	var mainProcess = spawnLoop(initApp, onMessage);
+
+	function enqueue(msg)
+	{
+		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
+	}
+
+	var ports = setupEffects(managers, enqueue);
+
+	return ports ? { ports: ports } : {};
+}
+
+
+// EFFECT MANAGERS
+
+var effectManagers = {};
+
+function setupEffects(managers, callback)
+{
+	var ports;
+
+	// setup all necessary effect managers
+	for (var key in effectManagers)
+	{
+		var manager = effectManagers[key];
+
+		if (manager.isForeign)
+		{
+			ports = ports || {};
+			ports[key] = manager.tag === 'cmd'
+				? setupOutgoingPort(key)
+				: setupIncomingPort(key, callback);
+		}
+
+		managers[key] = makeManager(manager, callback);
+	}
+
+	return ports;
+}
+
+function makeManager(info, callback)
+{
+	var router = {
+		main: callback,
+		self: undefined
+	};
+
+	var tag = info.tag;
+	var onEffects = info.onEffects;
+	var onSelfMsg = info.onSelfMsg;
+
+	function onMessage(msg, state)
+	{
+		if (msg.ctor === 'self')
+		{
+			return A3(onSelfMsg, router, msg._0, state);
+		}
+
+		var fx = msg._0;
+		switch (tag)
+		{
+			case 'cmd':
+				return A3(onEffects, router, fx.cmds, state);
+
+			case 'sub':
+				return A3(onEffects, router, fx.subs, state);
+
+			case 'fx':
+				return A4(onEffects, router, fx.cmds, fx.subs, state);
+		}
+	}
+
+	var process = spawnLoop(info.init, onMessage);
+	router.self = process;
+	return process;
+}
+
+function sendToApp(router, msg)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		router.main(msg);
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function sendToSelf(router, msg)
+{
+	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
+		ctor: 'self',
+		_0: msg
+	});
+}
+
+
+// HELPER for STATEFUL LOOPS
+
+function spawnLoop(init, onMessage)
+{
+	var andThen = _elm_lang$core$Native_Scheduler.andThen;
+
+	function loop(state)
+	{
+		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
+			return onMessage(msg, state);
+		});
+		return A2(andThen, loop, handleMsg);
+	}
+
+	var task = A2(andThen, loop, init);
+
+	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
+}
+
+
+// BAGS
+
+function leaf(home)
+{
+	return function(value)
+	{
+		return {
+			type: 'leaf',
+			home: home,
+			value: value
+		};
+	};
+}
+
+function batch(list)
+{
+	return {
+		type: 'node',
+		branches: list
+	};
+}
+
+function map(tagger, bag)
+{
+	return {
+		type: 'map',
+		tagger: tagger,
+		tree: bag
+	}
+}
+
+
+// PIPE BAGS INTO EFFECT MANAGERS
+
+function dispatchEffects(managers, cmdBag, subBag)
+{
+	var effectsDict = {};
+	gatherEffects(true, cmdBag, effectsDict, null);
+	gatherEffects(false, subBag, effectsDict, null);
+
+	for (var home in managers)
+	{
+		var fx = home in effectsDict
+			? effectsDict[home]
+			: {
+				cmds: _elm_lang$core$Native_List.Nil,
+				subs: _elm_lang$core$Native_List.Nil
+			};
+
+		_elm_lang$core$Native_Scheduler.rawSend(managers[home], { ctor: 'fx', _0: fx });
+	}
+}
+
+function gatherEffects(isCmd, bag, effectsDict, taggers)
+{
+	switch (bag.type)
+	{
+		case 'leaf':
+			var home = bag.home;
+			var effect = toEffect(isCmd, home, taggers, bag.value);
+			effectsDict[home] = insert(isCmd, effect, effectsDict[home]);
+			return;
+
+		case 'node':
+			var list = bag.branches;
+			while (list.ctor !== '[]')
+			{
+				gatherEffects(isCmd, list._0, effectsDict, taggers);
+				list = list._1;
+			}
+			return;
+
+		case 'map':
+			gatherEffects(isCmd, bag.tree, effectsDict, {
+				tagger: bag.tagger,
+				rest: taggers
+			});
+			return;
+	}
+}
+
+function toEffect(isCmd, home, taggers, value)
+{
+	function applyTaggers(x)
+	{
+		var temp = taggers;
+		while (temp)
+		{
+			x = temp.tagger(x);
+			temp = temp.rest;
+		}
+		return x;
+	}
+
+	var map = isCmd
+		? effectManagers[home].cmdMap
+		: effectManagers[home].subMap;
+
+	return A2(map, applyTaggers, value)
+}
+
+function insert(isCmd, newEffect, effects)
+{
+	effects = effects || {
+		cmds: _elm_lang$core$Native_List.Nil,
+		subs: _elm_lang$core$Native_List.Nil
+	};
+	if (isCmd)
+	{
+		effects.cmds = _elm_lang$core$Native_List.Cons(newEffect, effects.cmds);
+		return effects;
+	}
+	effects.subs = _elm_lang$core$Native_List.Cons(newEffect, effects.subs);
+	return effects;
+}
+
+
+// PORTS
+
+function checkPortName(name)
+{
+	if (name in effectManagers)
+	{
+		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
+	}
+}
+
+
+// OUTGOING PORTS
+
+function outgoingPort(name, converter)
+{
+	checkPortName(name);
+	effectManagers[name] = {
+		tag: 'cmd',
+		cmdMap: outgoingPortMap,
+		converter: converter,
+		isForeign: true
+	};
+	return leaf(name);
+}
+
+var outgoingPortMap = F2(function cmdMap(tagger, value) {
+	return value;
+});
+
+function setupOutgoingPort(name)
+{
+	var subs = [];
+	var converter = effectManagers[name].converter;
+
+	// CREATE MANAGER
+
+	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+
+	function onEffects(router, cmdList, state)
+	{
+		while (cmdList.ctor !== '[]')
+		{
+			// grab a separate reference to subs in case unsubscribe is called
+			var currentSubs = subs;
+			var value = converter(cmdList._0);
+			for (var i = 0; i < currentSubs.length; i++)
+			{
+				currentSubs[i](value);
+			}
+			cmdList = cmdList._1;
+		}
+		return init;
+	}
+
+	effectManagers[name].init = init;
+	effectManagers[name].onEffects = F3(onEffects);
+
+	// PUBLIC API
+
+	function subscribe(callback)
+	{
+		subs.push(callback);
+	}
+
+	function unsubscribe(callback)
+	{
+		// copy subs into a new array in case unsubscribe is called within a
+		// subscribed callback
+		subs = subs.slice();
+		var index = subs.indexOf(callback);
+		if (index >= 0)
+		{
+			subs.splice(index, 1);
+		}
+	}
+
+	return {
+		subscribe: subscribe,
+		unsubscribe: unsubscribe
+	};
+}
+
+
+// INCOMING PORTS
+
+function incomingPort(name, converter)
+{
+	checkPortName(name);
+	effectManagers[name] = {
+		tag: 'sub',
+		subMap: incomingPortMap,
+		converter: converter,
+		isForeign: true
+	};
+	return leaf(name);
+}
+
+var incomingPortMap = F2(function subMap(tagger, finalTagger)
+{
+	return function(value)
+	{
+		return tagger(finalTagger(value));
+	};
+});
+
+function setupIncomingPort(name, callback)
+{
+	var sentBeforeInit = [];
+	var subs = _elm_lang$core$Native_List.Nil;
+	var converter = effectManagers[name].converter;
+	var currentOnEffects = preInitOnEffects;
+	var currentSend = preInitSend;
+
+	// CREATE MANAGER
+
+	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+
+	function preInitOnEffects(router, subList, state)
+	{
+		var postInitResult = postInitOnEffects(router, subList, state);
+
+		for(var i = 0; i < sentBeforeInit.length; i++)
+		{
+			postInitSend(sentBeforeInit[i]);
+		}
+
+		sentBeforeInit = null; // to release objects held in queue
+		currentSend = postInitSend;
+		currentOnEffects = postInitOnEffects;
+		return postInitResult;
+	}
+
+	function postInitOnEffects(router, subList, state)
+	{
+		subs = subList;
+		return init;
+	}
+
+	function onEffects(router, subList, state)
+	{
+		return currentOnEffects(router, subList, state);
+	}
+
+	effectManagers[name].init = init;
+	effectManagers[name].onEffects = F3(onEffects);
+
+	// PUBLIC API
+
+	function preInitSend(value)
+	{
+		sentBeforeInit.push(value);
+	}
+
+	function postInitSend(value)
+	{
+		var temp = subs;
+		while (temp.ctor !== '[]')
+		{
+			callback(temp._0(value));
+			temp = temp._1;
+		}
+	}
+
+	function send(incomingValue)
+	{
+		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
+		if (result.ctor === 'Err')
+		{
+			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
+		}
+
+		currentSend(result._0);
+	}
+
+	return { send: send };
+}
+
+return {
+	// routers
+	sendToApp: F2(sendToApp),
+	sendToSelf: F2(sendToSelf),
+
+	// global setup
+	effectManagers: effectManagers,
+	outgoingPort: outgoingPort,
+	incomingPort: incomingPort,
+
+	htmlToProgram: htmlToProgram,
+	program: program,
+	programWithFlags: programWithFlags,
+	initialize: initialize,
+
+	// effect bags
+	leaf: leaf,
+	batch: batch,
+	map: F2(map)
+};
+
+}();
+
+//import Native.Utils //
+
+var _elm_lang$core$Native_Scheduler = function() {
+
+var MAX_STEPS = 10000;
+
+
+// TASKS
+
+function succeed(value)
+{
+	return {
+		ctor: '_Task_succeed',
+		value: value
+	};
+}
+
+function fail(error)
+{
+	return {
+		ctor: '_Task_fail',
+		value: error
+	};
+}
+
+function nativeBinding(callback)
+{
+	return {
+		ctor: '_Task_nativeBinding',
+		callback: callback,
+		cancel: null
+	};
+}
+
+function andThen(callback, task)
+{
+	return {
+		ctor: '_Task_andThen',
+		callback: callback,
+		task: task
+	};
+}
+
+function onError(callback, task)
+{
+	return {
+		ctor: '_Task_onError',
+		callback: callback,
+		task: task
+	};
+}
+
+function receive(callback)
+{
+	return {
+		ctor: '_Task_receive',
+		callback: callback
+	};
+}
+
+
+// PROCESSES
+
+function rawSpawn(task)
+{
+	var process = {
+		ctor: '_Process',
+		id: _elm_lang$core$Native_Utils.guid(),
+		root: task,
+		stack: null,
+		mailbox: []
+	};
+
+	enqueue(process);
+
+	return process;
+}
+
+function spawn(task)
+{
+	return nativeBinding(function(callback) {
+		var process = rawSpawn(task);
+		callback(succeed(process));
+	});
+}
+
+function rawSend(process, msg)
+{
+	process.mailbox.push(msg);
+	enqueue(process);
+}
+
+function send(process, msg)
+{
+	return nativeBinding(function(callback) {
+		rawSend(process, msg);
+		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function kill(process)
+{
+	return nativeBinding(function(callback) {
+		var root = process.root;
+		if (root.ctor === '_Task_nativeBinding' && root.cancel)
+		{
+			root.cancel();
+		}
+
+		process.root = null;
+
+		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function sleep(time)
+{
+	return nativeBinding(function(callback) {
+		var id = setTimeout(function() {
+			callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+		}, time);
+
+		return function() { clearTimeout(id); };
+	});
+}
+
+
+// STEP PROCESSES
+
+function step(numSteps, process)
+{
+	while (numSteps < MAX_STEPS)
+	{
+		var ctor = process.root.ctor;
+
+		if (ctor === '_Task_succeed')
+		{
+			while (process.stack && process.stack.ctor === '_Task_onError')
+			{
+				process.stack = process.stack.rest;
+			}
+			if (process.stack === null)
+			{
+				break;
+			}
+			process.root = process.stack.callback(process.root.value);
+			process.stack = process.stack.rest;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_fail')
+		{
+			while (process.stack && process.stack.ctor === '_Task_andThen')
+			{
+				process.stack = process.stack.rest;
+			}
+			if (process.stack === null)
+			{
+				break;
+			}
+			process.root = process.stack.callback(process.root.value);
+			process.stack = process.stack.rest;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_andThen')
+		{
+			process.stack = {
+				ctor: '_Task_andThen',
+				callback: process.root.callback,
+				rest: process.stack
+			};
+			process.root = process.root.task;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_onError')
+		{
+			process.stack = {
+				ctor: '_Task_onError',
+				callback: process.root.callback,
+				rest: process.stack
+			};
+			process.root = process.root.task;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_nativeBinding')
+		{
+			process.root.cancel = process.root.callback(function(newRoot) {
+				process.root = newRoot;
+				enqueue(process);
+			});
+
+			break;
+		}
+
+		if (ctor === '_Task_receive')
+		{
+			var mailbox = process.mailbox;
+			if (mailbox.length === 0)
+			{
+				break;
+			}
+
+			process.root = process.root.callback(mailbox.shift());
+			++numSteps;
+			continue;
+		}
+
+		throw new Error(ctor);
+	}
+
+	if (numSteps < MAX_STEPS)
+	{
+		return numSteps + 1;
+	}
+	enqueue(process);
+
+	return numSteps;
+}
+
+
+// WORK QUEUE
+
+var working = false;
+var workQueue = [];
+
+function enqueue(process)
+{
+	workQueue.push(process);
+
+	if (!working)
+	{
+		setTimeout(work, 0);
+		working = true;
+	}
+}
+
+function work()
+{
+	var numSteps = 0;
+	var process;
+	while (numSteps < MAX_STEPS && (process = workQueue.shift()))
+	{
+		if (process.root)
+		{
+			numSteps = step(numSteps, process);
+		}
+	}
+	if (!process)
+	{
+		working = false;
+		return;
+	}
+	setTimeout(work, 0);
+}
+
+
+return {
+	succeed: succeed,
+	fail: fail,
+	nativeBinding: nativeBinding,
+	andThen: F2(andThen),
+	onError: F2(onError),
+	receive: receive,
+
+	spawn: spawn,
+	kill: kill,
+	sleep: sleep,
+	send: F2(send),
+
+	rawSpawn: rawSpawn,
+	rawSend: rawSend
+};
+
+}();
+var _elm_lang$core$Platform_Cmd$batch = _elm_lang$core$Native_Platform.batch;
+var _elm_lang$core$Platform_Cmd$none = _elm_lang$core$Platform_Cmd$batch(
+	{ctor: '[]'});
+var _elm_lang$core$Platform_Cmd_ops = _elm_lang$core$Platform_Cmd_ops || {};
+_elm_lang$core$Platform_Cmd_ops['!'] = F2(
+	function (model, commands) {
+		return {
+			ctor: '_Tuple2',
+			_0: model,
+			_1: _elm_lang$core$Platform_Cmd$batch(commands)
+		};
+	});
+var _elm_lang$core$Platform_Cmd$map = _elm_lang$core$Native_Platform.map;
+var _elm_lang$core$Platform_Cmd$Cmd = {ctor: 'Cmd'};
+
+var _elm_lang$core$Platform_Sub$batch = _elm_lang$core$Native_Platform.batch;
+var _elm_lang$core$Platform_Sub$none = _elm_lang$core$Platform_Sub$batch(
+	{ctor: '[]'});
+var _elm_lang$core$Platform_Sub$map = _elm_lang$core$Native_Platform.map;
+var _elm_lang$core$Platform_Sub$Sub = {ctor: 'Sub'};
+
+var _elm_lang$core$Platform$hack = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Platform$sendToSelf = _elm_lang$core$Native_Platform.sendToSelf;
+var _elm_lang$core$Platform$sendToApp = _elm_lang$core$Native_Platform.sendToApp;
+var _elm_lang$core$Platform$programWithFlags = _elm_lang$core$Native_Platform.programWithFlags;
+var _elm_lang$core$Platform$program = _elm_lang$core$Native_Platform.program;
+var _elm_lang$core$Platform$Program = {ctor: 'Program'};
+var _elm_lang$core$Platform$Task = {ctor: 'Task'};
+var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
+var _elm_lang$core$Platform$Router = {ctor: 'Router'};
+
+var _Skinney$murmur3$UTF8$accumulate = F3(
+	function (add, $char, _p0) {
+		var _p1 = _p0;
+		var _p3 = _p1._0;
+		var _p2 = _p1._1;
+		if (_p2.ctor === 'Nothing') {
+			return (_elm_lang$core$Native_Utils.cmp($char, 128) < 0) ? {
+				ctor: '_Tuple2',
+				_0: A2(add, $char, _p3),
+				_1: _elm_lang$core$Maybe$Nothing
+			} : ((_elm_lang$core$Native_Utils.cmp($char, 2048) < 0) ? {
+				ctor: '_Tuple2',
+				_0: A2(
+					add,
+					128 | (63 & $char),
+					A2(add, 192 | ($char >>> 6), _p3)),
+				_1: _elm_lang$core$Maybe$Nothing
+			} : (((_elm_lang$core$Native_Utils.cmp($char, 55296) < 0) || (_elm_lang$core$Native_Utils.cmp($char, 57344) > -1)) ? {
+				ctor: '_Tuple2',
+				_0: A2(
+					add,
+					128 | (63 & $char),
+					A2(
+						add,
+						128 | (63 & ($char >>> 6)),
+						A2(add, 224 | ($char >>> 12), _p3))),
+				_1: _elm_lang$core$Maybe$Nothing
+			} : {
+				ctor: '_Tuple2',
+				_0: _p3,
+				_1: _elm_lang$core$Maybe$Just($char)
+			}));
+		} else {
+			var combined = ((1023 & $char) | ((1023 & _p2._0) << 10)) + 65536;
+			return {
+				ctor: '_Tuple2',
+				_0: A2(
+					add,
+					128 | (63 & combined),
+					A2(
+						add,
+						128 | (63 & (combined >>> 6)),
+						A2(
+							add,
+							128 | (63 & (combined >>> 12)),
+							A2(add, 240 | (combined >>> 18), _p3)))),
+				_1: _elm_lang$core$Maybe$Nothing
+			};
+		}
+	});
+var _Skinney$murmur3$UTF8$foldl = F3(
+	function (op, acc, input) {
+		var helper = F2(
+			function ($char, acc) {
+				return A3(
+					_Skinney$murmur3$UTF8$accumulate,
+					op,
+					_elm_lang$core$Char$toCode($char),
+					acc);
+			});
+		return _elm_lang$core$Tuple$first(
+			A3(
+				_elm_lang$core$String$foldl,
+				helper,
+				{ctor: '_Tuple2', _0: acc, _1: _elm_lang$core$Maybe$Nothing},
+				input));
+	});
+
+var _Skinney$murmur3$Murmur3$mur = F2(
+	function (c, h) {
+		return 4294967295 & (((h & 65535) * c) + ((65535 & ((h >>> 16) * c)) << 16));
+	});
+var _Skinney$murmur3$Murmur3$step = function (acc) {
+	var h1 = A2(_Skinney$murmur3$Murmur3$mur, 5, (acc >>> 19) | (acc << 13));
+	return ((h1 & 65535) + 27492) + ((65535 & ((h1 >>> 16) + 58964)) << 16);
+};
+var _Skinney$murmur3$Murmur3$mix = F2(
+	function (h1, h2) {
+		var k1 = A2(_Skinney$murmur3$Murmur3$mur, 3432918353, h2);
+		return h1 ^ A2(_Skinney$murmur3$Murmur3$mur, 461845907, (k1 >>> 17) | (k1 << 15));
+	});
+var _Skinney$murmur3$Murmur3$finalize = function (data) {
+	var acc = (!_elm_lang$core$Native_Utils.eq(data.hash, 0)) ? A2(_Skinney$murmur3$Murmur3$mix, data.seed, data.hash) : data.seed;
+	var h1 = acc ^ data.charsProcessed;
+	var h2 = A2(_Skinney$murmur3$Murmur3$mur, 2246822507, h1 ^ (h1 >>> 16));
+	var h3 = A2(_Skinney$murmur3$Murmur3$mur, 3266489909, h2 ^ (h2 >>> 13));
+	return (h3 ^ (h3 >>> 16)) >>> 0;
+};
+var _Skinney$murmur3$Murmur3$hashFold = F2(
+	function (c, data) {
+		var res = data.hash | (c << data.shift);
+		var _p0 = data.shift;
+		if (_p0 === 24) {
+			var newHash = _Skinney$murmur3$Murmur3$step(
+				A2(_Skinney$murmur3$Murmur3$mix, data.seed, res));
+			return {shift: 0, seed: newHash, hash: 0, charsProcessed: data.charsProcessed + 1};
+		} else {
+			return {shift: data.shift + 8, seed: data.seed, hash: res, charsProcessed: data.charsProcessed + 1};
+		}
+	});
+var _Skinney$murmur3$Murmur3$HashData = F4(
+	function (a, b, c, d) {
+		return {shift: a, seed: b, hash: c, charsProcessed: d};
+	});
+var _Skinney$murmur3$Murmur3$hashString = F2(
+	function (seed, str) {
+		return _Skinney$murmur3$Murmur3$finalize(
+			A3(
+				_Skinney$murmur3$UTF8$foldl,
+				_Skinney$murmur3$Murmur3$hashFold,
+				A4(_Skinney$murmur3$Murmur3$HashData, 0, seed, 0, 0),
+				str));
+	});
+
 //import Native.List //
 
 var _elm_lang$core$Native_Array = function() {
@@ -1102,1524 +4271,6 @@ return {
 };
 
 }();
-//import Native.Utils //
-
-var _elm_lang$core$Native_Basics = function() {
-
-function div(a, b)
-{
-	return (a / b) | 0;
-}
-function rem(a, b)
-{
-	return a % b;
-}
-function mod(a, b)
-{
-	if (b === 0)
-	{
-		throw new Error('Cannot perform mod 0. Division by zero error.');
-	}
-	var r = a % b;
-	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -mod(-a, -b));
-
-	return m === b ? 0 : m;
-}
-function logBase(base, n)
-{
-	return Math.log(n) / Math.log(base);
-}
-function negate(n)
-{
-	return -n;
-}
-function abs(n)
-{
-	return n < 0 ? -n : n;
-}
-
-function min(a, b)
-{
-	return _elm_lang$core$Native_Utils.cmp(a, b) < 0 ? a : b;
-}
-function max(a, b)
-{
-	return _elm_lang$core$Native_Utils.cmp(a, b) > 0 ? a : b;
-}
-function clamp(lo, hi, n)
-{
-	return _elm_lang$core$Native_Utils.cmp(n, lo) < 0
-		? lo
-		: _elm_lang$core$Native_Utils.cmp(n, hi) > 0
-			? hi
-			: n;
-}
-
-var ord = ['LT', 'EQ', 'GT'];
-
-function compare(x, y)
-{
-	return { ctor: ord[_elm_lang$core$Native_Utils.cmp(x, y) + 1] };
-}
-
-function xor(a, b)
-{
-	return a !== b;
-}
-function not(b)
-{
-	return !b;
-}
-function isInfinite(n)
-{
-	return n === Infinity || n === -Infinity;
-}
-
-function truncate(n)
-{
-	return n | 0;
-}
-
-function degrees(d)
-{
-	return d * Math.PI / 180;
-}
-function turns(t)
-{
-	return 2 * Math.PI * t;
-}
-function fromPolar(point)
-{
-	var r = point._0;
-	var t = point._1;
-	return _elm_lang$core$Native_Utils.Tuple2(r * Math.cos(t), r * Math.sin(t));
-}
-function toPolar(point)
-{
-	var x = point._0;
-	var y = point._1;
-	return _elm_lang$core$Native_Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
-}
-
-return {
-	div: F2(div),
-	rem: F2(rem),
-	mod: F2(mod),
-
-	pi: Math.PI,
-	e: Math.E,
-	cos: Math.cos,
-	sin: Math.sin,
-	tan: Math.tan,
-	acos: Math.acos,
-	asin: Math.asin,
-	atan: Math.atan,
-	atan2: F2(Math.atan2),
-
-	degrees: degrees,
-	turns: turns,
-	fromPolar: fromPolar,
-	toPolar: toPolar,
-
-	sqrt: Math.sqrt,
-	logBase: F2(logBase),
-	negate: negate,
-	abs: abs,
-	min: F2(min),
-	max: F2(max),
-	clamp: F3(clamp),
-	compare: F2(compare),
-
-	xor: F2(xor),
-	not: not,
-
-	truncate: truncate,
-	ceiling: Math.ceil,
-	floor: Math.floor,
-	round: Math.round,
-	toFloat: function(x) { return x; },
-	isNaN: isNaN,
-	isInfinite: isInfinite
-};
-
-}();
-//import //
-
-var _elm_lang$core$Native_Utils = function() {
-
-// COMPARISONS
-
-function eq(x, y)
-{
-	var stack = [];
-	var isEqual = eqHelp(x, y, 0, stack);
-	var pair;
-	while (isEqual && (pair = stack.pop()))
-	{
-		isEqual = eqHelp(pair.x, pair.y, 0, stack);
-	}
-	return isEqual;
-}
-
-
-function eqHelp(x, y, depth, stack)
-{
-	if (depth > 100)
-	{
-		stack.push({ x: x, y: y });
-		return true;
-	}
-
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object')
-	{
-		if (typeof x === 'function')
-		{
-			throw new Error(
-				'Trying to use `(==)` on functions. There is no way to know if functions are "the same" in the Elm sense.'
-				+ ' Read more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#=='
-				+ ' which describes why it is this way and what the better version will look like.'
-			);
-		}
-		return false;
-	}
-
-	if (x === null || y === null)
-	{
-		return false
-	}
-
-	if (x instanceof Date)
-	{
-		return x.getTime() === y.getTime();
-	}
-
-	if (!('ctor' in x))
-	{
-		for (var key in x)
-		{
-			if (!eqHelp(x[key], y[key], depth + 1, stack))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	// convert Dicts and Sets to lists
-	if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
-	{
-		x = _elm_lang$core$Dict$toList(x);
-		y = _elm_lang$core$Dict$toList(y);
-	}
-	if (x.ctor === 'Set_elm_builtin')
-	{
-		x = _elm_lang$core$Set$toList(x);
-		y = _elm_lang$core$Set$toList(y);
-	}
-
-	// check if lists are equal without recursion
-	if (x.ctor === '::')
-	{
-		var a = x;
-		var b = y;
-		while (a.ctor === '::' && b.ctor === '::')
-		{
-			if (!eqHelp(a._0, b._0, depth + 1, stack))
-			{
-				return false;
-			}
-			a = a._1;
-			b = b._1;
-		}
-		return a.ctor === b.ctor;
-	}
-
-	// check if Arrays are equal
-	if (x.ctor === '_Array')
-	{
-		var xs = _elm_lang$core$Native_Array.toJSArray(x);
-		var ys = _elm_lang$core$Native_Array.toJSArray(y);
-		if (xs.length !== ys.length)
-		{
-			return false;
-		}
-		for (var i = 0; i < xs.length; i++)
-		{
-			if (!eqHelp(xs[i], ys[i], depth + 1, stack))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	if (!eqHelp(x.ctor, y.ctor, depth + 1, stack))
-	{
-		return false;
-	}
-
-	for (var key in x)
-	{
-		if (!eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-var LT = -1, EQ = 0, GT = 1;
-
-function cmp(x, y)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? EQ : x < y ? LT : GT;
-	}
-
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? EQ : a < b ? LT : GT;
-	}
-
-	if (x.ctor === '::' || x.ctor === '[]')
-	{
-		while (x.ctor === '::' && y.ctor === '::')
-		{
-			var ord = cmp(x._0, y._0);
-			if (ord !== EQ)
-			{
-				return ord;
-			}
-			x = x._1;
-			y = y._1;
-		}
-		return x.ctor === y.ctor ? EQ : x.ctor === '[]' ? LT : GT;
-	}
-
-	if (x.ctor.slice(0, 6) === '_Tuple')
-	{
-		var ord;
-		var n = x.ctor.slice(6) - 0;
-		var err = 'cannot compare tuples with more than 6 elements.';
-		if (n === 0) return EQ;
-		if (n >= 1) { ord = cmp(x._0, y._0); if (ord !== EQ) return ord;
-		if (n >= 2) { ord = cmp(x._1, y._1); if (ord !== EQ) return ord;
-		if (n >= 3) { ord = cmp(x._2, y._2); if (ord !== EQ) return ord;
-		if (n >= 4) { ord = cmp(x._3, y._3); if (ord !== EQ) return ord;
-		if (n >= 5) { ord = cmp(x._4, y._4); if (ord !== EQ) return ord;
-		if (n >= 6) { ord = cmp(x._5, y._5); if (ord !== EQ) return ord;
-		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
-		return EQ;
-	}
-
-	throw new Error(
-		'Comparison error: comparison is only defined on ints, '
-		+ 'floats, times, chars, strings, lists of comparable values, '
-		+ 'and tuples of comparable values.'
-	);
-}
-
-
-// COMMON VALUES
-
-var Tuple0 = {
-	ctor: '_Tuple0'
-};
-
-function Tuple2(x, y)
-{
-	return {
-		ctor: '_Tuple2',
-		_0: x,
-		_1: y
-	};
-}
-
-function chr(c)
-{
-	return new String(c);
-}
-
-
-// GUID
-
-var count = 0;
-function guid(_)
-{
-	return count++;
-}
-
-
-// RECORDS
-
-function update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-//// LIST STUFF ////
-
-var Nil = { ctor: '[]' };
-
-function Cons(hd, tl)
-{
-	return {
-		ctor: '::',
-		_0: hd,
-		_1: tl
-	};
-}
-
-function append(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (xs.ctor === '[]')
-	{
-		return ys;
-	}
-	var root = Cons(xs._0, Nil);
-	var curr = root;
-	xs = xs._1;
-	while (xs.ctor !== '[]')
-	{
-		curr._1 = Cons(xs._0, Nil);
-		xs = xs._1;
-		curr = curr._1;
-	}
-	curr._1 = ys;
-	return root;
-}
-
-
-// CRASHES
-
-function crash(moduleName, region)
-{
-	return function(message) {
-		throw new Error(
-			'Ran into a `Debug.crash` in module `' + moduleName + '` ' + regionToString(region) + '\n'
-			+ 'The message provided by the code author is:\n\n    '
-			+ message
-		);
-	};
-}
-
-function crashCase(moduleName, region, value)
-{
-	return function(message) {
-		throw new Error(
-			'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
-			+ 'This was caused by the `case` expression ' + regionToString(region) + '.\n'
-			+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + toString(value) + '\n\n'
-			+ 'The message provided by the code author is:\n\n    '
-			+ message
-		);
-	};
-}
-
-function regionToString(region)
-{
-	if (region.start.line == region.end.line)
-	{
-		return 'on line ' + region.start.line;
-	}
-	return 'between lines ' + region.start.line + ' and ' + region.end.line;
-}
-
-
-// TO STRING
-
-function toString(v)
-{
-	var type = typeof v;
-	if (type === 'function')
-	{
-		return '<function>';
-	}
-
-	if (type === 'boolean')
-	{
-		return v ? 'True' : 'False';
-	}
-
-	if (type === 'number')
-	{
-		return v + '';
-	}
-
-	if (v instanceof String)
-	{
-		return '\'' + addSlashes(v, true) + '\'';
-	}
-
-	if (type === 'string')
-	{
-		return '"' + addSlashes(v, false) + '"';
-	}
-
-	if (v === null)
-	{
-		return 'null';
-	}
-
-	if (type === 'object' && 'ctor' in v)
-	{
-		var ctorStarter = v.ctor.substring(0, 5);
-
-		if (ctorStarter === '_Tupl')
-		{
-			var output = [];
-			for (var k in v)
-			{
-				if (k === 'ctor') continue;
-				output.push(toString(v[k]));
-			}
-			return '(' + output.join(',') + ')';
-		}
-
-		if (ctorStarter === '_Task')
-		{
-			return '<task>'
-		}
-
-		if (v.ctor === '_Array')
-		{
-			var list = _elm_lang$core$Array$toList(v);
-			return 'Array.fromList ' + toString(list);
-		}
-
-		if (v.ctor === '<decoder>')
-		{
-			return '<decoder>';
-		}
-
-		if (v.ctor === '_Process')
-		{
-			return '<process:' + v.id + '>';
-		}
-
-		if (v.ctor === '::')
-		{
-			var output = '[' + toString(v._0);
-			v = v._1;
-			while (v.ctor === '::')
-			{
-				output += ',' + toString(v._0);
-				v = v._1;
-			}
-			return output + ']';
-		}
-
-		if (v.ctor === '[]')
-		{
-			return '[]';
-		}
-
-		if (v.ctor === 'Set_elm_builtin')
-		{
-			return 'Set.fromList ' + toString(_elm_lang$core$Set$toList(v));
-		}
-
-		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin')
-		{
-			return 'Dict.fromList ' + toString(_elm_lang$core$Dict$toList(v));
-		}
-
-		var output = '';
-		for (var i in v)
-		{
-			if (i === 'ctor') continue;
-			var str = toString(v[i]);
-			var c0 = str[0];
-			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
-			output += ' ' + (parenless ? str : '(' + str + ')');
-		}
-		return v.ctor + output;
-	}
-
-	if (type === 'object')
-	{
-		if (v instanceof Date)
-		{
-			return '<' + v.toString() + '>';
-		}
-
-		if (v.elm_web_socket)
-		{
-			return '<websocket>';
-		}
-
-		var output = [];
-		for (var k in v)
-		{
-			output.push(k + ' = ' + toString(v[k]));
-		}
-		if (output.length === 0)
-		{
-			return '{}';
-		}
-		return '{ ' + output.join(', ') + ' }';
-	}
-
-	return '<internal structure>';
-}
-
-function addSlashes(str, isChar)
-{
-	var s = str.replace(/\\/g, '\\\\')
-			  .replace(/\n/g, '\\n')
-			  .replace(/\t/g, '\\t')
-			  .replace(/\r/g, '\\r')
-			  .replace(/\v/g, '\\v')
-			  .replace(/\0/g, '\\0');
-	if (isChar)
-	{
-		return s.replace(/\'/g, '\\\'');
-	}
-	else
-	{
-		return s.replace(/\"/g, '\\"');
-	}
-}
-
-
-return {
-	eq: eq,
-	cmp: cmp,
-	Tuple0: Tuple0,
-	Tuple2: Tuple2,
-	chr: chr,
-	update: update,
-	guid: guid,
-
-	append: F2(append),
-
-	crash: crash,
-	crashCase: crashCase,
-
-	toString: toString
-};
-
-}();
-var _elm_lang$core$Basics$never = function (_p0) {
-	never:
-	while (true) {
-		var _p1 = _p0;
-		var _v1 = _p1._0;
-		_p0 = _v1;
-		continue never;
-	}
-};
-var _elm_lang$core$Basics$uncurry = F2(
-	function (f, _p2) {
-		var _p3 = _p2;
-		return A2(f, _p3._0, _p3._1);
-	});
-var _elm_lang$core$Basics$curry = F3(
-	function (f, a, b) {
-		return f(
-			{ctor: '_Tuple2', _0: a, _1: b});
-	});
-var _elm_lang$core$Basics$flip = F3(
-	function (f, b, a) {
-		return A2(f, a, b);
-	});
-var _elm_lang$core$Basics$always = F2(
-	function (a, _p4) {
-		return a;
-	});
-var _elm_lang$core$Basics$identity = function (x) {
-	return x;
-};
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['<|'] = F2(
-	function (f, x) {
-		return f(x);
-	});
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['|>'] = F2(
-	function (x, f) {
-		return f(x);
-	});
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['>>'] = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['<<'] = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['++'] = _elm_lang$core$Native_Utils.append;
-var _elm_lang$core$Basics$toString = _elm_lang$core$Native_Utils.toString;
-var _elm_lang$core$Basics$isInfinite = _elm_lang$core$Native_Basics.isInfinite;
-var _elm_lang$core$Basics$isNaN = _elm_lang$core$Native_Basics.isNaN;
-var _elm_lang$core$Basics$toFloat = _elm_lang$core$Native_Basics.toFloat;
-var _elm_lang$core$Basics$ceiling = _elm_lang$core$Native_Basics.ceiling;
-var _elm_lang$core$Basics$floor = _elm_lang$core$Native_Basics.floor;
-var _elm_lang$core$Basics$truncate = _elm_lang$core$Native_Basics.truncate;
-var _elm_lang$core$Basics$round = _elm_lang$core$Native_Basics.round;
-var _elm_lang$core$Basics$not = _elm_lang$core$Native_Basics.not;
-var _elm_lang$core$Basics$xor = _elm_lang$core$Native_Basics.xor;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['||'] = _elm_lang$core$Native_Basics.or;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['&&'] = _elm_lang$core$Native_Basics.and;
-var _elm_lang$core$Basics$max = _elm_lang$core$Native_Basics.max;
-var _elm_lang$core$Basics$min = _elm_lang$core$Native_Basics.min;
-var _elm_lang$core$Basics$compare = _elm_lang$core$Native_Basics.compare;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['>='] = _elm_lang$core$Native_Basics.ge;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['<='] = _elm_lang$core$Native_Basics.le;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['>'] = _elm_lang$core$Native_Basics.gt;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['<'] = _elm_lang$core$Native_Basics.lt;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['/='] = _elm_lang$core$Native_Basics.neq;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['=='] = _elm_lang$core$Native_Basics.eq;
-var _elm_lang$core$Basics$e = _elm_lang$core$Native_Basics.e;
-var _elm_lang$core$Basics$pi = _elm_lang$core$Native_Basics.pi;
-var _elm_lang$core$Basics$clamp = _elm_lang$core$Native_Basics.clamp;
-var _elm_lang$core$Basics$logBase = _elm_lang$core$Native_Basics.logBase;
-var _elm_lang$core$Basics$abs = _elm_lang$core$Native_Basics.abs;
-var _elm_lang$core$Basics$negate = _elm_lang$core$Native_Basics.negate;
-var _elm_lang$core$Basics$sqrt = _elm_lang$core$Native_Basics.sqrt;
-var _elm_lang$core$Basics$atan2 = _elm_lang$core$Native_Basics.atan2;
-var _elm_lang$core$Basics$atan = _elm_lang$core$Native_Basics.atan;
-var _elm_lang$core$Basics$asin = _elm_lang$core$Native_Basics.asin;
-var _elm_lang$core$Basics$acos = _elm_lang$core$Native_Basics.acos;
-var _elm_lang$core$Basics$tan = _elm_lang$core$Native_Basics.tan;
-var _elm_lang$core$Basics$sin = _elm_lang$core$Native_Basics.sin;
-var _elm_lang$core$Basics$cos = _elm_lang$core$Native_Basics.cos;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['^'] = _elm_lang$core$Native_Basics.exp;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['%'] = _elm_lang$core$Native_Basics.mod;
-var _elm_lang$core$Basics$rem = _elm_lang$core$Native_Basics.rem;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['//'] = _elm_lang$core$Native_Basics.div;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['/'] = _elm_lang$core$Native_Basics.floatDiv;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['*'] = _elm_lang$core$Native_Basics.mul;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['-'] = _elm_lang$core$Native_Basics.sub;
-var _elm_lang$core$Basics_ops = _elm_lang$core$Basics_ops || {};
-_elm_lang$core$Basics_ops['+'] = _elm_lang$core$Native_Basics.add;
-var _elm_lang$core$Basics$toPolar = _elm_lang$core$Native_Basics.toPolar;
-var _elm_lang$core$Basics$fromPolar = _elm_lang$core$Native_Basics.fromPolar;
-var _elm_lang$core$Basics$turns = _elm_lang$core$Native_Basics.turns;
-var _elm_lang$core$Basics$degrees = _elm_lang$core$Native_Basics.degrees;
-var _elm_lang$core$Basics$radians = function (t) {
-	return t;
-};
-var _elm_lang$core$Basics$GT = {ctor: 'GT'};
-var _elm_lang$core$Basics$EQ = {ctor: 'EQ'};
-var _elm_lang$core$Basics$LT = {ctor: 'LT'};
-var _elm_lang$core$Basics$JustOneMore = function (a) {
-	return {ctor: 'JustOneMore', _0: a};
-};
-
-var _elm_lang$core$Maybe$withDefault = F2(
-	function ($default, maybe) {
-		var _p0 = maybe;
-		if (_p0.ctor === 'Just') {
-			return _p0._0;
-		} else {
-			return $default;
-		}
-	});
-var _elm_lang$core$Maybe$Nothing = {ctor: 'Nothing'};
-var _elm_lang$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		var _p1 = maybeValue;
-		if (_p1.ctor === 'Just') {
-			return callback(_p1._0);
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_lang$core$Maybe$Just = function (a) {
-	return {ctor: 'Just', _0: a};
-};
-var _elm_lang$core$Maybe$map = F2(
-	function (f, maybe) {
-		var _p2 = maybe;
-		if (_p2.ctor === 'Just') {
-			return _elm_lang$core$Maybe$Just(
-				f(_p2._0));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_lang$core$Maybe$map2 = F3(
-	function (func, ma, mb) {
-		var _p3 = {ctor: '_Tuple2', _0: ma, _1: mb};
-		if (((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Just')) && (_p3._1.ctor === 'Just')) {
-			return _elm_lang$core$Maybe$Just(
-				A2(func, _p3._0._0, _p3._1._0));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_lang$core$Maybe$map3 = F4(
-	function (func, ma, mb, mc) {
-		var _p4 = {ctor: '_Tuple3', _0: ma, _1: mb, _2: mc};
-		if ((((_p4.ctor === '_Tuple3') && (_p4._0.ctor === 'Just')) && (_p4._1.ctor === 'Just')) && (_p4._2.ctor === 'Just')) {
-			return _elm_lang$core$Maybe$Just(
-				A3(func, _p4._0._0, _p4._1._0, _p4._2._0));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_lang$core$Maybe$map4 = F5(
-	function (func, ma, mb, mc, md) {
-		var _p5 = {ctor: '_Tuple4', _0: ma, _1: mb, _2: mc, _3: md};
-		if (((((_p5.ctor === '_Tuple4') && (_p5._0.ctor === 'Just')) && (_p5._1.ctor === 'Just')) && (_p5._2.ctor === 'Just')) && (_p5._3.ctor === 'Just')) {
-			return _elm_lang$core$Maybe$Just(
-				A4(func, _p5._0._0, _p5._1._0, _p5._2._0, _p5._3._0));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_lang$core$Maybe$map5 = F6(
-	function (func, ma, mb, mc, md, me) {
-		var _p6 = {ctor: '_Tuple5', _0: ma, _1: mb, _2: mc, _3: md, _4: me};
-		if ((((((_p6.ctor === '_Tuple5') && (_p6._0.ctor === 'Just')) && (_p6._1.ctor === 'Just')) && (_p6._2.ctor === 'Just')) && (_p6._3.ctor === 'Just')) && (_p6._4.ctor === 'Just')) {
-			return _elm_lang$core$Maybe$Just(
-				A5(func, _p6._0._0, _p6._1._0, _p6._2._0, _p6._3._0, _p6._4._0));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-
-//import Native.Utils //
-
-var _elm_lang$core$Native_List = function() {
-
-var Nil = { ctor: '[]' };
-
-function Cons(hd, tl)
-{
-	return { ctor: '::', _0: hd, _1: tl };
-}
-
-function fromArray(arr)
-{
-	var out = Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = Cons(arr[i], out);
-	}
-	return out;
-}
-
-function toArray(xs)
-{
-	var out = [];
-	while (xs.ctor !== '[]')
-	{
-		out.push(xs._0);
-		xs = xs._1;
-	}
-	return out;
-}
-
-function foldr(f, b, xs)
-{
-	var arr = toArray(xs);
-	var acc = b;
-	for (var i = arr.length; i--; )
-	{
-		acc = A2(f, arr[i], acc);
-	}
-	return acc;
-}
-
-function map2(f, xs, ys)
-{
-	var arr = [];
-	while (xs.ctor !== '[]' && ys.ctor !== '[]')
-	{
-		arr.push(A2(f, xs._0, ys._0));
-		xs = xs._1;
-		ys = ys._1;
-	}
-	return fromArray(arr);
-}
-
-function map3(f, xs, ys, zs)
-{
-	var arr = [];
-	while (xs.ctor !== '[]' && ys.ctor !== '[]' && zs.ctor !== '[]')
-	{
-		arr.push(A3(f, xs._0, ys._0, zs._0));
-		xs = xs._1;
-		ys = ys._1;
-		zs = zs._1;
-	}
-	return fromArray(arr);
-}
-
-function map4(f, ws, xs, ys, zs)
-{
-	var arr = [];
-	while (   ws.ctor !== '[]'
-		   && xs.ctor !== '[]'
-		   && ys.ctor !== '[]'
-		   && zs.ctor !== '[]')
-	{
-		arr.push(A4(f, ws._0, xs._0, ys._0, zs._0));
-		ws = ws._1;
-		xs = xs._1;
-		ys = ys._1;
-		zs = zs._1;
-	}
-	return fromArray(arr);
-}
-
-function map5(f, vs, ws, xs, ys, zs)
-{
-	var arr = [];
-	while (   vs.ctor !== '[]'
-		   && ws.ctor !== '[]'
-		   && xs.ctor !== '[]'
-		   && ys.ctor !== '[]'
-		   && zs.ctor !== '[]')
-	{
-		arr.push(A5(f, vs._0, ws._0, xs._0, ys._0, zs._0));
-		vs = vs._1;
-		ws = ws._1;
-		xs = xs._1;
-		ys = ys._1;
-		zs = zs._1;
-	}
-	return fromArray(arr);
-}
-
-function sortBy(f, xs)
-{
-	return fromArray(toArray(xs).sort(function(a, b) {
-		return _elm_lang$core$Native_Utils.cmp(f(a), f(b));
-	}));
-}
-
-function sortWith(f, xs)
-{
-	return fromArray(toArray(xs).sort(function(a, b) {
-		var ord = f(a)(b).ctor;
-		return ord === 'EQ' ? 0 : ord === 'LT' ? -1 : 1;
-	}));
-}
-
-return {
-	Nil: Nil,
-	Cons: Cons,
-	cons: F2(Cons),
-	toArray: toArray,
-	fromArray: fromArray,
-
-	foldr: F3(foldr),
-
-	map2: F3(map2),
-	map3: F4(map3),
-	map4: F5(map4),
-	map5: F6(map5),
-	sortBy: F2(sortBy),
-	sortWith: F2(sortWith)
-};
-
-}();
-var _elm_lang$core$List$sortWith = _elm_lang$core$Native_List.sortWith;
-var _elm_lang$core$List$sortBy = _elm_lang$core$Native_List.sortBy;
-var _elm_lang$core$List$sort = function (xs) {
-	return A2(_elm_lang$core$List$sortBy, _elm_lang$core$Basics$identity, xs);
-};
-var _elm_lang$core$List$singleton = function (value) {
-	return {
-		ctor: '::',
-		_0: value,
-		_1: {ctor: '[]'}
-	};
-};
-var _elm_lang$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
-				return list;
-			} else {
-				var _p0 = list;
-				if (_p0.ctor === '[]') {
-					return list;
-				} else {
-					var _v1 = n - 1,
-						_v2 = _p0._1;
-					n = _v1;
-					list = _v2;
-					continue drop;
-				}
-			}
-		}
-	});
-var _elm_lang$core$List$map5 = _elm_lang$core$Native_List.map5;
-var _elm_lang$core$List$map4 = _elm_lang$core$Native_List.map4;
-var _elm_lang$core$List$map3 = _elm_lang$core$Native_List.map3;
-var _elm_lang$core$List$map2 = _elm_lang$core$Native_List.map2;
-var _elm_lang$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			var _p1 = list;
-			if (_p1.ctor === '[]') {
-				return false;
-			} else {
-				if (isOkay(_p1._0)) {
-					return true;
-				} else {
-					var _v4 = isOkay,
-						_v5 = _p1._1;
-					isOkay = _v4;
-					list = _v5;
-					continue any;
-				}
-			}
-		}
-	});
-var _elm_lang$core$List$all = F2(
-	function (isOkay, list) {
-		return !A2(
-			_elm_lang$core$List$any,
-			function (_p2) {
-				return !isOkay(_p2);
-			},
-			list);
-	});
-var _elm_lang$core$List$foldr = _elm_lang$core$Native_List.foldr;
-var _elm_lang$core$List$foldl = F3(
-	function (func, acc, list) {
-		foldl:
-		while (true) {
-			var _p3 = list;
-			if (_p3.ctor === '[]') {
-				return acc;
-			} else {
-				var _v7 = func,
-					_v8 = A2(func, _p3._0, acc),
-					_v9 = _p3._1;
-				func = _v7;
-				acc = _v8;
-				list = _v9;
-				continue foldl;
-			}
-		}
-	});
-var _elm_lang$core$List$length = function (xs) {
-	return A3(
-		_elm_lang$core$List$foldl,
-		F2(
-			function (_p4, i) {
-				return i + 1;
-			}),
-		0,
-		xs);
-};
-var _elm_lang$core$List$sum = function (numbers) {
-	return A3(
-		_elm_lang$core$List$foldl,
-		F2(
-			function (x, y) {
-				return x + y;
-			}),
-		0,
-		numbers);
-};
-var _elm_lang$core$List$product = function (numbers) {
-	return A3(
-		_elm_lang$core$List$foldl,
-		F2(
-			function (x, y) {
-				return x * y;
-			}),
-		1,
-		numbers);
-};
-var _elm_lang$core$List$maximum = function (list) {
-	var _p5 = list;
-	if (_p5.ctor === '::') {
-		return _elm_lang$core$Maybe$Just(
-			A3(_elm_lang$core$List$foldl, _elm_lang$core$Basics$max, _p5._0, _p5._1));
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_lang$core$List$minimum = function (list) {
-	var _p6 = list;
-	if (_p6.ctor === '::') {
-		return _elm_lang$core$Maybe$Just(
-			A3(_elm_lang$core$List$foldl, _elm_lang$core$Basics$min, _p6._0, _p6._1));
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_lang$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			_elm_lang$core$List$any,
-			function (a) {
-				return _elm_lang$core$Native_Utils.eq(a, x);
-			},
-			xs);
-	});
-var _elm_lang$core$List$isEmpty = function (xs) {
-	var _p7 = xs;
-	if (_p7.ctor === '[]') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _elm_lang$core$List$tail = function (list) {
-	var _p8 = list;
-	if (_p8.ctor === '::') {
-		return _elm_lang$core$Maybe$Just(_p8._1);
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_lang$core$List$head = function (list) {
-	var _p9 = list;
-	if (_p9.ctor === '::') {
-		return _elm_lang$core$Maybe$Just(_p9._0);
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_lang$core$List_ops = _elm_lang$core$List_ops || {};
-_elm_lang$core$List_ops['::'] = _elm_lang$core$Native_List.cons;
-var _elm_lang$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			_elm_lang$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return {
-						ctor: '::',
-						_0: f(x),
-						_1: acc
-					};
-				}),
-			{ctor: '[]'},
-			xs);
-	});
-var _elm_lang$core$List$filter = F2(
-	function (pred, xs) {
-		var conditionalCons = F2(
-			function (front, back) {
-				return pred(front) ? {ctor: '::', _0: front, _1: back} : back;
-			});
-		return A3(
-			_elm_lang$core$List$foldr,
-			conditionalCons,
-			{ctor: '[]'},
-			xs);
-	});
-var _elm_lang$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _p10 = f(mx);
-		if (_p10.ctor === 'Just') {
-			return {ctor: '::', _0: _p10._0, _1: xs};
-		} else {
-			return xs;
-		}
-	});
-var _elm_lang$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			_elm_lang$core$List$foldr,
-			_elm_lang$core$List$maybeCons(f),
-			{ctor: '[]'},
-			xs);
-	});
-var _elm_lang$core$List$reverse = function (list) {
-	return A3(
-		_elm_lang$core$List$foldl,
-		F2(
-			function (x, y) {
-				return {ctor: '::', _0: x, _1: y};
-			}),
-		{ctor: '[]'},
-		list);
-};
-var _elm_lang$core$List$scanl = F3(
-	function (f, b, xs) {
-		var scan1 = F2(
-			function (x, accAcc) {
-				var _p11 = accAcc;
-				if (_p11.ctor === '::') {
-					return {
-						ctor: '::',
-						_0: A2(f, x, _p11._0),
-						_1: accAcc
-					};
-				} else {
-					return {ctor: '[]'};
-				}
-			});
-		return _elm_lang$core$List$reverse(
-			A3(
-				_elm_lang$core$List$foldl,
-				scan1,
-				{
-					ctor: '::',
-					_0: b,
-					_1: {ctor: '[]'}
-				},
-				xs));
-	});
-var _elm_lang$core$List$append = F2(
-	function (xs, ys) {
-		var _p12 = ys;
-		if (_p12.ctor === '[]') {
-			return xs;
-		} else {
-			return A3(
-				_elm_lang$core$List$foldr,
-				F2(
-					function (x, y) {
-						return {ctor: '::', _0: x, _1: y};
-					}),
-				ys,
-				xs);
-		}
-	});
-var _elm_lang$core$List$concat = function (lists) {
-	return A3(
-		_elm_lang$core$List$foldr,
-		_elm_lang$core$List$append,
-		{ctor: '[]'},
-		lists);
-};
-var _elm_lang$core$List$concatMap = F2(
-	function (f, list) {
-		return _elm_lang$core$List$concat(
-			A2(_elm_lang$core$List$map, f, list));
-	});
-var _elm_lang$core$List$partition = F2(
-	function (pred, list) {
-		var step = F2(
-			function (x, _p13) {
-				var _p14 = _p13;
-				var _p16 = _p14._0;
-				var _p15 = _p14._1;
-				return pred(x) ? {
-					ctor: '_Tuple2',
-					_0: {ctor: '::', _0: x, _1: _p16},
-					_1: _p15
-				} : {
-					ctor: '_Tuple2',
-					_0: _p16,
-					_1: {ctor: '::', _0: x, _1: _p15}
-				};
-			});
-		return A3(
-			_elm_lang$core$List$foldr,
-			step,
-			{
-				ctor: '_Tuple2',
-				_0: {ctor: '[]'},
-				_1: {ctor: '[]'}
-			},
-			list);
-	});
-var _elm_lang$core$List$unzip = function (pairs) {
-	var step = F2(
-		function (_p18, _p17) {
-			var _p19 = _p18;
-			var _p20 = _p17;
-			return {
-				ctor: '_Tuple2',
-				_0: {ctor: '::', _0: _p19._0, _1: _p20._0},
-				_1: {ctor: '::', _0: _p19._1, _1: _p20._1}
-			};
-		});
-	return A3(
-		_elm_lang$core$List$foldr,
-		step,
-		{
-			ctor: '_Tuple2',
-			_0: {ctor: '[]'},
-			_1: {ctor: '[]'}
-		},
-		pairs);
-};
-var _elm_lang$core$List$intersperse = F2(
-	function (sep, xs) {
-		var _p21 = xs;
-		if (_p21.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			var step = F2(
-				function (x, rest) {
-					return {
-						ctor: '::',
-						_0: sep,
-						_1: {ctor: '::', _0: x, _1: rest}
-					};
-				});
-			var spersed = A3(
-				_elm_lang$core$List$foldr,
-				step,
-				{ctor: '[]'},
-				_p21._1);
-			return {ctor: '::', _0: _p21._0, _1: spersed};
-		}
-	});
-var _elm_lang$core$List$takeReverse = F3(
-	function (n, list, taken) {
-		takeReverse:
-		while (true) {
-			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
-				return taken;
-			} else {
-				var _p22 = list;
-				if (_p22.ctor === '[]') {
-					return taken;
-				} else {
-					var _v23 = n - 1,
-						_v24 = _p22._1,
-						_v25 = {ctor: '::', _0: _p22._0, _1: taken};
-					n = _v23;
-					list = _v24;
-					taken = _v25;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var _elm_lang$core$List$takeTailRec = F2(
-	function (n, list) {
-		return _elm_lang$core$List$reverse(
-			A3(
-				_elm_lang$core$List$takeReverse,
-				n,
-				list,
-				{ctor: '[]'}));
-	});
-var _elm_lang$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
-			return {ctor: '[]'};
-		} else {
-			var _p23 = {ctor: '_Tuple2', _0: n, _1: list};
-			_v26_5:
-			do {
-				_v26_1:
-				do {
-					if (_p23.ctor === '_Tuple2') {
-						if (_p23._1.ctor === '[]') {
-							return list;
-						} else {
-							if (_p23._1._1.ctor === '::') {
-								switch (_p23._0) {
-									case 1:
-										break _v26_1;
-									case 2:
-										return {
-											ctor: '::',
-											_0: _p23._1._0,
-											_1: {
-												ctor: '::',
-												_0: _p23._1._1._0,
-												_1: {ctor: '[]'}
-											}
-										};
-									case 3:
-										if (_p23._1._1._1.ctor === '::') {
-											return {
-												ctor: '::',
-												_0: _p23._1._0,
-												_1: {
-													ctor: '::',
-													_0: _p23._1._1._0,
-													_1: {
-														ctor: '::',
-														_0: _p23._1._1._1._0,
-														_1: {ctor: '[]'}
-													}
-												}
-											};
-										} else {
-											break _v26_5;
-										}
-									default:
-										if ((_p23._1._1._1.ctor === '::') && (_p23._1._1._1._1.ctor === '::')) {
-											var _p28 = _p23._1._1._1._0;
-											var _p27 = _p23._1._1._0;
-											var _p26 = _p23._1._0;
-											var _p25 = _p23._1._1._1._1._0;
-											var _p24 = _p23._1._1._1._1._1;
-											return (_elm_lang$core$Native_Utils.cmp(ctr, 1000) > 0) ? {
-												ctor: '::',
-												_0: _p26,
-												_1: {
-													ctor: '::',
-													_0: _p27,
-													_1: {
-														ctor: '::',
-														_0: _p28,
-														_1: {
-															ctor: '::',
-															_0: _p25,
-															_1: A2(_elm_lang$core$List$takeTailRec, n - 4, _p24)
-														}
-													}
-												}
-											} : {
-												ctor: '::',
-												_0: _p26,
-												_1: {
-													ctor: '::',
-													_0: _p27,
-													_1: {
-														ctor: '::',
-														_0: _p28,
-														_1: {
-															ctor: '::',
-															_0: _p25,
-															_1: A3(_elm_lang$core$List$takeFast, ctr + 1, n - 4, _p24)
-														}
-													}
-												}
-											};
-										} else {
-											break _v26_5;
-										}
-								}
-							} else {
-								if (_p23._0 === 1) {
-									break _v26_1;
-								} else {
-									break _v26_5;
-								}
-							}
-						}
-					} else {
-						break _v26_5;
-					}
-				} while(false);
-				return {
-					ctor: '::',
-					_0: _p23._1._0,
-					_1: {ctor: '[]'}
-				};
-			} while(false);
-			return list;
-		}
-	});
-var _elm_lang$core$List$take = F2(
-	function (n, list) {
-		return A3(_elm_lang$core$List$takeFast, 0, n, list);
-	});
-var _elm_lang$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
-		while (true) {
-			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
-				return result;
-			} else {
-				var _v27 = {ctor: '::', _0: value, _1: result},
-					_v28 = n - 1,
-					_v29 = value;
-				result = _v27;
-				n = _v28;
-				value = _v29;
-				continue repeatHelp;
-			}
-		}
-	});
-var _elm_lang$core$List$repeat = F2(
-	function (n, value) {
-		return A3(
-			_elm_lang$core$List$repeatHelp,
-			{ctor: '[]'},
-			n,
-			value);
-	});
-var _elm_lang$core$List$rangeHelp = F3(
-	function (lo, hi, list) {
-		rangeHelp:
-		while (true) {
-			if (_elm_lang$core$Native_Utils.cmp(lo, hi) < 1) {
-				var _v30 = lo,
-					_v31 = hi - 1,
-					_v32 = {ctor: '::', _0: hi, _1: list};
-				lo = _v30;
-				hi = _v31;
-				list = _v32;
-				continue rangeHelp;
-			} else {
-				return list;
-			}
-		}
-	});
-var _elm_lang$core$List$range = F2(
-	function (lo, hi) {
-		return A3(
-			_elm_lang$core$List$rangeHelp,
-			lo,
-			hi,
-			{ctor: '[]'});
-	});
-var _elm_lang$core$List$indexedMap = F2(
-	function (f, xs) {
-		return A3(
-			_elm_lang$core$List$map2,
-			f,
-			A2(
-				_elm_lang$core$List$range,
-				0,
-				_elm_lang$core$List$length(xs) - 1),
-			xs);
-	});
-
 var _elm_lang$core$Array$append = _elm_lang$core$Native_Array.append;
 var _elm_lang$core$Array$length = _elm_lang$core$Native_Array.length;
 var _elm_lang$core$Array$isEmpty = function (array) {
@@ -2674,619 +4325,6 @@ var _elm_lang$core$Array$repeat = F2(
 			_elm_lang$core$Basics$always(e));
 	});
 var _elm_lang$core$Array$Array = {ctor: 'Array'};
-
-//import Native.Utils //
-
-var _elm_lang$core$Native_Debug = function() {
-
-function log(tag, value)
-{
-	var msg = tag + ': ' + _elm_lang$core$Native_Utils.toString(value);
-	var process = process || {};
-	if (process.stdout)
-	{
-		process.stdout.write(msg);
-	}
-	else
-	{
-		console.log(msg);
-	}
-	return value;
-}
-
-function crash(message)
-{
-	throw new Error(message);
-}
-
-return {
-	crash: crash,
-	log: F2(log)
-};
-
-}();
-//import Maybe, Native.List, Native.Utils, Result //
-
-var _elm_lang$core$Native_String = function() {
-
-function isEmpty(str)
-{
-	return str.length === 0;
-}
-function cons(chr, str)
-{
-	return chr + str;
-}
-function uncons(str)
-{
-	var hd = str[0];
-	if (hd)
-	{
-		return _elm_lang$core$Maybe$Just(_elm_lang$core$Native_Utils.Tuple2(_elm_lang$core$Native_Utils.chr(hd), str.slice(1)));
-	}
-	return _elm_lang$core$Maybe$Nothing;
-}
-function append(a, b)
-{
-	return a + b;
-}
-function concat(strs)
-{
-	return _elm_lang$core$Native_List.toArray(strs).join('');
-}
-function length(str)
-{
-	return str.length;
-}
-function map(f, str)
-{
-	var out = str.split('');
-	for (var i = out.length; i--; )
-	{
-		out[i] = f(_elm_lang$core$Native_Utils.chr(out[i]));
-	}
-	return out.join('');
-}
-function filter(pred, str)
-{
-	return str.split('').map(_elm_lang$core$Native_Utils.chr).filter(pred).join('');
-}
-function reverse(str)
-{
-	return str.split('').reverse().join('');
-}
-function foldl(f, b, str)
-{
-	var len = str.length;
-	for (var i = 0; i < len; ++i)
-	{
-		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
-	}
-	return b;
-}
-function foldr(f, b, str)
-{
-	for (var i = str.length; i--; )
-	{
-		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
-	}
-	return b;
-}
-function split(sep, str)
-{
-	return _elm_lang$core$Native_List.fromArray(str.split(sep));
-}
-function join(sep, strs)
-{
-	return _elm_lang$core$Native_List.toArray(strs).join(sep);
-}
-function repeat(n, str)
-{
-	var result = '';
-	while (n > 0)
-	{
-		if (n & 1)
-		{
-			result += str;
-		}
-		n >>= 1, str += str;
-	}
-	return result;
-}
-function slice(start, end, str)
-{
-	return str.slice(start, end);
-}
-function left(n, str)
-{
-	return n < 1 ? '' : str.slice(0, n);
-}
-function right(n, str)
-{
-	return n < 1 ? '' : str.slice(-n);
-}
-function dropLeft(n, str)
-{
-	return n < 1 ? str : str.slice(n);
-}
-function dropRight(n, str)
-{
-	return n < 1 ? str : str.slice(0, -n);
-}
-function pad(n, chr, str)
-{
-	var half = (n - str.length) / 2;
-	return repeat(Math.ceil(half), chr) + str + repeat(half | 0, chr);
-}
-function padRight(n, chr, str)
-{
-	return str + repeat(n - str.length, chr);
-}
-function padLeft(n, chr, str)
-{
-	return repeat(n - str.length, chr) + str;
-}
-
-function trim(str)
-{
-	return str.trim();
-}
-function trimLeft(str)
-{
-	return str.replace(/^\s+/, '');
-}
-function trimRight(str)
-{
-	return str.replace(/\s+$/, '');
-}
-
-function words(str)
-{
-	return _elm_lang$core$Native_List.fromArray(str.trim().split(/\s+/g));
-}
-function lines(str)
-{
-	return _elm_lang$core$Native_List.fromArray(str.split(/\r\n|\r|\n/g));
-}
-
-function toUpper(str)
-{
-	return str.toUpperCase();
-}
-function toLower(str)
-{
-	return str.toLowerCase();
-}
-
-function any(pred, str)
-{
-	for (var i = str.length; i--; )
-	{
-		if (pred(_elm_lang$core$Native_Utils.chr(str[i])))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-function all(pred, str)
-{
-	for (var i = str.length; i--; )
-	{
-		if (!pred(_elm_lang$core$Native_Utils.chr(str[i])))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-function contains(sub, str)
-{
-	return str.indexOf(sub) > -1;
-}
-function startsWith(sub, str)
-{
-	return str.indexOf(sub) === 0;
-}
-function endsWith(sub, str)
-{
-	return str.length >= sub.length &&
-		str.lastIndexOf(sub) === str.length - sub.length;
-}
-function indexes(sub, str)
-{
-	var subLen = sub.length;
-
-	if (subLen < 1)
-	{
-		return _elm_lang$core$Native_List.Nil;
-	}
-
-	var i = 0;
-	var is = [];
-
-	while ((i = str.indexOf(sub, i)) > -1)
-	{
-		is.push(i);
-		i = i + subLen;
-	}
-
-	return _elm_lang$core$Native_List.fromArray(is);
-}
-
-
-function toInt(s)
-{
-	var len = s.length;
-
-	// if empty
-	if (len === 0)
-	{
-		return intErr(s);
-	}
-
-	// if hex
-	var c = s[0];
-	if (c === '0' && s[1] === 'x')
-	{
-		for (var i = 2; i < len; ++i)
-		{
-			var c = s[i];
-			if (('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'))
-			{
-				continue;
-			}
-			return intErr(s);
-		}
-		return _elm_lang$core$Result$Ok(parseInt(s, 16));
-	}
-
-	// is decimal
-	if (c > '9' || (c < '0' && c !== '-' && c !== '+'))
-	{
-		return intErr(s);
-	}
-	for (var i = 1; i < len; ++i)
-	{
-		var c = s[i];
-		if (c < '0' || '9' < c)
-		{
-			return intErr(s);
-		}
-	}
-
-	return _elm_lang$core$Result$Ok(parseInt(s, 10));
-}
-
-function intErr(s)
-{
-	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int");
-}
-
-
-function toFloat(s)
-{
-	// check if it is a hex, octal, or binary number
-	if (s.length === 0 || /[\sxbo]/.test(s))
-	{
-		return floatErr(s);
-	}
-	var n = +s;
-	// faster isNaN check
-	return n === n ? _elm_lang$core$Result$Ok(n) : floatErr(s);
-}
-
-function floatErr(s)
-{
-	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float");
-}
-
-
-function toList(str)
-{
-	return _elm_lang$core$Native_List.fromArray(str.split('').map(_elm_lang$core$Native_Utils.chr));
-}
-function fromList(chars)
-{
-	return _elm_lang$core$Native_List.toArray(chars).join('');
-}
-
-return {
-	isEmpty: isEmpty,
-	cons: F2(cons),
-	uncons: uncons,
-	append: F2(append),
-	concat: concat,
-	length: length,
-	map: F2(map),
-	filter: F2(filter),
-	reverse: reverse,
-	foldl: F3(foldl),
-	foldr: F3(foldr),
-
-	split: F2(split),
-	join: F2(join),
-	repeat: F2(repeat),
-
-	slice: F3(slice),
-	left: F2(left),
-	right: F2(right),
-	dropLeft: F2(dropLeft),
-	dropRight: F2(dropRight),
-
-	pad: F3(pad),
-	padLeft: F3(padLeft),
-	padRight: F3(padRight),
-
-	trim: trim,
-	trimLeft: trimLeft,
-	trimRight: trimRight,
-
-	words: words,
-	lines: lines,
-
-	toUpper: toUpper,
-	toLower: toLower,
-
-	any: F2(any),
-	all: F2(all),
-
-	contains: F2(contains),
-	startsWith: F2(startsWith),
-	endsWith: F2(endsWith),
-	indexes: F2(indexes),
-
-	toInt: toInt,
-	toFloat: toFloat,
-	toList: toList,
-	fromList: fromList
-};
-
-}();
-
-//import Native.Utils //
-
-var _elm_lang$core$Native_Char = function() {
-
-return {
-	fromCode: function(c) { return _elm_lang$core$Native_Utils.chr(String.fromCharCode(c)); },
-	toCode: function(c) { return c.charCodeAt(0); },
-	toUpper: function(c) { return _elm_lang$core$Native_Utils.chr(c.toUpperCase()); },
-	toLower: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLowerCase()); },
-	toLocaleUpper: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLocaleUpperCase()); },
-	toLocaleLower: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLocaleLowerCase()); }
-};
-
-}();
-var _elm_lang$core$Char$fromCode = _elm_lang$core$Native_Char.fromCode;
-var _elm_lang$core$Char$toCode = _elm_lang$core$Native_Char.toCode;
-var _elm_lang$core$Char$toLocaleLower = _elm_lang$core$Native_Char.toLocaleLower;
-var _elm_lang$core$Char$toLocaleUpper = _elm_lang$core$Native_Char.toLocaleUpper;
-var _elm_lang$core$Char$toLower = _elm_lang$core$Native_Char.toLower;
-var _elm_lang$core$Char$toUpper = _elm_lang$core$Native_Char.toUpper;
-var _elm_lang$core$Char$isBetween = F3(
-	function (low, high, $char) {
-		var code = _elm_lang$core$Char$toCode($char);
-		return (_elm_lang$core$Native_Utils.cmp(
-			code,
-			_elm_lang$core$Char$toCode(low)) > -1) && (_elm_lang$core$Native_Utils.cmp(
-			code,
-			_elm_lang$core$Char$toCode(high)) < 1);
-	});
-var _elm_lang$core$Char$isUpper = A2(
-	_elm_lang$core$Char$isBetween,
-	_elm_lang$core$Native_Utils.chr('A'),
-	_elm_lang$core$Native_Utils.chr('Z'));
-var _elm_lang$core$Char$isLower = A2(
-	_elm_lang$core$Char$isBetween,
-	_elm_lang$core$Native_Utils.chr('a'),
-	_elm_lang$core$Native_Utils.chr('z'));
-var _elm_lang$core$Char$isDigit = A2(
-	_elm_lang$core$Char$isBetween,
-	_elm_lang$core$Native_Utils.chr('0'),
-	_elm_lang$core$Native_Utils.chr('9'));
-var _elm_lang$core$Char$isOctDigit = A2(
-	_elm_lang$core$Char$isBetween,
-	_elm_lang$core$Native_Utils.chr('0'),
-	_elm_lang$core$Native_Utils.chr('7'));
-var _elm_lang$core$Char$isHexDigit = function ($char) {
-	return _elm_lang$core$Char$isDigit($char) || (A3(
-		_elm_lang$core$Char$isBetween,
-		_elm_lang$core$Native_Utils.chr('a'),
-		_elm_lang$core$Native_Utils.chr('f'),
-		$char) || A3(
-		_elm_lang$core$Char$isBetween,
-		_elm_lang$core$Native_Utils.chr('A'),
-		_elm_lang$core$Native_Utils.chr('F'),
-		$char));
-};
-
-var _elm_lang$core$Result$toMaybe = function (result) {
-	var _p0 = result;
-	if (_p0.ctor === 'Ok') {
-		return _elm_lang$core$Maybe$Just(_p0._0);
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_lang$core$Result$withDefault = F2(
-	function (def, result) {
-		var _p1 = result;
-		if (_p1.ctor === 'Ok') {
-			return _p1._0;
-		} else {
-			return def;
-		}
-	});
-var _elm_lang$core$Result$Err = function (a) {
-	return {ctor: 'Err', _0: a};
-};
-var _elm_lang$core$Result$andThen = F2(
-	function (callback, result) {
-		var _p2 = result;
-		if (_p2.ctor === 'Ok') {
-			return callback(_p2._0);
-		} else {
-			return _elm_lang$core$Result$Err(_p2._0);
-		}
-	});
-var _elm_lang$core$Result$Ok = function (a) {
-	return {ctor: 'Ok', _0: a};
-};
-var _elm_lang$core$Result$map = F2(
-	function (func, ra) {
-		var _p3 = ra;
-		if (_p3.ctor === 'Ok') {
-			return _elm_lang$core$Result$Ok(
-				func(_p3._0));
-		} else {
-			return _elm_lang$core$Result$Err(_p3._0);
-		}
-	});
-var _elm_lang$core$Result$map2 = F3(
-	function (func, ra, rb) {
-		var _p4 = {ctor: '_Tuple2', _0: ra, _1: rb};
-		if (_p4._0.ctor === 'Ok') {
-			if (_p4._1.ctor === 'Ok') {
-				return _elm_lang$core$Result$Ok(
-					A2(func, _p4._0._0, _p4._1._0));
-			} else {
-				return _elm_lang$core$Result$Err(_p4._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p4._0._0);
-		}
-	});
-var _elm_lang$core$Result$map3 = F4(
-	function (func, ra, rb, rc) {
-		var _p5 = {ctor: '_Tuple3', _0: ra, _1: rb, _2: rc};
-		if (_p5._0.ctor === 'Ok') {
-			if (_p5._1.ctor === 'Ok') {
-				if (_p5._2.ctor === 'Ok') {
-					return _elm_lang$core$Result$Ok(
-						A3(func, _p5._0._0, _p5._1._0, _p5._2._0));
-				} else {
-					return _elm_lang$core$Result$Err(_p5._2._0);
-				}
-			} else {
-				return _elm_lang$core$Result$Err(_p5._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p5._0._0);
-		}
-	});
-var _elm_lang$core$Result$map4 = F5(
-	function (func, ra, rb, rc, rd) {
-		var _p6 = {ctor: '_Tuple4', _0: ra, _1: rb, _2: rc, _3: rd};
-		if (_p6._0.ctor === 'Ok') {
-			if (_p6._1.ctor === 'Ok') {
-				if (_p6._2.ctor === 'Ok') {
-					if (_p6._3.ctor === 'Ok') {
-						return _elm_lang$core$Result$Ok(
-							A4(func, _p6._0._0, _p6._1._0, _p6._2._0, _p6._3._0));
-					} else {
-						return _elm_lang$core$Result$Err(_p6._3._0);
-					}
-				} else {
-					return _elm_lang$core$Result$Err(_p6._2._0);
-				}
-			} else {
-				return _elm_lang$core$Result$Err(_p6._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p6._0._0);
-		}
-	});
-var _elm_lang$core$Result$map5 = F6(
-	function (func, ra, rb, rc, rd, re) {
-		var _p7 = {ctor: '_Tuple5', _0: ra, _1: rb, _2: rc, _3: rd, _4: re};
-		if (_p7._0.ctor === 'Ok') {
-			if (_p7._1.ctor === 'Ok') {
-				if (_p7._2.ctor === 'Ok') {
-					if (_p7._3.ctor === 'Ok') {
-						if (_p7._4.ctor === 'Ok') {
-							return _elm_lang$core$Result$Ok(
-								A5(func, _p7._0._0, _p7._1._0, _p7._2._0, _p7._3._0, _p7._4._0));
-						} else {
-							return _elm_lang$core$Result$Err(_p7._4._0);
-						}
-					} else {
-						return _elm_lang$core$Result$Err(_p7._3._0);
-					}
-				} else {
-					return _elm_lang$core$Result$Err(_p7._2._0);
-				}
-			} else {
-				return _elm_lang$core$Result$Err(_p7._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p7._0._0);
-		}
-	});
-var _elm_lang$core$Result$mapError = F2(
-	function (f, result) {
-		var _p8 = result;
-		if (_p8.ctor === 'Ok') {
-			return _elm_lang$core$Result$Ok(_p8._0);
-		} else {
-			return _elm_lang$core$Result$Err(
-				f(_p8._0));
-		}
-	});
-var _elm_lang$core$Result$fromMaybe = F2(
-	function (err, maybe) {
-		var _p9 = maybe;
-		if (_p9.ctor === 'Just') {
-			return _elm_lang$core$Result$Ok(_p9._0);
-		} else {
-			return _elm_lang$core$Result$Err(err);
-		}
-	});
-
-var _elm_lang$core$String$fromList = _elm_lang$core$Native_String.fromList;
-var _elm_lang$core$String$toList = _elm_lang$core$Native_String.toList;
-var _elm_lang$core$String$toFloat = _elm_lang$core$Native_String.toFloat;
-var _elm_lang$core$String$toInt = _elm_lang$core$Native_String.toInt;
-var _elm_lang$core$String$indices = _elm_lang$core$Native_String.indexes;
-var _elm_lang$core$String$indexes = _elm_lang$core$Native_String.indexes;
-var _elm_lang$core$String$endsWith = _elm_lang$core$Native_String.endsWith;
-var _elm_lang$core$String$startsWith = _elm_lang$core$Native_String.startsWith;
-var _elm_lang$core$String$contains = _elm_lang$core$Native_String.contains;
-var _elm_lang$core$String$all = _elm_lang$core$Native_String.all;
-var _elm_lang$core$String$any = _elm_lang$core$Native_String.any;
-var _elm_lang$core$String$toLower = _elm_lang$core$Native_String.toLower;
-var _elm_lang$core$String$toUpper = _elm_lang$core$Native_String.toUpper;
-var _elm_lang$core$String$lines = _elm_lang$core$Native_String.lines;
-var _elm_lang$core$String$words = _elm_lang$core$Native_String.words;
-var _elm_lang$core$String$trimRight = _elm_lang$core$Native_String.trimRight;
-var _elm_lang$core$String$trimLeft = _elm_lang$core$Native_String.trimLeft;
-var _elm_lang$core$String$trim = _elm_lang$core$Native_String.trim;
-var _elm_lang$core$String$padRight = _elm_lang$core$Native_String.padRight;
-var _elm_lang$core$String$padLeft = _elm_lang$core$Native_String.padLeft;
-var _elm_lang$core$String$pad = _elm_lang$core$Native_String.pad;
-var _elm_lang$core$String$dropRight = _elm_lang$core$Native_String.dropRight;
-var _elm_lang$core$String$dropLeft = _elm_lang$core$Native_String.dropLeft;
-var _elm_lang$core$String$right = _elm_lang$core$Native_String.right;
-var _elm_lang$core$String$left = _elm_lang$core$Native_String.left;
-var _elm_lang$core$String$slice = _elm_lang$core$Native_String.slice;
-var _elm_lang$core$String$repeat = _elm_lang$core$Native_String.repeat;
-var _elm_lang$core$String$join = _elm_lang$core$Native_String.join;
-var _elm_lang$core$String$split = _elm_lang$core$Native_String.split;
-var _elm_lang$core$String$foldr = _elm_lang$core$Native_String.foldr;
-var _elm_lang$core$String$foldl = _elm_lang$core$Native_String.foldl;
-var _elm_lang$core$String$reverse = _elm_lang$core$Native_String.reverse;
-var _elm_lang$core$String$filter = _elm_lang$core$Native_String.filter;
-var _elm_lang$core$String$map = _elm_lang$core$Native_String.map;
-var _elm_lang$core$String$length = _elm_lang$core$Native_String.length;
-var _elm_lang$core$String$concat = _elm_lang$core$Native_String.concat;
-var _elm_lang$core$String$append = _elm_lang$core$Native_String.append;
-var _elm_lang$core$String$uncons = _elm_lang$core$Native_String.uncons;
-var _elm_lang$core$String$cons = _elm_lang$core$Native_String.cons;
-var _elm_lang$core$String$fromChar = function ($char) {
-	return A2(_elm_lang$core$String$cons, $char, '');
-};
-var _elm_lang$core$String$isEmpty = _elm_lang$core$Native_String.isEmpty;
 
 var _elm_lang$core$Dict$foldr = F3(
 	function (f, acc, t) {
@@ -4854,908 +5892,6 @@ var _elm_lang$core$Json_Decode$int = _elm_lang$core$Native_Json.decodePrimitive(
 var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive('bool');
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
-
-var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
-var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
-
-var _elm_lang$core$Tuple$mapSecond = F2(
-	function (func, _p0) {
-		var _p1 = _p0;
-		return {
-			ctor: '_Tuple2',
-			_0: _p1._0,
-			_1: func(_p1._1)
-		};
-	});
-var _elm_lang$core$Tuple$mapFirst = F2(
-	function (func, _p2) {
-		var _p3 = _p2;
-		return {
-			ctor: '_Tuple2',
-			_0: func(_p3._0),
-			_1: _p3._1
-		};
-	});
-var _elm_lang$core$Tuple$second = function (_p4) {
-	var _p5 = _p4;
-	return _p5._1;
-};
-var _elm_lang$core$Tuple$first = function (_p6) {
-	var _p7 = _p6;
-	return _p7._0;
-};
-
-//import //
-
-var _elm_lang$core$Native_Platform = function() {
-
-
-// PROGRAMS
-
-function program(impl)
-{
-	return function(flagDecoder)
-	{
-		return function(object, moduleName)
-		{
-			object['worker'] = function worker(flags)
-			{
-				if (typeof flags !== 'undefined')
-				{
-					throw new Error(
-						'The `' + moduleName + '` module does not need flags.\n'
-						+ 'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
-					);
-				}
-
-				return initialize(
-					impl.init,
-					impl.update,
-					impl.subscriptions,
-					renderer
-				);
-			};
-		};
-	};
-}
-
-function programWithFlags(impl)
-{
-	return function(flagDecoder)
-	{
-		return function(object, moduleName)
-		{
-			object['worker'] = function worker(flags)
-			{
-				if (typeof flagDecoder === 'undefined')
-				{
-					throw new Error(
-						'Are you trying to sneak a Never value into Elm? Trickster!\n'
-						+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
-						+ 'Use `program` instead if you do not want flags.'
-					);
-				}
-
-				var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
-				if (result.ctor === 'Err')
-				{
-					throw new Error(
-						moduleName + '.worker(...) was called with an unexpected argument.\n'
-						+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
-						+ result._0
-					);
-				}
-
-				return initialize(
-					impl.init(result._0),
-					impl.update,
-					impl.subscriptions,
-					renderer
-				);
-			};
-		};
-	};
-}
-
-function renderer(enqueue, _)
-{
-	return function(_) {};
-}
-
-
-// HTML TO PROGRAM
-
-function htmlToProgram(vnode)
-{
-	var emptyBag = batch(_elm_lang$core$Native_List.Nil);
-	var noChange = _elm_lang$core$Native_Utils.Tuple2(
-		_elm_lang$core$Native_Utils.Tuple0,
-		emptyBag
-	);
-
-	return _elm_lang$virtual_dom$VirtualDom$program({
-		init: noChange,
-		view: function(model) { return main; },
-		update: F2(function(msg, model) { return noChange; }),
-		subscriptions: function (model) { return emptyBag; }
-	});
-}
-
-
-// INITIALIZE A PROGRAM
-
-function initialize(init, update, subscriptions, renderer)
-{
-	// ambient state
-	var managers = {};
-	var updateView;
-
-	// init and update state in main process
-	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-		var model = init._0;
-		updateView = renderer(enqueue, model);
-		var cmds = init._1;
-		var subs = subscriptions(model);
-		dispatchEffects(managers, cmds, subs);
-		callback(_elm_lang$core$Native_Scheduler.succeed(model));
-	});
-
-	function onMessage(msg, model)
-	{
-		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-			var results = A2(update, msg, model);
-			model = results._0;
-			updateView(model);
-			var cmds = results._1;
-			var subs = subscriptions(model);
-			dispatchEffects(managers, cmds, subs);
-			callback(_elm_lang$core$Native_Scheduler.succeed(model));
-		});
-	}
-
-	var mainProcess = spawnLoop(initApp, onMessage);
-
-	function enqueue(msg)
-	{
-		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
-	}
-
-	var ports = setupEffects(managers, enqueue);
-
-	return ports ? { ports: ports } : {};
-}
-
-
-// EFFECT MANAGERS
-
-var effectManagers = {};
-
-function setupEffects(managers, callback)
-{
-	var ports;
-
-	// setup all necessary effect managers
-	for (var key in effectManagers)
-	{
-		var manager = effectManagers[key];
-
-		if (manager.isForeign)
-		{
-			ports = ports || {};
-			ports[key] = manager.tag === 'cmd'
-				? setupOutgoingPort(key)
-				: setupIncomingPort(key, callback);
-		}
-
-		managers[key] = makeManager(manager, callback);
-	}
-
-	return ports;
-}
-
-function makeManager(info, callback)
-{
-	var router = {
-		main: callback,
-		self: undefined
-	};
-
-	var tag = info.tag;
-	var onEffects = info.onEffects;
-	var onSelfMsg = info.onSelfMsg;
-
-	function onMessage(msg, state)
-	{
-		if (msg.ctor === 'self')
-		{
-			return A3(onSelfMsg, router, msg._0, state);
-		}
-
-		var fx = msg._0;
-		switch (tag)
-		{
-			case 'cmd':
-				return A3(onEffects, router, fx.cmds, state);
-
-			case 'sub':
-				return A3(onEffects, router, fx.subs, state);
-
-			case 'fx':
-				return A4(onEffects, router, fx.cmds, fx.subs, state);
-		}
-	}
-
-	var process = spawnLoop(info.init, onMessage);
-	router.self = process;
-	return process;
-}
-
-function sendToApp(router, msg)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		router.main(msg);
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function sendToSelf(router, msg)
-{
-	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
-		ctor: 'self',
-		_0: msg
-	});
-}
-
-
-// HELPER for STATEFUL LOOPS
-
-function spawnLoop(init, onMessage)
-{
-	var andThen = _elm_lang$core$Native_Scheduler.andThen;
-
-	function loop(state)
-	{
-		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
-			return onMessage(msg, state);
-		});
-		return A2(andThen, loop, handleMsg);
-	}
-
-	var task = A2(andThen, loop, init);
-
-	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
-}
-
-
-// BAGS
-
-function leaf(home)
-{
-	return function(value)
-	{
-		return {
-			type: 'leaf',
-			home: home,
-			value: value
-		};
-	};
-}
-
-function batch(list)
-{
-	return {
-		type: 'node',
-		branches: list
-	};
-}
-
-function map(tagger, bag)
-{
-	return {
-		type: 'map',
-		tagger: tagger,
-		tree: bag
-	}
-}
-
-
-// PIPE BAGS INTO EFFECT MANAGERS
-
-function dispatchEffects(managers, cmdBag, subBag)
-{
-	var effectsDict = {};
-	gatherEffects(true, cmdBag, effectsDict, null);
-	gatherEffects(false, subBag, effectsDict, null);
-
-	for (var home in managers)
-	{
-		var fx = home in effectsDict
-			? effectsDict[home]
-			: {
-				cmds: _elm_lang$core$Native_List.Nil,
-				subs: _elm_lang$core$Native_List.Nil
-			};
-
-		_elm_lang$core$Native_Scheduler.rawSend(managers[home], { ctor: 'fx', _0: fx });
-	}
-}
-
-function gatherEffects(isCmd, bag, effectsDict, taggers)
-{
-	switch (bag.type)
-	{
-		case 'leaf':
-			var home = bag.home;
-			var effect = toEffect(isCmd, home, taggers, bag.value);
-			effectsDict[home] = insert(isCmd, effect, effectsDict[home]);
-			return;
-
-		case 'node':
-			var list = bag.branches;
-			while (list.ctor !== '[]')
-			{
-				gatherEffects(isCmd, list._0, effectsDict, taggers);
-				list = list._1;
-			}
-			return;
-
-		case 'map':
-			gatherEffects(isCmd, bag.tree, effectsDict, {
-				tagger: bag.tagger,
-				rest: taggers
-			});
-			return;
-	}
-}
-
-function toEffect(isCmd, home, taggers, value)
-{
-	function applyTaggers(x)
-	{
-		var temp = taggers;
-		while (temp)
-		{
-			x = temp.tagger(x);
-			temp = temp.rest;
-		}
-		return x;
-	}
-
-	var map = isCmd
-		? effectManagers[home].cmdMap
-		: effectManagers[home].subMap;
-
-	return A2(map, applyTaggers, value)
-}
-
-function insert(isCmd, newEffect, effects)
-{
-	effects = effects || {
-		cmds: _elm_lang$core$Native_List.Nil,
-		subs: _elm_lang$core$Native_List.Nil
-	};
-	if (isCmd)
-	{
-		effects.cmds = _elm_lang$core$Native_List.Cons(newEffect, effects.cmds);
-		return effects;
-	}
-	effects.subs = _elm_lang$core$Native_List.Cons(newEffect, effects.subs);
-	return effects;
-}
-
-
-// PORTS
-
-function checkPortName(name)
-{
-	if (name in effectManagers)
-	{
-		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
-	}
-}
-
-
-// OUTGOING PORTS
-
-function outgoingPort(name, converter)
-{
-	checkPortName(name);
-	effectManagers[name] = {
-		tag: 'cmd',
-		cmdMap: outgoingPortMap,
-		converter: converter,
-		isForeign: true
-	};
-	return leaf(name);
-}
-
-var outgoingPortMap = F2(function cmdMap(tagger, value) {
-	return value;
-});
-
-function setupOutgoingPort(name)
-{
-	var subs = [];
-	var converter = effectManagers[name].converter;
-
-	// CREATE MANAGER
-
-	var init = _elm_lang$core$Native_Scheduler.succeed(null);
-
-	function onEffects(router, cmdList, state)
-	{
-		while (cmdList.ctor !== '[]')
-		{
-			// grab a separate reference to subs in case unsubscribe is called
-			var currentSubs = subs;
-			var value = converter(cmdList._0);
-			for (var i = 0; i < currentSubs.length; i++)
-			{
-				currentSubs[i](value);
-			}
-			cmdList = cmdList._1;
-		}
-		return init;
-	}
-
-	effectManagers[name].init = init;
-	effectManagers[name].onEffects = F3(onEffects);
-
-	// PUBLIC API
-
-	function subscribe(callback)
-	{
-		subs.push(callback);
-	}
-
-	function unsubscribe(callback)
-	{
-		// copy subs into a new array in case unsubscribe is called within a
-		// subscribed callback
-		subs = subs.slice();
-		var index = subs.indexOf(callback);
-		if (index >= 0)
-		{
-			subs.splice(index, 1);
-		}
-	}
-
-	return {
-		subscribe: subscribe,
-		unsubscribe: unsubscribe
-	};
-}
-
-
-// INCOMING PORTS
-
-function incomingPort(name, converter)
-{
-	checkPortName(name);
-	effectManagers[name] = {
-		tag: 'sub',
-		subMap: incomingPortMap,
-		converter: converter,
-		isForeign: true
-	};
-	return leaf(name);
-}
-
-var incomingPortMap = F2(function subMap(tagger, finalTagger)
-{
-	return function(value)
-	{
-		return tagger(finalTagger(value));
-	};
-});
-
-function setupIncomingPort(name, callback)
-{
-	var sentBeforeInit = [];
-	var subs = _elm_lang$core$Native_List.Nil;
-	var converter = effectManagers[name].converter;
-	var currentOnEffects = preInitOnEffects;
-	var currentSend = preInitSend;
-
-	// CREATE MANAGER
-
-	var init = _elm_lang$core$Native_Scheduler.succeed(null);
-
-	function preInitOnEffects(router, subList, state)
-	{
-		var postInitResult = postInitOnEffects(router, subList, state);
-
-		for(var i = 0; i < sentBeforeInit.length; i++)
-		{
-			postInitSend(sentBeforeInit[i]);
-		}
-
-		sentBeforeInit = null; // to release objects held in queue
-		currentSend = postInitSend;
-		currentOnEffects = postInitOnEffects;
-		return postInitResult;
-	}
-
-	function postInitOnEffects(router, subList, state)
-	{
-		subs = subList;
-		return init;
-	}
-
-	function onEffects(router, subList, state)
-	{
-		return currentOnEffects(router, subList, state);
-	}
-
-	effectManagers[name].init = init;
-	effectManagers[name].onEffects = F3(onEffects);
-
-	// PUBLIC API
-
-	function preInitSend(value)
-	{
-		sentBeforeInit.push(value);
-	}
-
-	function postInitSend(value)
-	{
-		var temp = subs;
-		while (temp.ctor !== '[]')
-		{
-			callback(temp._0(value));
-			temp = temp._1;
-		}
-	}
-
-	function send(incomingValue)
-	{
-		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
-		if (result.ctor === 'Err')
-		{
-			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
-		}
-
-		currentSend(result._0);
-	}
-
-	return { send: send };
-}
-
-return {
-	// routers
-	sendToApp: F2(sendToApp),
-	sendToSelf: F2(sendToSelf),
-
-	// global setup
-	effectManagers: effectManagers,
-	outgoingPort: outgoingPort,
-	incomingPort: incomingPort,
-
-	htmlToProgram: htmlToProgram,
-	program: program,
-	programWithFlags: programWithFlags,
-	initialize: initialize,
-
-	// effect bags
-	leaf: leaf,
-	batch: batch,
-	map: F2(map)
-};
-
-}();
-
-//import Native.Utils //
-
-var _elm_lang$core$Native_Scheduler = function() {
-
-var MAX_STEPS = 10000;
-
-
-// TASKS
-
-function succeed(value)
-{
-	return {
-		ctor: '_Task_succeed',
-		value: value
-	};
-}
-
-function fail(error)
-{
-	return {
-		ctor: '_Task_fail',
-		value: error
-	};
-}
-
-function nativeBinding(callback)
-{
-	return {
-		ctor: '_Task_nativeBinding',
-		callback: callback,
-		cancel: null
-	};
-}
-
-function andThen(callback, task)
-{
-	return {
-		ctor: '_Task_andThen',
-		callback: callback,
-		task: task
-	};
-}
-
-function onError(callback, task)
-{
-	return {
-		ctor: '_Task_onError',
-		callback: callback,
-		task: task
-	};
-}
-
-function receive(callback)
-{
-	return {
-		ctor: '_Task_receive',
-		callback: callback
-	};
-}
-
-
-// PROCESSES
-
-function rawSpawn(task)
-{
-	var process = {
-		ctor: '_Process',
-		id: _elm_lang$core$Native_Utils.guid(),
-		root: task,
-		stack: null,
-		mailbox: []
-	};
-
-	enqueue(process);
-
-	return process;
-}
-
-function spawn(task)
-{
-	return nativeBinding(function(callback) {
-		var process = rawSpawn(task);
-		callback(succeed(process));
-	});
-}
-
-function rawSend(process, msg)
-{
-	process.mailbox.push(msg);
-	enqueue(process);
-}
-
-function send(process, msg)
-{
-	return nativeBinding(function(callback) {
-		rawSend(process, msg);
-		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function kill(process)
-{
-	return nativeBinding(function(callback) {
-		var root = process.root;
-		if (root.ctor === '_Task_nativeBinding' && root.cancel)
-		{
-			root.cancel();
-		}
-
-		process.root = null;
-
-		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function sleep(time)
-{
-	return nativeBinding(function(callback) {
-		var id = setTimeout(function() {
-			callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-		}, time);
-
-		return function() { clearTimeout(id); };
-	});
-}
-
-
-// STEP PROCESSES
-
-function step(numSteps, process)
-{
-	while (numSteps < MAX_STEPS)
-	{
-		var ctor = process.root.ctor;
-
-		if (ctor === '_Task_succeed')
-		{
-			while (process.stack && process.stack.ctor === '_Task_onError')
-			{
-				process.stack = process.stack.rest;
-			}
-			if (process.stack === null)
-			{
-				break;
-			}
-			process.root = process.stack.callback(process.root.value);
-			process.stack = process.stack.rest;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_fail')
-		{
-			while (process.stack && process.stack.ctor === '_Task_andThen')
-			{
-				process.stack = process.stack.rest;
-			}
-			if (process.stack === null)
-			{
-				break;
-			}
-			process.root = process.stack.callback(process.root.value);
-			process.stack = process.stack.rest;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_andThen')
-		{
-			process.stack = {
-				ctor: '_Task_andThen',
-				callback: process.root.callback,
-				rest: process.stack
-			};
-			process.root = process.root.task;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_onError')
-		{
-			process.stack = {
-				ctor: '_Task_onError',
-				callback: process.root.callback,
-				rest: process.stack
-			};
-			process.root = process.root.task;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_nativeBinding')
-		{
-			process.root.cancel = process.root.callback(function(newRoot) {
-				process.root = newRoot;
-				enqueue(process);
-			});
-
-			break;
-		}
-
-		if (ctor === '_Task_receive')
-		{
-			var mailbox = process.mailbox;
-			if (mailbox.length === 0)
-			{
-				break;
-			}
-
-			process.root = process.root.callback(mailbox.shift());
-			++numSteps;
-			continue;
-		}
-
-		throw new Error(ctor);
-	}
-
-	if (numSteps < MAX_STEPS)
-	{
-		return numSteps + 1;
-	}
-	enqueue(process);
-
-	return numSteps;
-}
-
-
-// WORK QUEUE
-
-var working = false;
-var workQueue = [];
-
-function enqueue(process)
-{
-	workQueue.push(process);
-
-	if (!working)
-	{
-		setTimeout(work, 0);
-		working = true;
-	}
-}
-
-function work()
-{
-	var numSteps = 0;
-	var process;
-	while (numSteps < MAX_STEPS && (process = workQueue.shift()))
-	{
-		if (process.root)
-		{
-			numSteps = step(numSteps, process);
-		}
-	}
-	if (!process)
-	{
-		working = false;
-		return;
-	}
-	setTimeout(work, 0);
-}
-
-
-return {
-	succeed: succeed,
-	fail: fail,
-	nativeBinding: nativeBinding,
-	andThen: F2(andThen),
-	onError: F2(onError),
-	receive: receive,
-
-	spawn: spawn,
-	kill: kill,
-	sleep: sleep,
-	send: F2(send),
-
-	rawSpawn: rawSpawn,
-	rawSend: rawSend
-};
-
-}();
-var _elm_lang$core$Platform_Cmd$batch = _elm_lang$core$Native_Platform.batch;
-var _elm_lang$core$Platform_Cmd$none = _elm_lang$core$Platform_Cmd$batch(
-	{ctor: '[]'});
-var _elm_lang$core$Platform_Cmd_ops = _elm_lang$core$Platform_Cmd_ops || {};
-_elm_lang$core$Platform_Cmd_ops['!'] = F2(
-	function (model, commands) {
-		return {
-			ctor: '_Tuple2',
-			_0: model,
-			_1: _elm_lang$core$Platform_Cmd$batch(commands)
-		};
-	});
-var _elm_lang$core$Platform_Cmd$map = _elm_lang$core$Native_Platform.map;
-var _elm_lang$core$Platform_Cmd$Cmd = {ctor: 'Cmd'};
-
-var _elm_lang$core$Platform_Sub$batch = _elm_lang$core$Native_Platform.batch;
-var _elm_lang$core$Platform_Sub$none = _elm_lang$core$Platform_Sub$batch(
-	{ctor: '[]'});
-var _elm_lang$core$Platform_Sub$map = _elm_lang$core$Native_Platform.map;
-var _elm_lang$core$Platform_Sub$Sub = {ctor: 'Sub'};
-
-var _elm_lang$core$Platform$hack = _elm_lang$core$Native_Scheduler.succeed;
-var _elm_lang$core$Platform$sendToSelf = _elm_lang$core$Native_Platform.sendToSelf;
-var _elm_lang$core$Platform$sendToApp = _elm_lang$core$Native_Platform.sendToApp;
-var _elm_lang$core$Platform$programWithFlags = _elm_lang$core$Native_Platform.programWithFlags;
-var _elm_lang$core$Platform$program = _elm_lang$core$Native_Platform.program;
-var _elm_lang$core$Platform$Program = {ctor: 'Program'};
-var _elm_lang$core$Platform$Task = {ctor: 'Task'};
-var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
-var _elm_lang$core$Platform$Router = {ctor: 'Router'};
 
 var _debois$elm_dom$DOM$className = A2(
 	_elm_lang$core$Json_Decode$at,
@@ -9890,134 +10026,6 @@ var _rtfeldman$elm_css_util$Css_Helpers$identifierToString = F2(
 			_rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier(identifier));
 	});
 
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$stylesheetLink = function (url) {
-	return A3(
-		_elm_lang$html$Html$node,
-		'link',
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html_Attributes$property,
-				'rel',
-				_elm_lang$core$Json_Encode$string('stylesheet')),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html_Attributes$property,
-					'type',
-					_elm_lang$core$Json_Encode$string('text/css')),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html_Attributes$property,
-						'href',
-						_elm_lang$core$Json_Encode$string(url)),
-					_1: {ctor: '[]'}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$style = function (text) {
-	return A3(
-		_elm_lang$html$Html$node,
-		'style',
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html_Attributes$property,
-				'textContent',
-				_elm_lang$core$Json_Encode$string(text)),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html_Attributes$property,
-					'type',
-					_elm_lang$core$Json_Encode$string('text/css')),
-				_1: {ctor: '[]'}
-			}
-		},
-		{ctor: '[]'});
-};
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$namespacedClass = F2(
-	function (name, list) {
-		return _elm_lang$html$Html_Attributes$class(
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				A2(
-					_elm_lang$core$List$map,
-					_rtfeldman$elm_css_util$Css_Helpers$identifierToString(name),
-					list)));
-	});
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$class = _rtfeldman$elm_css_helpers$Html_CssHelpers$namespacedClass('');
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$classList = function (list) {
-	return _rtfeldman$elm_css_helpers$Html_CssHelpers$class(
-		A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$first,
-			A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$second, list)));
-};
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$namespacedClassList = F2(
-	function (name, list) {
-		return A2(
-			_rtfeldman$elm_css_helpers$Html_CssHelpers$namespacedClass,
-			name,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$second, list)));
-	});
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$helpers = {
-	$class: _rtfeldman$elm_css_helpers$Html_CssHelpers$class,
-	classList: _rtfeldman$elm_css_helpers$Html_CssHelpers$classList,
-	id: function (_p0) {
-		return _elm_lang$html$Html_Attributes$id(
-			_rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier(_p0));
-	}
-};
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace = function (name) {
-	return {
-		$class: _rtfeldman$elm_css_helpers$Html_CssHelpers$namespacedClass(name),
-		classList: _rtfeldman$elm_css_helpers$Html_CssHelpers$namespacedClassList(name),
-		id: function (_p1) {
-			return _elm_lang$html$Html_Attributes$id(
-				_rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier(_p1));
-		},
-		name: name
-	};
-};
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$withClass = F3(
-	function (className, makeElem, attrs) {
-		return makeElem(
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class(className),
-				_1: attrs
-			});
-	});
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$Helpers = F3(
-	function (a, b, c) {
-		return {$class: a, classList: b, id: c};
-	});
-var _rtfeldman$elm_css_helpers$Html_CssHelpers$Namespace = F4(
-	function (a, b, c, d) {
-		return {$class: a, classList: b, id: c, name: d};
-	});
-
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$tab = 9;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace = 8;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$end = 35;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$home = 36;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown = 34;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp = 33;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow = 40;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow = 38;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$rightArrow = 39;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$leftArrow = 37;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape = 27;
-var _inkuzmin$elm_multiselect$Multiselect_Keycodes$return = 13;
-
 var _rtfeldman$elm_css$Css_Structure$dropEmptyDeclarations = function (declarations) {
 	dropEmptyDeclarations:
 	while (true) {
@@ -10967,6 +10975,2842 @@ var _rtfeldman$elm_css$Css_Preprocess$StyleBlock = F3(
 	function (a, b, c) {
 		return {ctor: 'StyleBlock', _0: a, _1: b, _2: c};
 	});
+
+var _rtfeldman$hex$Hex$toString = function (num) {
+	return _elm_lang$core$String$fromList(
+		(_elm_lang$core$Native_Utils.cmp(num, 0) < 0) ? {
+			ctor: '::',
+			_0: _elm_lang$core$Native_Utils.chr('-'),
+			_1: A2(
+				_rtfeldman$hex$Hex$unsafePositiveToDigits,
+				{ctor: '[]'},
+				_elm_lang$core$Basics$negate(num))
+		} : A2(
+			_rtfeldman$hex$Hex$unsafePositiveToDigits,
+			{ctor: '[]'},
+			num));
+};
+var _rtfeldman$hex$Hex$unsafePositiveToDigits = F2(
+	function (digits, num) {
+		unsafePositiveToDigits:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(num, 16) < 0) {
+				return {
+					ctor: '::',
+					_0: _rtfeldman$hex$Hex$unsafeToDigit(num),
+					_1: digits
+				};
+			} else {
+				var _v0 = {
+					ctor: '::',
+					_0: _rtfeldman$hex$Hex$unsafeToDigit(
+						A2(_elm_lang$core$Basics_ops['%'], num, 16)),
+					_1: digits
+				},
+					_v1 = (num / 16) | 0;
+				digits = _v0;
+				num = _v1;
+				continue unsafePositiveToDigits;
+			}
+		}
+	});
+var _rtfeldman$hex$Hex$unsafeToDigit = function (num) {
+	var _p0 = num;
+	switch (_p0) {
+		case 0:
+			return _elm_lang$core$Native_Utils.chr('0');
+		case 1:
+			return _elm_lang$core$Native_Utils.chr('1');
+		case 2:
+			return _elm_lang$core$Native_Utils.chr('2');
+		case 3:
+			return _elm_lang$core$Native_Utils.chr('3');
+		case 4:
+			return _elm_lang$core$Native_Utils.chr('4');
+		case 5:
+			return _elm_lang$core$Native_Utils.chr('5');
+		case 6:
+			return _elm_lang$core$Native_Utils.chr('6');
+		case 7:
+			return _elm_lang$core$Native_Utils.chr('7');
+		case 8:
+			return _elm_lang$core$Native_Utils.chr('8');
+		case 9:
+			return _elm_lang$core$Native_Utils.chr('9');
+		case 10:
+			return _elm_lang$core$Native_Utils.chr('a');
+		case 11:
+			return _elm_lang$core$Native_Utils.chr('b');
+		case 12:
+			return _elm_lang$core$Native_Utils.chr('c');
+		case 13:
+			return _elm_lang$core$Native_Utils.chr('d');
+		case 14:
+			return _elm_lang$core$Native_Utils.chr('e');
+		case 15:
+			return _elm_lang$core$Native_Utils.chr('f');
+		default:
+			return _elm_lang$core$Native_Utils.crashCase(
+				'Hex',
+				{
+					start: {line: 138, column: 5},
+					end: {line: 188, column: 84}
+				},
+				_p0)(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Tried to convert ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_rtfeldman$hex$Hex$toString(num),
+						' to hexadecimal.')));
+	}
+};
+var _rtfeldman$hex$Hex$fromStringHelp = F3(
+	function (position, chars, accumulated) {
+		var _p2 = chars;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Result$Ok(accumulated);
+		} else {
+			var recurse = function (additional) {
+				return A3(
+					_rtfeldman$hex$Hex$fromStringHelp,
+					position - 1,
+					_p2._1,
+					accumulated + (additional * Math.pow(16, position)));
+			};
+			var _p3 = _p2._0;
+			switch (_p3.valueOf()) {
+				case '0':
+					return recurse(0);
+				case '1':
+					return recurse(1);
+				case '2':
+					return recurse(2);
+				case '3':
+					return recurse(3);
+				case '4':
+					return recurse(4);
+				case '5':
+					return recurse(5);
+				case '6':
+					return recurse(6);
+				case '7':
+					return recurse(7);
+				case '8':
+					return recurse(8);
+				case '9':
+					return recurse(9);
+				case 'a':
+					return recurse(10);
+				case 'b':
+					return recurse(11);
+				case 'c':
+					return recurse(12);
+				case 'd':
+					return recurse(13);
+				case 'e':
+					return recurse(14);
+				case 'f':
+					return recurse(15);
+				default:
+					return _elm_lang$core$Result$Err(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(_p3),
+							' is not a valid hexadecimal character.'));
+			}
+		}
+	});
+var _rtfeldman$hex$Hex$fromString = function (str) {
+	if (_elm_lang$core$String$isEmpty(str)) {
+		return _elm_lang$core$Result$Err('Empty strings are not valid hexadecimal strings.');
+	} else {
+		var formatError = function (err) {
+			return A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: _elm_lang$core$Basics$toString(str),
+					_1: {
+						ctor: '::',
+						_0: 'is not a valid hexadecimal string because',
+						_1: {
+							ctor: '::',
+							_0: err,
+							_1: {ctor: '[]'}
+						}
+					}
+				});
+		};
+		var result = function () {
+			if (A2(_elm_lang$core$String$startsWith, '-', str)) {
+				var list = A2(
+					_elm_lang$core$Maybe$withDefault,
+					{ctor: '[]'},
+					_elm_lang$core$List$tail(
+						_elm_lang$core$String$toList(str)));
+				return A2(
+					_elm_lang$core$Result$map,
+					_elm_lang$core$Basics$negate,
+					A3(
+						_rtfeldman$hex$Hex$fromStringHelp,
+						_elm_lang$core$List$length(list) - 1,
+						list,
+						0));
+			} else {
+				return A3(
+					_rtfeldman$hex$Hex$fromStringHelp,
+					_elm_lang$core$String$length(str) - 1,
+					_elm_lang$core$String$toList(str),
+					0);
+			}
+		}();
+		return A2(_elm_lang$core$Result$mapError, formatError, result);
+	}
+};
+
+var _rtfeldman$elm_css$Css$stroke = {value: 'stroke', pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$painted = {value: 'painted', pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$visibleStroke = {value: 'visibleStroke', pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$visibleFill = {value: 'visibleFill', pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$visiblePainted = {value: 'visiblePainted', pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$manipulation = {value: 'manipulation', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$pinchZoom = {value: 'pinch-zoom', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panDown = {value: 'pan-down', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panUp = {value: 'pan-up', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panY = {value: 'pan-y', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panRight = {value: 'pan-right', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panLeft = {value: 'pan-left', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$panX = {value: 'pan-x', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$stringsToValue = function (list) {
+	return _elm_lang$core$List$isEmpty(list) ? {value: 'none'} : {
+		value: A2(
+			_elm_lang$core$String$join,
+			', ',
+			A2(
+				_elm_lang$core$List$map,
+				function (s) {
+					return s;
+				},
+				list))
+	};
+};
+var _rtfeldman$elm_css$Css$valuesOrNone = function (list) {
+	return _elm_lang$core$List$isEmpty(list) ? {value: 'none'} : {
+		value: A2(
+			_elm_lang$core$String$join,
+			' ',
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.value;
+				},
+				list))
+	};
+};
+var _rtfeldman$elm_css$Css$stringToInt = function (str) {
+	return A2(
+		_elm_lang$core$Result$withDefault,
+		0,
+		_elm_lang$core$String$toInt(str));
+};
+var _rtfeldman$elm_css$Css$numberToString = function (num) {
+	return _elm_lang$core$Basics$toString(num + 0);
+};
+var _rtfeldman$elm_css$Css$numericalPercentageToString = function (value) {
+	return A3(
+		_elm_lang$core$Basics$flip,
+		F2(
+			function (x, y) {
+				return A2(_elm_lang$core$Basics_ops['++'], x, y);
+			}),
+		'%',
+		_rtfeldman$elm_css$Css$numberToString(
+			A2(
+				F2(
+					function (x, y) {
+						return x * y;
+					}),
+				100,
+				value)));
+};
+var _rtfeldman$elm_css$Css$pseudoElement = function (element) {
+	return _rtfeldman$elm_css$Css_Preprocess$WithPseudoElement(
+		_rtfeldman$elm_css$Css_Structure$PseudoElement(element));
+};
+var _rtfeldman$elm_css$Css$after = _rtfeldman$elm_css$Css$pseudoElement('after');
+var _rtfeldman$elm_css$Css$before = _rtfeldman$elm_css$Css$pseudoElement('before');
+var _rtfeldman$elm_css$Css$firstLetter = _rtfeldman$elm_css$Css$pseudoElement('first-letter');
+var _rtfeldman$elm_css$Css$firstLine = _rtfeldman$elm_css$Css$pseudoElement('first-line');
+var _rtfeldman$elm_css$Css$selection = _rtfeldman$elm_css$Css$pseudoElement('selection');
+var _rtfeldman$elm_css$Css$pseudoClass = function ($class) {
+	return _rtfeldman$elm_css$Css_Preprocess$ExtendSelector(
+		_rtfeldman$elm_css$Css_Structure$PseudoClassSelector($class));
+};
+var _rtfeldman$elm_css$Css$active = _rtfeldman$elm_css$Css$pseudoClass('active');
+var _rtfeldman$elm_css$Css$any = function (str) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'any(',
+			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
+};
+var _rtfeldman$elm_css$Css$checked = _rtfeldman$elm_css$Css$pseudoClass('checked');
+var _rtfeldman$elm_css$Css$disabled = _rtfeldman$elm_css$Css$pseudoClass('disabled');
+var _rtfeldman$elm_css$Css$empty = _rtfeldman$elm_css$Css$pseudoClass('empty');
+var _rtfeldman$elm_css$Css$enabled = _rtfeldman$elm_css$Css$pseudoClass('enabled');
+var _rtfeldman$elm_css$Css$first = _rtfeldman$elm_css$Css$pseudoClass('first');
+var _rtfeldman$elm_css$Css$firstChild = _rtfeldman$elm_css$Css$pseudoClass('first-child');
+var _rtfeldman$elm_css$Css$firstOfType = _rtfeldman$elm_css$Css$pseudoClass('first-of-type');
+var _rtfeldman$elm_css$Css$fullscreen = _rtfeldman$elm_css$Css$pseudoClass('fullscreen');
+var _rtfeldman$elm_css$Css$focus = _rtfeldman$elm_css$Css$pseudoClass('focus');
+var _rtfeldman$elm_css$Css$hover = _rtfeldman$elm_css$Css$pseudoClass('hover');
+var _rtfeldman$elm_css$Css$visited = _rtfeldman$elm_css$Css$pseudoClass('visited');
+var _rtfeldman$elm_css$Css$indeterminate = _rtfeldman$elm_css$Css$pseudoClass('indeterminate');
+var _rtfeldman$elm_css$Css$invalid = _rtfeldman$elm_css$Css$pseudoClass('invalid');
+var _rtfeldman$elm_css$Css$lang = function (str) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'lang(',
+			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
+};
+var _rtfeldman$elm_css$Css$lastChild = _rtfeldman$elm_css$Css$pseudoClass('last-child');
+var _rtfeldman$elm_css$Css$lastOfType = _rtfeldman$elm_css$Css$pseudoClass('last-of-type');
+var _rtfeldman$elm_css$Css$link = _rtfeldman$elm_css$Css$pseudoClass('link');
+var _rtfeldman$elm_css$Css$nthChild = function (str) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'nth-child(',
+			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
+};
+var _rtfeldman$elm_css$Css$nthLastChild = function (str) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'nth-last-child(',
+			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
+};
+var _rtfeldman$elm_css$Css$nthLastOfType = function (str) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'nth-last-of-type(',
+			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
+};
+var _rtfeldman$elm_css$Css$nthOfType = function (str) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'nth-of-type(',
+			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
+};
+var _rtfeldman$elm_css$Css$onlyChild = _rtfeldman$elm_css$Css$pseudoClass('only-child');
+var _rtfeldman$elm_css$Css$onlyOfType = _rtfeldman$elm_css$Css$pseudoClass('only-of-type');
+var _rtfeldman$elm_css$Css$optional = _rtfeldman$elm_css$Css$pseudoClass('optional');
+var _rtfeldman$elm_css$Css$outOfRange = _rtfeldman$elm_css$Css$pseudoClass('out-of-range');
+var _rtfeldman$elm_css$Css$readWrite = _rtfeldman$elm_css$Css$pseudoClass('read-write');
+var _rtfeldman$elm_css$Css$required = _rtfeldman$elm_css$Css$pseudoClass('required');
+var _rtfeldman$elm_css$Css$root = _rtfeldman$elm_css$Css$pseudoClass('root');
+var _rtfeldman$elm_css$Css$scope = _rtfeldman$elm_css$Css$pseudoClass('scope');
+var _rtfeldman$elm_css$Css$target = _rtfeldman$elm_css$Css$pseudoClass('target');
+var _rtfeldman$elm_css$Css$valid = _rtfeldman$elm_css$Css$pseudoClass('valid');
+var _rtfeldman$elm_css$Css$directionalityToString = function (directionality) {
+	var _p0 = directionality;
+	if (_p0.ctor === 'Ltr') {
+		return 'ltr';
+	} else {
+		return 'rtl';
+	}
+};
+var _rtfeldman$elm_css$Css$dir = function (directionality) {
+	return _rtfeldman$elm_css$Css$pseudoClass(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'dir(',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rtfeldman$elm_css$Css$directionalityToString(directionality),
+				')')));
+};
+var _rtfeldman$elm_css$Css$propertyWithWarnings = F3(
+	function (warnings, key, value) {
+		return _rtfeldman$elm_css$Css_Preprocess$AppendProperty(
+			{key: key, value: value, important: false, warnings: warnings});
+	});
+var _rtfeldman$elm_css$Css$property = _rtfeldman$elm_css$Css$propertyWithWarnings(
+	{ctor: '[]'});
+var _rtfeldman$elm_css$Css$pointerEventsFill = A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'fill');
+var _rtfeldman$elm_css$Css$pointerEventsAll = A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'all');
+var _rtfeldman$elm_css$Css$batch = _rtfeldman$elm_css$Css_Preprocess$ApplyStyles;
+var _rtfeldman$elm_css$Css$animationNames = function (identifiers) {
+	var value = A2(
+		_elm_lang$core$String$join,
+		', ',
+		A2(
+			_elm_lang$core$List$map,
+			_rtfeldman$elm_css_util$Css_Helpers$identifierToString(''),
+			identifiers));
+	return A2(_rtfeldman$elm_css$Css$property, 'animation-name', value);
+};
+var _rtfeldman$elm_css$Css$animationName = function (identifier) {
+	return _rtfeldman$elm_css$Css$animationNames(
+		{
+			ctor: '::',
+			_0: identifier,
+			_1: {ctor: '[]'}
+		});
+};
+var _rtfeldman$elm_css$Css$preLine = {value: 'pre-line', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$preWrap = {value: 'pre-wrap', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$pre = {value: 'pre', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$grabbing = {value: 'grabbing', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$grab = {value: 'grab', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$zoomOut = {value: 'zoom-out', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$zoomIn = {value: 'zoom-in', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$allScroll = {value: 'all-scroll', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$rowResize = {value: 'row-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$colResize = {value: 'col-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nwseResize = {value: 'nwse-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$neswResize = {value: 'nesw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nsResize = {value: 'ns-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ewResize = {value: 'ew-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wResize = {value: 'w-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$swResize = {value: 'sw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$seResize = {value: 'se-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sResize = {value: 's-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nwResize = {value: 'nw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$neResize = {value: 'ne-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$nResize = {value: 'n-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$eResize = {value: 'e-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$notAllowed = {value: 'not-allowed', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noDrop = {value: 'no-drop', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$move = {value: 'move', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$copy = {value: 'copy', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cursorAlias = {value: 'alias', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$verticalText = {value: 'vertical-text', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$text_ = {value: 'text', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cell = {value: 'cell', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wait = {value: 'wait', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$progress = {value: 'progress', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$pointer = {value: 'pointer', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$help = {value: 'help', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contextMenu = {value: 'context-menu', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$crosshair = {value: 'crosshair', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$default = {value: 'default', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fontWeight = function (_p1) {
+	var _p2 = _p1;
+	var _p3 = _p2.value;
+	var validWeight = function (weight) {
+		return (!_elm_lang$core$Native_Utils.eq(
+			_p3,
+			_elm_lang$core$Basics$toString(weight))) ? true : A2(
+			_elm_lang$core$List$member,
+			weight,
+			A2(
+				_elm_lang$core$List$map,
+				F2(
+					function (x, y) {
+						return x * y;
+					})(100),
+				A2(_elm_lang$core$List$range, 1, 9)));
+	};
+	var warnings = validWeight(
+		_rtfeldman$elm_css$Css$stringToInt(_p3)) ? {ctor: '[]'} : {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$core$Basics_ops['++'],
+			'fontWeight ',
+			A2(_elm_lang$core$Basics_ops['++'], _p3, ' is invalid. Valid weights are: 100, 200, 300, 400, 500, 600, 700, 800, 900. Please see https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#Values')),
+		_1: {ctor: '[]'}
+	};
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'font-weight', _p3);
+};
+var _rtfeldman$elm_css$Css$fontFeatureSettingsList = function (featureTagValues) {
+	var warnings = _elm_lang$core$List$concat(
+		A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.warnings;
+			},
+			featureTagValues));
+	var value = A2(
+		_elm_lang$core$String$join,
+		', ',
+		A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.value;
+			},
+			featureTagValues));
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'font-feature-settings', value);
+};
+var _rtfeldman$elm_css$Css$fontFeatureSettings = function (_p4) {
+	var _p5 = _p4;
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, _p5.warnings, 'font-feature-settings', _p5.value);
+};
+var _rtfeldman$elm_css$Css$qt = function (str) {
+	return _elm_lang$core$Basics$toString(str);
+};
+var _rtfeldman$elm_css$Css$fontFace = function (value) {
+	return A2(_elm_lang$core$Basics_ops['++'], 'font-face ', value);
+};
+var _rtfeldman$elm_css$Css$src_ = function (value) {
+	return _elm_lang$core$Basics$toString(value.value);
+};
+var _rtfeldman$elm_css$Css$color = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'color', c.value);
+};
+var _rtfeldman$elm_css$Css$backgroundColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'background-color', c.value);
+};
+var _rtfeldman$elm_css$Css$outlineColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'outline-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderColor4 = F4(
+	function (c1, c2, c3, c4) {
+		var value = A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: c1.value,
+				_1: {
+					ctor: '::',
+					_0: c2.value,
+					_1: {
+						ctor: '::',
+						_0: c3.value,
+						_1: {
+							ctor: '::',
+							_0: c4.value,
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+		var warnings = A2(
+			_elm_lang$core$Basics_ops['++'],
+			c1.warnings,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				c2.warnings,
+				A2(_elm_lang$core$Basics_ops['++'], c3.warnings, c4.warnings)));
+		return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'border-color', value);
+	});
+var _rtfeldman$elm_css$Css$borderColor3 = F3(
+	function (c1, c2, c3) {
+		var value = A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: c1.value,
+				_1: {
+					ctor: '::',
+					_0: c2.value,
+					_1: {
+						ctor: '::',
+						_0: c3.value,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+		var warnings = A2(
+			_elm_lang$core$Basics_ops['++'],
+			c1.warnings,
+			A2(_elm_lang$core$Basics_ops['++'], c2.warnings, c3.warnings));
+		return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'border-color', value);
+	});
+var _rtfeldman$elm_css$Css$borderColor2 = F2(
+	function (c1, c2) {
+		var value = A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: c1.value,
+				_1: {
+					ctor: '::',
+					_0: c2.value,
+					_1: {ctor: '[]'}
+				}
+			});
+		var warnings = A2(_elm_lang$core$Basics_ops['++'], c1.warnings, c2.warnings);
+		return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'border-color', value);
+	});
+var _rtfeldman$elm_css$Css$borderColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderBlockEndColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-block-end-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderTopColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-top-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderRightColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-right-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderLeftColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-left-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderInlineEndColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-inline-end-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderInlineStartColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-inline-start-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderBottomColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-bottom-color', c.value);
+};
+var _rtfeldman$elm_css$Css$borderBlockStartColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-block-start-color', c.value);
+};
+var _rtfeldman$elm_css$Css$featureTag2 = F2(
+	function (tag, value) {
+		var potentialWarnings = {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: !_elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$String$length(tag),
+					4),
+				_1: A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Feature tags must be exactly 4 characters long. ',
+					A2(_elm_lang$core$Basics_ops['++'], tag, ' is invalid.'))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.cmp(value, 0) < 0,
+					_1: A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Feature values cannot be negative. ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(value),
+							' is invalid.'))
+				},
+				_1: {ctor: '[]'}
+			}
+		};
+		var warnings = A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$second,
+			A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$first, potentialWarnings));
+		return {
+			value: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(tag),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					' ',
+					_elm_lang$core$Basics$toString(value))),
+			featureTagValue: _rtfeldman$elm_css$Css_Structure$Compatible,
+			warnings: warnings
+		};
+	});
+var _rtfeldman$elm_css$Css$featureTag = function (tag) {
+	return A2(_rtfeldman$elm_css$Css$featureTag2, tag, 1);
+};
+var _rtfeldman$elm_css$Css$featureOff = 0;
+var _rtfeldman$elm_css$Css$featureOn = 1;
+var _rtfeldman$elm_css$Css$slashedZero = {value: 'slashed-zero', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ordinal = {value: 'ordinal', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$stackedFractions = {value: 'stacked-fractions', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$diagonalFractions = {value: 'diagonal-fractions', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tabularNums = {value: 'tabular-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$proportionalNums = {value: 'proportional-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$oldstyleNums = {value: 'oldstyle-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$liningNums = {value: 'lining-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noContextual = {value: 'no-contextual', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contextual = {value: 'context', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noHistoricalLigatures = {value: 'no-historical-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$historicalLigatures = {value: 'historical-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noDiscretionaryLigatures = {value: 'no-discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$discretionaryLigatures = {value: 'discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noCommonLigatures = {value: 'no-common-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$commonLigatures = {value: 'common-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$titlingCaps = {value: 'titling-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$unicase = {value: 'unicase', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$allPetiteCaps = {value: 'all-petite-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$petiteCaps = {value: 'petite-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$allSmallCaps = {value: 'all-small-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$smallCaps = {value: 'small-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$bolder = {value: 'bolder', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lighter = {value: 'lighter', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$bold = {value: 'bold', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$oblique = {value: 'oblique', fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$italic = {value: 'italic', fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$normal = {
+	value: 'normal',
+	warnings: {ctor: '[]'},
+	fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
+	featureTagValue: _rtfeldman$elm_css$Css_Structure$Compatible,
+	overflowWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
+	whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible
+};
+var _rtfeldman$elm_css$Css$larger = {value: 'larger', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$smaller = {value: 'smaller', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xxLarge = {value: 'xx-large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xLarge = {value: 'x-large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$large = {value: 'large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$medium = {value: 'medium', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$small = {value: 'small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xSmall = {value: 'x-small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$xxSmall = {value: 'xx-small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fantasy = {value: 'fantasy', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cursive = {value: 'cursive', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$monospace = {value: 'monospace', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sansSerif = {value: 'sans-serif', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$serif = {value: 'serif', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$absolute = {value: 'absolute', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$relative = {value: 'relative', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sticky = {value: 'sticky', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fixed = {value: 'fixed', position: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible, tableLayout: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$static = {value: 'static', position: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fillAvailable = {value: 'fill-available', minMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fitContent = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$fillAvailable,
+	{value: 'fit-content'});
+var _rtfeldman$elm_css$Css$minContent = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$fillAvailable,
+	{value: 'min-content'});
+var _rtfeldman$elm_css$Css$maxContent = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$fillAvailable,
+	{value: 'max-content'});
+var _rtfeldman$elm_css$Css$displayFlex = A2(_rtfeldman$elm_css$Css$property, 'display', 'flex');
+var _rtfeldman$elm_css$Css$textEmphasisColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'text-emphasis-color', c.value);
+};
+var _rtfeldman$elm_css$Css$textDecorationColor = function (c) {
+	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'text-decoration-color', c.value);
+};
+var _rtfeldman$elm_css$Css$prop6 = F7(
+	function (key, argA, argB, argC, argD, argE, argF) {
+		return A2(
+			_rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: argA.value,
+					_1: {
+						ctor: '::',
+						_0: argB.value,
+						_1: {
+							ctor: '::',
+							_0: argC.value,
+							_1: {
+								ctor: '::',
+								_0: argD.value,
+								_1: {
+									ctor: '::',
+									_0: argE.value,
+									_1: {
+										ctor: '::',
+										_0: argF.value,
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}));
+	});
+var _rtfeldman$elm_css$Css$boxShadow6 = _rtfeldman$elm_css$Css$prop6('box-shadow');
+var _rtfeldman$elm_css$Css$prop5 = F6(
+	function (key, argA, argB, argC, argD, argE) {
+		return A2(
+			_rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: argA.value,
+					_1: {
+						ctor: '::',
+						_0: argB.value,
+						_1: {
+							ctor: '::',
+							_0: argC.value,
+							_1: {
+								ctor: '::',
+								_0: argD.value,
+								_1: {
+									ctor: '::',
+									_0: argE.value,
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}));
+	});
+var _rtfeldman$elm_css$Css$boxShadow5 = _rtfeldman$elm_css$Css$prop5('box-shadow');
+var _rtfeldman$elm_css$Css$prop4 = F5(
+	function (key, argA, argB, argC, argD) {
+		return A2(
+			_rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: argA.value,
+					_1: {
+						ctor: '::',
+						_0: argB.value,
+						_1: {
+							ctor: '::',
+							_0: argC.value,
+							_1: {
+								ctor: '::',
+								_0: argD.value,
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}));
+	});
+var _rtfeldman$elm_css$Css$textShadow4 = _rtfeldman$elm_css$Css$prop4('text-shadow');
+var _rtfeldman$elm_css$Css$boxShadow4 = _rtfeldman$elm_css$Css$prop4('box-shadow');
+var _rtfeldman$elm_css$Css$padding4 = _rtfeldman$elm_css$Css$prop4('padding');
+var _rtfeldman$elm_css$Css$margin4 = _rtfeldman$elm_css$Css$prop4('margin');
+var _rtfeldman$elm_css$Css$borderImageOutset4 = _rtfeldman$elm_css$Css$prop4('border-image-outset');
+var _rtfeldman$elm_css$Css$borderImageWidth4 = _rtfeldman$elm_css$Css$prop4('border-image-width');
+var _rtfeldman$elm_css$Css$borderWidth4 = _rtfeldman$elm_css$Css$prop4('border-width');
+var _rtfeldman$elm_css$Css$borderRadius4 = _rtfeldman$elm_css$Css$prop4('border-radius');
+var _rtfeldman$elm_css$Css$prop3 = F4(
+	function (key, argA, argB, argC) {
+		return A2(
+			_rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: argA.value,
+					_1: {
+						ctor: '::',
+						_0: argB.value,
+						_1: {
+							ctor: '::',
+							_0: argC.value,
+							_1: {ctor: '[]'}
+						}
+					}
+				}));
+	});
+var _rtfeldman$elm_css$Css$textShadow3 = _rtfeldman$elm_css$Css$prop3('text-shadow');
+var _rtfeldman$elm_css$Css$boxShadow3 = _rtfeldman$elm_css$Css$prop3('box-shadow');
+var _rtfeldman$elm_css$Css$textIndent3 = _rtfeldman$elm_css$Css$prop3('text-indent');
+var _rtfeldman$elm_css$Css$padding3 = _rtfeldman$elm_css$Css$prop3('padding');
+var _rtfeldman$elm_css$Css$margin3 = _rtfeldman$elm_css$Css$prop3('margin');
+var _rtfeldman$elm_css$Css$border3 = _rtfeldman$elm_css$Css$prop3('border');
+var _rtfeldman$elm_css$Css$borderTop3 = _rtfeldman$elm_css$Css$prop3('border-top');
+var _rtfeldman$elm_css$Css$borderBottom3 = _rtfeldman$elm_css$Css$prop3('border-bottom');
+var _rtfeldman$elm_css$Css$borderLeft3 = _rtfeldman$elm_css$Css$prop3('border-left');
+var _rtfeldman$elm_css$Css$borderRight3 = _rtfeldman$elm_css$Css$prop3('border-right');
+var _rtfeldman$elm_css$Css$borderBlockStart3 = _rtfeldman$elm_css$Css$prop3('border-block-start');
+var _rtfeldman$elm_css$Css$borderBlockEnd3 = _rtfeldman$elm_css$Css$prop3('border-block-end');
+var _rtfeldman$elm_css$Css$borderInlineStart3 = _rtfeldman$elm_css$Css$prop3('border-block-start');
+var _rtfeldman$elm_css$Css$borderInlineEnd3 = _rtfeldman$elm_css$Css$prop3('border-block-end');
+var _rtfeldman$elm_css$Css$borderImageOutset3 = _rtfeldman$elm_css$Css$prop3('border-image-outset');
+var _rtfeldman$elm_css$Css$borderImageWidth3 = _rtfeldman$elm_css$Css$prop3('border-image-width');
+var _rtfeldman$elm_css$Css$borderWidth3 = _rtfeldman$elm_css$Css$prop3('border-width');
+var _rtfeldman$elm_css$Css$borderRadius3 = _rtfeldman$elm_css$Css$prop3('border-radius');
+var _rtfeldman$elm_css$Css$outline3 = _rtfeldman$elm_css$Css$prop3('outline');
+var _rtfeldman$elm_css$Css$fontVariant3 = _rtfeldman$elm_css$Css$prop3('font-variant');
+var _rtfeldman$elm_css$Css$fontVariantNumeric3 = _rtfeldman$elm_css$Css$prop3('font-variant-numeric');
+var _rtfeldman$elm_css$Css$textDecoration3 = _rtfeldman$elm_css$Css$prop3('text-decoration');
+var _rtfeldman$elm_css$Css$textDecorations3 = function (_p6) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop3,
+		'text-decoration',
+		_rtfeldman$elm_css$Css$valuesOrNone(_p6));
+};
+var _rtfeldman$elm_css$Css$prop2 = F3(
+	function (key, argA, argB) {
+		return A2(
+			_rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: argA.value,
+					_1: {
+						ctor: '::',
+						_0: argB.value,
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _rtfeldman$elm_css$Css$textShadow2 = _rtfeldman$elm_css$Css$prop2('text-shadow');
+var _rtfeldman$elm_css$Css$boxShadow2 = _rtfeldman$elm_css$Css$prop2('box-shadow');
+var _rtfeldman$elm_css$Css$textIndent2 = _rtfeldman$elm_css$Css$prop2('text-indent');
+var _rtfeldman$elm_css$Css$padding2 = _rtfeldman$elm_css$Css$prop2('padding');
+var _rtfeldman$elm_css$Css$margin2 = _rtfeldman$elm_css$Css$prop2('margin');
+var _rtfeldman$elm_css$Css$border2 = _rtfeldman$elm_css$Css$prop2('border');
+var _rtfeldman$elm_css$Css$borderTop2 = _rtfeldman$elm_css$Css$prop2('border-top');
+var _rtfeldman$elm_css$Css$borderBottom2 = _rtfeldman$elm_css$Css$prop2('border-bottom');
+var _rtfeldman$elm_css$Css$borderLeft2 = _rtfeldman$elm_css$Css$prop2('border-left');
+var _rtfeldman$elm_css$Css$borderRight2 = _rtfeldman$elm_css$Css$prop2('border-right');
+var _rtfeldman$elm_css$Css$borderBlockStart2 = _rtfeldman$elm_css$Css$prop2('border-block-start');
+var _rtfeldman$elm_css$Css$borderBlockEnd2 = _rtfeldman$elm_css$Css$prop2('border-block-end');
+var _rtfeldman$elm_css$Css$borderInlineStart2 = _rtfeldman$elm_css$Css$prop2('border-block-start');
+var _rtfeldman$elm_css$Css$borderInlineEnd2 = _rtfeldman$elm_css$Css$prop2('border-block-end');
+var _rtfeldman$elm_css$Css$borderImageOutset2 = _rtfeldman$elm_css$Css$prop2('border-image-outset');
+var _rtfeldman$elm_css$Css$borderImageWidth2 = _rtfeldman$elm_css$Css$prop2('border-image-width');
+var _rtfeldman$elm_css$Css$borderWidth2 = _rtfeldman$elm_css$Css$prop2('border-width');
+var _rtfeldman$elm_css$Css$borderTopWidth2 = _rtfeldman$elm_css$Css$prop2('border-top-width');
+var _rtfeldman$elm_css$Css$borderBottomLeftRadius2 = _rtfeldman$elm_css$Css$prop2('border-bottom-left-radius');
+var _rtfeldman$elm_css$Css$borderBottomRightRadius2 = _rtfeldman$elm_css$Css$prop2('border-bottom-right-radius');
+var _rtfeldman$elm_css$Css$borderTopLeftRadius2 = _rtfeldman$elm_css$Css$prop2('border-top-left-radius');
+var _rtfeldman$elm_css$Css$borderTopRightRadius2 = _rtfeldman$elm_css$Css$prop2('border-top-right-radius');
+var _rtfeldman$elm_css$Css$borderRadius2 = _rtfeldman$elm_css$Css$prop2('border-radius');
+var _rtfeldman$elm_css$Css$borderSpacing2 = _rtfeldman$elm_css$Css$prop2('border-spacing');
+var _rtfeldman$elm_css$Css$backgroundRepeat2 = _rtfeldman$elm_css$Css$prop2('background-repeat');
+var _rtfeldman$elm_css$Css$backgroundPosition2 = _rtfeldman$elm_css$Css$prop2('background-position');
+var _rtfeldman$elm_css$Css$backgroundSize2 = _rtfeldman$elm_css$Css$prop2('background-size');
+var _rtfeldman$elm_css$Css$fontVariant2 = _rtfeldman$elm_css$Css$prop2('font-variant');
+var _rtfeldman$elm_css$Css$fontVariantNumeric2 = _rtfeldman$elm_css$Css$prop2('font-variant-numeric');
+var _rtfeldman$elm_css$Css$textDecoration2 = _rtfeldman$elm_css$Css$prop2('text-decoration');
+var _rtfeldman$elm_css$Css$textDecorations2 = function (_p7) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop2,
+		'text-decoration',
+		_rtfeldman$elm_css$Css$valuesOrNone(_p7));
+};
+var _rtfeldman$elm_css$Css$prop1 = F2(
+	function (key, arg) {
+		return A2(_rtfeldman$elm_css$Css$property, key, arg.value);
+	});
+var _rtfeldman$elm_css$Css$textRendering = _rtfeldman$elm_css$Css$prop1('text-rendering');
+var _rtfeldman$elm_css$Css$textOrientation = _rtfeldman$elm_css$Css$prop1('text-orientation');
+var _rtfeldman$elm_css$Css$textOverflow = _rtfeldman$elm_css$Css$prop1('text-overflow');
+var _rtfeldman$elm_css$Css$textShadow = _rtfeldman$elm_css$Css$prop1('text-shadow');
+var _rtfeldman$elm_css$Css$boxShadow = _rtfeldman$elm_css$Css$prop1('box-shadow');
+var _rtfeldman$elm_css$Css$textIndent = _rtfeldman$elm_css$Css$prop1('text-indent');
+var _rtfeldman$elm_css$Css$textTransform = _rtfeldman$elm_css$Css$prop1('text-transform');
+var _rtfeldman$elm_css$Css$display = _rtfeldman$elm_css$Css$prop1('display');
+var _rtfeldman$elm_css$Css$opacity = _rtfeldman$elm_css$Css$prop1('opacity');
+var _rtfeldman$elm_css$Css$width = _rtfeldman$elm_css$Css$prop1('width');
+var _rtfeldman$elm_css$Css$maxWidth = _rtfeldman$elm_css$Css$prop1('max-width');
+var _rtfeldman$elm_css$Css$minWidth = _rtfeldman$elm_css$Css$prop1('min-width');
+var _rtfeldman$elm_css$Css$height = _rtfeldman$elm_css$Css$prop1('height');
+var _rtfeldman$elm_css$Css$minHeight = _rtfeldman$elm_css$Css$prop1('min-height');
+var _rtfeldman$elm_css$Css$maxHeight = _rtfeldman$elm_css$Css$prop1('max-height');
+var _rtfeldman$elm_css$Css$padding = _rtfeldman$elm_css$Css$prop1('padding');
+var _rtfeldman$elm_css$Css$paddingBlockStart = _rtfeldman$elm_css$Css$prop1('padding-block-start');
+var _rtfeldman$elm_css$Css$paddingBlockEnd = _rtfeldman$elm_css$Css$prop1('padding-block-end');
+var _rtfeldman$elm_css$Css$paddingInlineStart = _rtfeldman$elm_css$Css$prop1('padding-inline-start');
+var _rtfeldman$elm_css$Css$paddingInlineEnd = _rtfeldman$elm_css$Css$prop1('padding-inline-end');
+var _rtfeldman$elm_css$Css$paddingTop = _rtfeldman$elm_css$Css$prop1('padding-top');
+var _rtfeldman$elm_css$Css$paddingBottom = _rtfeldman$elm_css$Css$prop1('padding-bottom');
+var _rtfeldman$elm_css$Css$paddingRight = _rtfeldman$elm_css$Css$prop1('padding-right');
+var _rtfeldman$elm_css$Css$paddingLeft = _rtfeldman$elm_css$Css$prop1('padding-left');
+var _rtfeldman$elm_css$Css$margin = _rtfeldman$elm_css$Css$prop1('margin');
+var _rtfeldman$elm_css$Css$marginTop = _rtfeldman$elm_css$Css$prop1('margin-top');
+var _rtfeldman$elm_css$Css$marginBottom = _rtfeldman$elm_css$Css$prop1('margin-bottom');
+var _rtfeldman$elm_css$Css$marginRight = _rtfeldman$elm_css$Css$prop1('margin-right');
+var _rtfeldman$elm_css$Css$marginLeft = _rtfeldman$elm_css$Css$prop1('margin-left');
+var _rtfeldman$elm_css$Css$marginBlockStart = _rtfeldman$elm_css$Css$prop1('margin-block-start');
+var _rtfeldman$elm_css$Css$marginBlockEnd = _rtfeldman$elm_css$Css$prop1('margin-block-end');
+var _rtfeldman$elm_css$Css$marginInlineStart = _rtfeldman$elm_css$Css$prop1('margin-inline-start');
+var _rtfeldman$elm_css$Css$marginInlineEnd = _rtfeldman$elm_css$Css$prop1('margin-inline-end');
+var _rtfeldman$elm_css$Css$top = _rtfeldman$elm_css$Css$prop1('top');
+var _rtfeldman$elm_css$Css$bottom = _rtfeldman$elm_css$Css$prop1('bottom');
+var _rtfeldman$elm_css$Css$left = _rtfeldman$elm_css$Css$prop1('left');
+var _rtfeldman$elm_css$Css$right = _rtfeldman$elm_css$Css$prop1('right');
+var _rtfeldman$elm_css$Css$border = _rtfeldman$elm_css$Css$prop1('border');
+var _rtfeldman$elm_css$Css$borderTop = _rtfeldman$elm_css$Css$prop1('border-top');
+var _rtfeldman$elm_css$Css$borderBottom = _rtfeldman$elm_css$Css$prop1('border-bottom');
+var _rtfeldman$elm_css$Css$borderLeft = _rtfeldman$elm_css$Css$prop1('border-left');
+var _rtfeldman$elm_css$Css$borderRight = _rtfeldman$elm_css$Css$prop1('border-right');
+var _rtfeldman$elm_css$Css$borderBlockStart = _rtfeldman$elm_css$Css$prop1('border-block-start');
+var _rtfeldman$elm_css$Css$borderBlockEnd = _rtfeldman$elm_css$Css$prop1('border-block-end');
+var _rtfeldman$elm_css$Css$borderInlineStart = _rtfeldman$elm_css$Css$prop1('border-block-start');
+var _rtfeldman$elm_css$Css$borderInlineEnd = _rtfeldman$elm_css$Css$prop1('border-block-end');
+var _rtfeldman$elm_css$Css$borderImageOutset = _rtfeldman$elm_css$Css$prop1('border-image-outset');
+var _rtfeldman$elm_css$Css$borderImageWidth = _rtfeldman$elm_css$Css$prop1('border-image-width');
+var _rtfeldman$elm_css$Css$borderBlockEndStyle = _rtfeldman$elm_css$Css$prop1('border-block-end-style');
+var _rtfeldman$elm_css$Css$borderBlockStartStyle = _rtfeldman$elm_css$Css$prop1('border-block-start-style');
+var _rtfeldman$elm_css$Css$borderInlineEndStyle = _rtfeldman$elm_css$Css$prop1('border-inline-end-style');
+var _rtfeldman$elm_css$Css$borderBottomStyle = _rtfeldman$elm_css$Css$prop1('border-bottom-style');
+var _rtfeldman$elm_css$Css$borderInlineStartStyle = _rtfeldman$elm_css$Css$prop1('border-inline-start-style');
+var _rtfeldman$elm_css$Css$borderLeftStyle = _rtfeldman$elm_css$Css$prop1('border-left-style');
+var _rtfeldman$elm_css$Css$borderRightStyle = _rtfeldman$elm_css$Css$prop1('border-right-style');
+var _rtfeldman$elm_css$Css$borderTopStyle = _rtfeldman$elm_css$Css$prop1('border-top-style');
+var _rtfeldman$elm_css$Css$borderStyle = _rtfeldman$elm_css$Css$prop1('border-style');
+var _rtfeldman$elm_css$Css$borderCollapse = _rtfeldman$elm_css$Css$prop1('border-collapse');
+var _rtfeldman$elm_css$Css$borderWidth = _rtfeldman$elm_css$Css$prop1('border-width');
+var _rtfeldman$elm_css$Css$borderBottomWidth = _rtfeldman$elm_css$Css$prop1('border-bottom-width');
+var _rtfeldman$elm_css$Css$borderInlineEndWidth = _rtfeldman$elm_css$Css$prop1('border-inline-end-width');
+var _rtfeldman$elm_css$Css$borderLeftWidth = _rtfeldman$elm_css$Css$prop1('border-left-width');
+var _rtfeldman$elm_css$Css$borderRightWidth = _rtfeldman$elm_css$Css$prop1('border-right-width');
+var _rtfeldman$elm_css$Css$borderTopWidth = _rtfeldman$elm_css$Css$prop1('border-top-width');
+var _rtfeldman$elm_css$Css$borderBottomLeftRadius = _rtfeldman$elm_css$Css$prop1('border-bottom-left-radius');
+var _rtfeldman$elm_css$Css$borderBottomRightRadius = _rtfeldman$elm_css$Css$prop1('border-bottom-right-radius');
+var _rtfeldman$elm_css$Css$borderTopLeftRadius = _rtfeldman$elm_css$Css$prop1('border-top-left-radius');
+var _rtfeldman$elm_css$Css$borderTopRightRadius = _rtfeldman$elm_css$Css$prop1('border-top-right-radius');
+var _rtfeldman$elm_css$Css$borderRadius = _rtfeldman$elm_css$Css$prop1('border-radius');
+var _rtfeldman$elm_css$Css$borderSpacing = _rtfeldman$elm_css$Css$prop1('border-spacing');
+var _rtfeldman$elm_css$Css$outline = _rtfeldman$elm_css$Css$prop1('outline');
+var _rtfeldman$elm_css$Css$outlineWidth = _rtfeldman$elm_css$Css$prop1('outline-width');
+var _rtfeldman$elm_css$Css$outlineStyle = _rtfeldman$elm_css$Css$prop1('outline-style');
+var _rtfeldman$elm_css$Css$outlineOffset = _rtfeldman$elm_css$Css$prop1('outline-offset');
+var _rtfeldman$elm_css$Css$resize = _rtfeldman$elm_css$Css$prop1('resize');
+var _rtfeldman$elm_css$Css$fill = _rtfeldman$elm_css$Css$prop1('fill');
+var _rtfeldman$elm_css$Css$visibility = _rtfeldman$elm_css$Css$prop1('visibility');
+var _rtfeldman$elm_css$Css$overflow = _rtfeldman$elm_css$Css$prop1('overflow');
+var _rtfeldman$elm_css$Css$overflowX = _rtfeldman$elm_css$Css$prop1('overflow-x');
+var _rtfeldman$elm_css$Css$overflowY = _rtfeldman$elm_css$Css$prop1('overflow-y');
+var _rtfeldman$elm_css$Css$overflowWrap = _rtfeldman$elm_css$Css$prop1('overflow-wrap');
+var _rtfeldman$elm_css$Css$whiteSpace = _rtfeldman$elm_css$Css$prop1('white-space');
+var _rtfeldman$elm_css$Css$backgroundRepeat = _rtfeldman$elm_css$Css$prop1('background-repeat');
+var _rtfeldman$elm_css$Css$backgroundAttachment = _rtfeldman$elm_css$Css$prop1('background-attachment');
+var _rtfeldman$elm_css$Css$backgroundClip = _rtfeldman$elm_css$Css$prop1('background-clip');
+var _rtfeldman$elm_css$Css$backgroundOrigin = _rtfeldman$elm_css$Css$prop1('background-origin');
+var _rtfeldman$elm_css$Css$backgroundImage = _rtfeldman$elm_css$Css$prop1('background-image');
+var _rtfeldman$elm_css$Css$backgroundSize = _rtfeldman$elm_css$Css$prop1('background-size');
+var _rtfeldman$elm_css$Css$lineHeight = _rtfeldman$elm_css$Css$prop1('line-height');
+var _rtfeldman$elm_css$Css$letterSpacing = _rtfeldman$elm_css$Css$prop1('letter-spacing');
+var _rtfeldman$elm_css$Css$fontFamily = _rtfeldman$elm_css$Css$prop1('font-family');
+var _rtfeldman$elm_css$Css$fontFamilies = function (_p8) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop1,
+		'font-family',
+		_rtfeldman$elm_css$Css$stringsToValue(_p8));
+};
+var _rtfeldman$elm_css$Css$fontSize = _rtfeldman$elm_css$Css$prop1('font-size');
+var _rtfeldman$elm_css$Css$fontStyle = _rtfeldman$elm_css$Css$prop1('font-style');
+var _rtfeldman$elm_css$Css$fontVariant = _rtfeldman$elm_css$Css$prop1('font-variant');
+var _rtfeldman$elm_css$Css$fontVariantLigatures = _rtfeldman$elm_css$Css$prop1('font-variant-ligatures');
+var _rtfeldman$elm_css$Css$fontVariantCaps = _rtfeldman$elm_css$Css$prop1('font-variant-caps');
+var _rtfeldman$elm_css$Css$fontVariantNumeric = _rtfeldman$elm_css$Css$prop1('font-variant-numeric');
+var _rtfeldman$elm_css$Css$fontVariantNumerics = function (_p9) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop1,
+		'font-variant-numeric',
+		_rtfeldman$elm_css$Css$valuesOrNone(_p9));
+};
+var _rtfeldman$elm_css$Css$cursor = _rtfeldman$elm_css$Css$prop1('cursor');
+var _rtfeldman$elm_css$Css$textDecoration = _rtfeldman$elm_css$Css$prop1('text-decoration');
+var _rtfeldman$elm_css$Css$textDecorations = function (_p10) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop1,
+		'text-decoration',
+		_rtfeldman$elm_css$Css$valuesOrNone(_p10));
+};
+var _rtfeldman$elm_css$Css$textDecorationLine = _rtfeldman$elm_css$Css$prop1('text-decoration-line');
+var _rtfeldman$elm_css$Css$textDecorationLines = function (_p11) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop1,
+		'text-decoration-line',
+		_rtfeldman$elm_css$Css$valuesOrNone(_p11));
+};
+var _rtfeldman$elm_css$Css$textDecorationStyle = _rtfeldman$elm_css$Css$prop1('text-decoration-style');
+var _rtfeldman$elm_css$Css$zIndex = _rtfeldman$elm_css$Css$prop1('z-index');
+var _rtfeldman$elm_css$Css$touchAction = _rtfeldman$elm_css$Css$prop1('touch-action');
+var _rtfeldman$elm_css$Css$tableLayout = _rtfeldman$elm_css$Css$prop1('table-layout');
+var _rtfeldman$elm_css$Css$pointerEvents = _rtfeldman$elm_css$Css$prop1('pointer-events');
+var _rtfeldman$elm_css$Css$position = _rtfeldman$elm_css$Css$prop1('position');
+var _rtfeldman$elm_css$Css$textBottom = _rtfeldman$elm_css$Css$prop1('text-bottom');
+var _rtfeldman$elm_css$Css$textTop = _rtfeldman$elm_css$Css$prop1('text-top');
+var _rtfeldman$elm_css$Css$super = _rtfeldman$elm_css$Css$prop1('super');
+var _rtfeldman$elm_css$Css$sub = _rtfeldman$elm_css$Css$prop1('sub');
+var _rtfeldman$elm_css$Css$baseline = _rtfeldman$elm_css$Css$prop1('baseline');
+var _rtfeldman$elm_css$Css$middle = _rtfeldman$elm_css$Css$prop1('middle');
+var _rtfeldman$elm_css$Css$noWrap = {value: 'nowrap', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible, flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$auto = {value: 'auto', cursor: _rtfeldman$elm_css$Css_Structure$Compatible, flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, overflow: _rtfeldman$elm_css$Css_Structure$Compatible, textRendering: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, alignItemsOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible, justifyContentOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible, touchAction: _rtfeldman$elm_css$Css_Structure$Compatible, tableLayout: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$none = {value: 'none', cursor: _rtfeldman$elm_css$Css_Structure$Compatible, none: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible, display: _rtfeldman$elm_css$Css_Structure$Compatible, outline: _rtfeldman$elm_css$Css_Structure$Compatible, pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible, resize: _rtfeldman$elm_css$Css_Structure$Compatible, transform: _rtfeldman$elm_css$Css_Structure$Compatible, borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible, textTransform: _rtfeldman$elm_css$Css_Structure$Compatible, touchAction: _rtfeldman$elm_css$Css_Structure$Compatible, updateFrequency: _rtfeldman$elm_css$Css_Structure$Compatible, blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, inlineAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, pointerDevice: _rtfeldman$elm_css$Css_Structure$Compatible, hoverCapability: _rtfeldman$elm_css$Css_Structure$Compatible, scriptingSupport: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineListItem = {value: 'inline-list-item', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$listItem = {value: 'list-item', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableFooterGroup = {value: 'table-footer-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableHeaderGroup = {value: 'table-header-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableColumnGroup = {value: 'table-column-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableRowGroup = {value: 'table-row-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableCaption = {value: 'table-caption', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableColumn = {value: 'table-column', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableCell = {value: 'table-cell', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$tableRow = {value: 'table-row', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineTable = {value: 'inline-table', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$table = {value: 'table', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inline = {value: 'inline', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineFlex = {value: 'inline-flex', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inlineBlock = {value: 'inline-block', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$block = {value: 'block', display: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toTopLeft = {value: 'to top left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toLeft = {value: 'to left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toBottomLeft = {value: 'to bottom left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toBottom = {value: 'to bottom', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toBottomRight = {value: 'to bottom right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toRight = {value: 'to right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toTopRight = {value: 'to top right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$toTop = {value: 'to top', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$stop2 = F2(
+	function (c, len) {
+		return {
+			ctor: '_Tuple2',
+			_0: c,
+			_1: _elm_lang$core$Maybe$Just(len)
+		};
+	});
+var _rtfeldman$elm_css$Css$stop = function (c) {
+	return {ctor: '_Tuple2', _0: c, _1: _elm_lang$core$Maybe$Nothing};
+};
+var _rtfeldman$elm_css$Css$collectStops = _elm_lang$core$List$map(
+	function (_p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$core$String$append,
+			_p13._0.value,
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				'',
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (_p14) {
+						return A2(
+							_elm_lang$core$String$cons,
+							_elm_lang$core$Native_Utils.chr(' '),
+							function (_) {
+								return _.value;
+							}(_p14));
+					},
+					_p13._1)));
+	});
+var _rtfeldman$elm_css$Css$local = {value: 'local', backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$noRepeat = {value: 'no-repeat', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$round = {value: 'round', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$space = {value: 'space', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$repeat = {value: 'repeat', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$repeatY = {value: 'repeat-y', backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$repeatX = {value: 'repeat-x', backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lineThrough = {value: 'line-through', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$overline = {value: 'overline', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$underline = {value: 'underline', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$row = {value: 'row', flexDirection: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$rowReverse = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$row,
+	{value: 'row-reverse'});
+var _rtfeldman$elm_css$Css$column = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$row,
+	{value: 'column'});
+var _rtfeldman$elm_css$Css$columnReverse = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$row,
+	{value: 'column-reverse'});
+var _rtfeldman$elm_css$Css$stretch = _rtfeldman$elm_css$Css$prop1('stretch');
+var _rtfeldman$elm_css$Css$spaceBetween = _rtfeldman$elm_css$Css$prop1('space-between');
+var _rtfeldman$elm_css$Css$spaceAround = _rtfeldman$elm_css$Css$prop1('space-around');
+var _rtfeldman$elm_css$Css$flexEnd = _rtfeldman$elm_css$Css$prop1('flex-end');
+var _rtfeldman$elm_css$Css$flexStart = _rtfeldman$elm_css$Css$prop1('flex-start');
+var _rtfeldman$elm_css$Css$wrap = {value: 'wrap', flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wrapReverse = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$wrap,
+	{value: 'wrap-reverse'});
+var _rtfeldman$elm_css$Css$content = {value: 'content', flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$order = _rtfeldman$elm_css$Css$prop1('order');
+var _rtfeldman$elm_css$Css$flexFlow2 = _rtfeldman$elm_css$Css$prop2('flex-flow');
+var _rtfeldman$elm_css$Css$flexFlow1 = _rtfeldman$elm_css$Css$prop1('flex-flow');
+var _rtfeldman$elm_css$Css$flexDirection = _rtfeldman$elm_css$Css$prop1('flex-direction');
+var _rtfeldman$elm_css$Css$flexWrap = _rtfeldman$elm_css$Css$prop1('flex-wrap');
+var _rtfeldman$elm_css$Css$flexShrink = _rtfeldman$elm_css$Css$prop1('flex-shrink');
+var _rtfeldman$elm_css$Css$flexGrow = _rtfeldman$elm_css$Css$prop1('flex-grow');
+var _rtfeldman$elm_css$Css$flexBasis = _rtfeldman$elm_css$Css$prop1('flex-basis');
+var _rtfeldman$elm_css$Css$flex3 = _rtfeldman$elm_css$Css$prop3('flex');
+var _rtfeldman$elm_css$Css$flex2 = _rtfeldman$elm_css$Css$prop2('flex');
+var _rtfeldman$elm_css$Css$flex = _rtfeldman$elm_css$Css$prop1('flex');
+var _rtfeldman$elm_css$Css$listStyle3 = _rtfeldman$elm_css$Css$prop3('list-style');
+var _rtfeldman$elm_css$Css$listStyle2 = _rtfeldman$elm_css$Css$prop2('list-style');
+var _rtfeldman$elm_css$Css$listStyle = _rtfeldman$elm_css$Css$prop1('list-style');
+var _rtfeldman$elm_css$Css$thai = {value: 'thai', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$telugu = {value: 'telugu', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$oriya = {value: 'oriya', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$myanmar = {value: 'myanmar', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$malayalam = {value: 'malayalam', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lao = {value: 'lao', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$khmer = {value: 'khmer', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$kannada = {value: 'kannada', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$gurmukhi = {value: 'gurmukhi', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$gujarati = {value: 'gujarati', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$georgian = {value: 'georgian', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$devanagari = {value: 'devanagari', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cjkHeavenlyStem = {value: 'cjk-heavenly-stem', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cjkEarthlyBranch = {value: 'cjk-earthly-branch', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$bengali = {value: 'bengali', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$armenian = {value: 'armenian', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$arabicIndic = {value: 'arabic-indic', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperLatin = {value: 'upper-latin', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerLatin = {value: 'lower-latin', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperAlpha = {value: 'upper-alpha', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerAlpha = {value: 'lower-alpha', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperGreek = {value: 'upper-greek', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerGreek = {value: 'lower-greek', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upperRoman = {value: 'upper-roman', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowerRoman = {value: 'lower-roman', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$decimalLeadingZero = {value: 'decimal-leading-zero', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$decimal = {value: 'decimal', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$square = {value: 'square', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$circle = {value: 'circle', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$disc = {value: 'disc', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$listStyleType = _rtfeldman$elm_css$Css$prop1('list-style-type');
+var _rtfeldman$elm_css$Css$outside = {value: 'outside', listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inside = {value: 'inside', listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$listStylePosition = _rtfeldman$elm_css$Css$prop1('list-style-position');
+var _rtfeldman$elm_css$Css$transformStyle = _rtfeldman$elm_css$Css$prop1('transform-style');
+var _rtfeldman$elm_css$Css$flat = {value: 'flat', transformStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$preserve3d = {value: 'preserve-3d', transformStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$boxSizing = _rtfeldman$elm_css$Css$prop1('box-sizing');
+var _rtfeldman$elm_css$Css$transformBox = _rtfeldman$elm_css$Css$prop1('transform-box');
+var _rtfeldman$elm_css$Css$viewBox = {value: 'view-box', transformBox: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$borderBox = {value: 'border-box', boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contentBox = {value: 'content-box', boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fillBox = {value: 'fill-box', transformBox: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$transforms = function (_p15) {
+	return A2(
+		_rtfeldman$elm_css$Css$prop1,
+		'transform',
+		_rtfeldman$elm_css$Css$valuesOrNone(_p15));
+};
+var _rtfeldman$elm_css$Css$transform = function (only) {
+	return _rtfeldman$elm_css$Css$transforms(
+		{
+			ctor: '::',
+			_0: only,
+			_1: {ctor: '[]'}
+		});
+};
+var _rtfeldman$elm_css$Css$angleConverter = F2(
+	function (suffix, num) {
+		return {
+			value: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rtfeldman$elm_css$Css$numberToString(num),
+				suffix),
+			angle: _rtfeldman$elm_css$Css_Structure$Compatible,
+			angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$deg = _rtfeldman$elm_css$Css$angleConverter('deg');
+var _rtfeldman$elm_css$Css$grad = _rtfeldman$elm_css$Css$angleConverter('grad');
+var _rtfeldman$elm_css$Css$rad = _rtfeldman$elm_css$Css$angleConverter('rad');
+var _rtfeldman$elm_css$Css$turn = _rtfeldman$elm_css$Css$angleConverter('turn');
+var _rtfeldman$elm_css$Css$lengthConverter = F3(
+	function (units, unitLabel, numericValue) {
+		return {
+			value: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rtfeldman$elm_css$Css$numberToString(numericValue),
+				unitLabel),
+			numericValue: numericValue,
+			units: units,
+			unitLabel: unitLabel,
+			length: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+			textIndent: _rtfeldman$elm_css$Css_Structure$Compatible,
+			flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+			fontSize: _rtfeldman$elm_css$Css_Structure$Compatible,
+			absoluteLength: _rtfeldman$elm_css$Css_Structure$Compatible,
+			lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible,
+			calc: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$true = _rtfeldman$elm_css$Css$prop1('true');
+var _rtfeldman$elm_css$Css$matchParent = _rtfeldman$elm_css$Css$prop1('match-parent');
+var _rtfeldman$elm_css$Css$end = _rtfeldman$elm_css$Css$prop1('end');
+var _rtfeldman$elm_css$Css$start = _rtfeldman$elm_css$Css$prop1('start');
+var _rtfeldman$elm_css$Css$justifyAll = _rtfeldman$elm_css$Css$prop1('justify-all');
+var _rtfeldman$elm_css$Css$justify = _rtfeldman$elm_css$Css$prop1('justify');
+var _rtfeldman$elm_css$Css$center = _rtfeldman$elm_css$Css$prop1('center');
+var _rtfeldman$elm_css$Css$collapse = {value: 'collapse', borderCollapse: _rtfeldman$elm_css$Css_Structure$Compatible, visibility: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$separate = {value: 'separate', borderCollapse: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$outset = {value: 'outset', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$inset = {value: 'inset', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ridge = {value: 'ridge', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$groove = {value: 'groove', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$double = {value: 'double', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$solid = {value: 'solid', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$dashed = {value: 'dashed', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$dotted = {value: 'dotted', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$wavy = {value: 'wavy', textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$clip = {value: 'clip', textOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$ellipsis = {value: 'ellipsis', textOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$fullWidth = {value: 'full-width', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$lowercase = {value: 'lowercase', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$uppercase = {value: 'uppercase', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$capitalize = {value: 'capitalize', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$sideways = {value: 'sideways', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$upright = {value: 'upright', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$mixed = {value: 'mixed', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$eachLine = {value: 'each-line', textIndent: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$hanging = {value: 'hanging', textIndent: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$geometricPrecision = {value: 'geometricPrecision', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$optimizeLegibility = {value: 'optimizeLegibility', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$optimizeSpeed = {value: 'optimizeSpeed', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$hslaToRgba = F6(
+	function (value, warnings, hue, saturation, lightness, hslAlpha) {
+		var _p16 = _elm_lang$core$Color$toRgb(
+			A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, hslAlpha));
+		var red = _p16.red;
+		var green = _p16.green;
+		var blue = _p16.blue;
+		var alpha = _p16.alpha;
+		return {value: value, color: _rtfeldman$elm_css$Css_Structure$Compatible, red: red, green: green, blue: blue, alpha: alpha, warnings: warnings};
+	});
+var _rtfeldman$elm_css$Css$withPrecedingHash = function (str) {
+	return A2(_elm_lang$core$String$startsWith, '#', str) ? str : A2(
+		_elm_lang$core$String$cons,
+		_elm_lang$core$Native_Utils.chr('#'),
+		str);
+};
+var _rtfeldman$elm_css$Css$erroneousHex = function (str) {
+	return {
+		value: _rtfeldman$elm_css$Css$withPrecedingHash(str),
+		color: _rtfeldman$elm_css$Css_Structure$Compatible,
+		red: 0,
+		green: 0,
+		blue: 0,
+		alpha: 1,
+		warnings: _elm_lang$core$List$singleton(
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
+					ctor: '::',
+					_0: 'Hex color strings must contain exactly 3, 4, 6, or 8 hexadecimal digits, optionally preceded by \"#\".',
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Basics$toString(str),
+						_1: {
+							ctor: '::',
+							_0: 'is an invalid hex color string.',
+							_1: {
+								ctor: '::',
+								_0: 'Please see: https://drafts.csswg.org/css-color/#hex-notation',
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}))
+	};
+};
+var _rtfeldman$elm_css$Css$validHex = F5(
+	function (str, _p20, _p19, _p18, _p17) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		var _p23 = _p18;
+		var _p24 = _p17;
+		var toResult = function (_p25) {
+			return _rtfeldman$hex$Hex$fromString(
+				_elm_lang$core$String$toLower(
+					_elm_lang$core$String$fromList(_p25)));
+		};
+		var results = {
+			ctor: '_Tuple4',
+			_0: toResult(
+				{
+					ctor: '::',
+					_0: _p21._0,
+					_1: {
+						ctor: '::',
+						_0: _p21._1,
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: toResult(
+				{
+					ctor: '::',
+					_0: _p22._0,
+					_1: {
+						ctor: '::',
+						_0: _p22._1,
+						_1: {ctor: '[]'}
+					}
+				}),
+			_2: toResult(
+				{
+					ctor: '::',
+					_0: _p23._0,
+					_1: {
+						ctor: '::',
+						_0: _p23._1,
+						_1: {ctor: '[]'}
+					}
+				}),
+			_3: toResult(
+				{
+					ctor: '::',
+					_0: _p24._0,
+					_1: {
+						ctor: '::',
+						_0: _p24._1,
+						_1: {ctor: '[]'}
+					}
+				})
+		};
+		var _p26 = results;
+		if (((((_p26.ctor === '_Tuple4') && (_p26._0.ctor === 'Ok')) && (_p26._1.ctor === 'Ok')) && (_p26._2.ctor === 'Ok')) && (_p26._3.ctor === 'Ok')) {
+			return {
+				value: _rtfeldman$elm_css$Css$withPrecedingHash(str),
+				color: _rtfeldman$elm_css$Css_Structure$Compatible,
+				red: _p26._0._0,
+				green: _p26._1._0,
+				blue: _p26._2._0,
+				alpha: _elm_lang$core$Basics$toFloat(_p26._3._0) / 255,
+				warnings: {ctor: '[]'}
+			};
+		} else {
+			return _rtfeldman$elm_css$Css$erroneousHex(str);
+		}
+	});
+var _rtfeldman$elm_css$Css$hex = function (str) {
+	var withoutHash = A2(_elm_lang$core$String$startsWith, '#', str) ? A2(_elm_lang$core$String$dropLeft, 1, str) : str;
+	var _p27 = _elm_lang$core$String$toList(withoutHash);
+	_v9_4:
+	do {
+		if (((_p27.ctor === '::') && (_p27._1.ctor === '::')) && (_p27._1._1.ctor === '::')) {
+			if (_p27._1._1._1.ctor === '[]') {
+				var _p30 = _p27._0;
+				var _p29 = _p27._1._0;
+				var _p28 = _p27._1._1._0;
+				return A5(
+					_rtfeldman$elm_css$Css$validHex,
+					str,
+					{ctor: '_Tuple2', _0: _p30, _1: _p30},
+					{ctor: '_Tuple2', _0: _p29, _1: _p29},
+					{ctor: '_Tuple2', _0: _p28, _1: _p28},
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.chr('f'),
+						_1: _elm_lang$core$Native_Utils.chr('f')
+					});
+			} else {
+				if (_p27._1._1._1._1.ctor === '[]') {
+					var _p34 = _p27._0;
+					var _p33 = _p27._1._0;
+					var _p32 = _p27._1._1._0;
+					var _p31 = _p27._1._1._1._0;
+					return A5(
+						_rtfeldman$elm_css$Css$validHex,
+						str,
+						{ctor: '_Tuple2', _0: _p34, _1: _p34},
+						{ctor: '_Tuple2', _0: _p33, _1: _p33},
+						{ctor: '_Tuple2', _0: _p32, _1: _p32},
+						{ctor: '_Tuple2', _0: _p31, _1: _p31});
+				} else {
+					if (_p27._1._1._1._1._1.ctor === '::') {
+						if (_p27._1._1._1._1._1._1.ctor === '[]') {
+							return A5(
+								_rtfeldman$elm_css$Css$validHex,
+								str,
+								{ctor: '_Tuple2', _0: _p27._0, _1: _p27._1._0},
+								{ctor: '_Tuple2', _0: _p27._1._1._0, _1: _p27._1._1._1._0},
+								{ctor: '_Tuple2', _0: _p27._1._1._1._1._0, _1: _p27._1._1._1._1._1._0},
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.chr('f'),
+									_1: _elm_lang$core$Native_Utils.chr('f')
+								});
+						} else {
+							if ((_p27._1._1._1._1._1._1._1.ctor === '::') && (_p27._1._1._1._1._1._1._1._1.ctor === '[]')) {
+								return A5(
+									_rtfeldman$elm_css$Css$validHex,
+									str,
+									{ctor: '_Tuple2', _0: _p27._0, _1: _p27._1._0},
+									{ctor: '_Tuple2', _0: _p27._1._1._0, _1: _p27._1._1._1._0},
+									{ctor: '_Tuple2', _0: _p27._1._1._1._1._0, _1: _p27._1._1._1._1._1._0},
+									{ctor: '_Tuple2', _0: _p27._1._1._1._1._1._1._0, _1: _p27._1._1._1._1._1._1._1._0});
+							} else {
+								break _v9_4;
+							}
+						}
+					} else {
+						break _v9_4;
+					}
+				}
+			}
+		} else {
+			break _v9_4;
+		}
+	} while(false);
+	return _rtfeldman$elm_css$Css$erroneousHex(str);
+};
+var _rtfeldman$elm_css$Css$hidden = {value: 'hidden', overflow: _rtfeldman$elm_css$Css_Structure$Compatible, borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, visibility: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$contain = {value: 'contain', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$cover = {value: 'cover', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$url = function (urlValue) {
+	return {
+		value: A2(
+			_elm_lang$core$Basics_ops['++'],
+			'url(',
+			A2(_elm_lang$core$Basics_ops['++'], urlValue, ')')),
+		backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$paddingBox = {value: 'padding-box', backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$luminosity = _rtfeldman$elm_css$Css$prop1('luminosity');
+var _rtfeldman$elm_css$Css$saturation = _rtfeldman$elm_css$Css$prop1('saturation');
+var _rtfeldman$elm_css$Css$hue = _rtfeldman$elm_css$Css$prop1('hue');
+var _rtfeldman$elm_css$Css$exclusion = _rtfeldman$elm_css$Css$prop1('exclusion');
+var _rtfeldman$elm_css$Css$difference = _rtfeldman$elm_css$Css$prop1('difference');
+var _rtfeldman$elm_css$Css$softLight = _rtfeldman$elm_css$Css$prop1('soft-light');
+var _rtfeldman$elm_css$Css$hardLight = _rtfeldman$elm_css$Css$prop1('hard-light');
+var _rtfeldman$elm_css$Css$colorBurn = _rtfeldman$elm_css$Css$prop1('color-burn');
+var _rtfeldman$elm_css$Css$colorDodge = _rtfeldman$elm_css$Css$prop1('color-dodge');
+var _rtfeldman$elm_css$Css$lighten = _rtfeldman$elm_css$Css$prop1('lighten');
+var _rtfeldman$elm_css$Css$darken = _rtfeldman$elm_css$Css$prop1('darken');
+var _rtfeldman$elm_css$Css$overlay = _rtfeldman$elm_css$Css$prop1('overlay');
+var _rtfeldman$elm_css$Css$screenBlendMode = _rtfeldman$elm_css$Css$prop1('screen');
+var _rtfeldman$elm_css$Css$multiply = _rtfeldman$elm_css$Css$prop1('multiply');
+var _rtfeldman$elm_css$Css$vertical = {value: 'vertical', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$horizontal = {value: 'horizontal', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$both = {value: 'both', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$breakWord = {value: 'break-word', overflowWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$scroll = {value: 'scroll', scroll: _rtfeldman$elm_css$Css_Structure$Compatible, overflow: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible, blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, inlineAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$visible = {value: 'visible', overflow: _rtfeldman$elm_css$Css_Structure$Compatible, visibility: _rtfeldman$elm_css$Css_Structure$Compatible, pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$currentColor = {
+	value: 'currentColor',
+	color: _rtfeldman$elm_css$Css_Structure$Compatible,
+	warnings: {ctor: '[]'}
+};
+var _rtfeldman$elm_css$Css$transparent = {
+	value: 'transparent',
+	color: _rtfeldman$elm_css$Css_Structure$Compatible,
+	warnings: {ctor: '[]'}
+};
+var _rtfeldman$elm_css$Css$important = _rtfeldman$elm_css$Css_Preprocess$mapLastProperty(
+	function (property) {
+		return _elm_lang$core$Native_Utils.update(
+			property,
+			{important: true});
+	});
+var _rtfeldman$elm_css$Css$all = _rtfeldman$elm_css$Css$prop1('all');
+var _rtfeldman$elm_css$Css$combineLengths = F3(
+	function (operation, first, second) {
+		var numericValue = A2(operation, first.numericValue, second.numericValue);
+		var value = A2(
+			_elm_lang$core$String$join,
+			'',
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p35) {
+					return !_elm_lang$core$String$isEmpty(_p35);
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$core$Basics$toString(numericValue),
+					_1: {
+						ctor: '::',
+						_0: first.unitLabel,
+						_1: {ctor: '[]'}
+					}
+				}));
+		return _elm_lang$core$Native_Utils.update(
+			first,
+			{value: value, numericValue: numericValue});
+	});
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|*|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x * y;
+		}));
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|/|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x / y;
+		}));
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|-|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x - y;
+		}));
+var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
+_rtfeldman$elm_css$Css_ops['|+|'] = _rtfeldman$elm_css$Css$combineLengths(
+	F2(
+		function (x, y) {
+			return x + y;
+		}));
+var _rtfeldman$elm_css$Css$calcExpressionToString = function (expression) {
+	var _p36 = expression;
+	if (_p36.ctor === 'Addition') {
+		return '+';
+	} else {
+		return '-';
+	}
+};
+var _rtfeldman$elm_css$Css$colorValueForOverloadedProperty = _rtfeldman$elm_css$Css$transparent;
+var _rtfeldman$elm_css$Css$getOverloadedProperty = F3(
+	function (functionName, desiredKey, style) {
+		getOverloadedProperty:
+		while (true) {
+			var _p37 = style;
+			switch (_p37.ctor) {
+				case 'AppendProperty':
+					return A2(_rtfeldman$elm_css$Css$property, desiredKey, _p37._0.key);
+				case 'ExtendSelector':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for selector ',
+										_elm_lang$core$Basics$toString(_p37._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				case 'NestSnippet':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for combinator ',
+										_elm_lang$core$Basics$toString(_p37._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				case 'WithPseudoElement':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for pseudo-element setter ',
+										_elm_lang$core$Basics$toString(_p37._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				case 'WithMedia':
+					return A3(
+						_rtfeldman$elm_css$Css$propertyWithWarnings,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Cannot apply ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									functionName,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' with inapplicable Style for media query ',
+										_elm_lang$core$Basics$toString(_p37._0)))),
+							_1: {ctor: '[]'}
+						},
+						desiredKey,
+						'');
+				default:
+					if (_p37._0.ctor === '[]') {
+						return A3(
+							_rtfeldman$elm_css$Css$propertyWithWarnings,
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Cannot apply ',
+									A2(_elm_lang$core$Basics_ops['++'], functionName, ' with empty Style. ')),
+								_1: {ctor: '[]'}
+							},
+							desiredKey,
+							'');
+					} else {
+						if (_p37._0._1.ctor === '[]') {
+							var _v12 = functionName,
+								_v13 = desiredKey,
+								_v14 = _p37._0._0;
+							functionName = _v12;
+							desiredKey = _v13;
+							style = _v14;
+							continue getOverloadedProperty;
+						} else {
+							var _v15 = functionName,
+								_v16 = desiredKey,
+								_v17 = _rtfeldman$elm_css$Css_Preprocess$ApplyStyles(_p37._0._1);
+							functionName = _v15;
+							desiredKey = _v16;
+							style = _v17;
+							continue getOverloadedProperty;
+						}
+					}
+			}
+		}
+	});
+var _rtfeldman$elm_css$Css$backgroundBlendMode = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'backgroundBlendMode',
+		'background-blend-mode',
+		fn(_rtfeldman$elm_css$Css$colorValueForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$cssFunction = F2(
+	function (funcName, args) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			funcName,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(_elm_lang$core$String$join, ', ', args),
+					')')));
+	});
+var _rtfeldman$elm_css$Css$calc = F3(
+	function (first, expression, second) {
+		var grab = function (l) {
+			return A2(_elm_lang$core$String$startsWith, 'calc(', l.value) ? A2(_elm_lang$core$String$dropLeft, 4, l.value) : l.value;
+		};
+		var calcs = A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: grab(first),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$calcExpressionToString(expression),
+					_1: {
+						ctor: '::',
+						_0: grab(second),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+		var value = A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'calc',
+			{
+				ctor: '::',
+				_0: calcs,
+				_1: {ctor: '[]'}
+			});
+		return {value: value, length: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, textIndent: _rtfeldman$elm_css$Css_Structure$Compatible, flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, fontSize: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible, calc: _rtfeldman$elm_css$Css_Structure$Compatible};
+	});
+var _rtfeldman$elm_css$Css$rgb = F3(
+	function (red, green, blue) {
+		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(blue, 255) > 0)))))) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'RGB color values must be between 0 and 255. rgb(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(red),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						', ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(green),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(blue),
+									') is not valid.')))))),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'rgb',
+				A2(
+					_elm_lang$core$List$map,
+					_rtfeldman$elm_css$Css$numberToString,
+					{
+						ctor: '::',
+						_0: red,
+						_1: {
+							ctor: '::',
+							_0: green,
+							_1: {
+								ctor: '::',
+								_0: blue,
+								_1: {ctor: '[]'}
+							}
+						}
+					})),
+			color: _rtfeldman$elm_css$Css_Structure$Compatible,
+			warnings: warnings,
+			red: red,
+			green: green,
+			blue: blue,
+			alpha: 1
+		};
+	});
+var _rtfeldman$elm_css$Css$rgba = F4(
+	function (red, green, blue, alpha) {
+		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(alpha, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(alpha, 1) > 0)))))))) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'RGB color values must be between 0 and 255, and the alpha in RGBA must be between 0 and 1. rgba(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(red),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						', ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(green),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(blue),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										', ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(alpha),
+											') is not valid.')))))))),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'rgba',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css$numberToString,
+						{
+							ctor: '::',
+							_0: red,
+							_1: {
+								ctor: '::',
+								_0: green,
+								_1: {
+									ctor: '::',
+									_0: blue,
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$numberToString(alpha),
+						_1: {ctor: '[]'}
+					})),
+			color: _rtfeldman$elm_css$Css_Structure$Compatible,
+			warnings: warnings,
+			red: red,
+			green: green,
+			blue: blue,
+			alpha: alpha
+		};
+	});
+var _rtfeldman$elm_css$Css$hsl = F3(
+	function (hue, saturation, lightness) {
+		var valuesList = {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$numberToString(hue),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$numericalPercentageToString(saturation),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$numericalPercentageToString(lightness),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+		var value = A2(_rtfeldman$elm_css$Css$cssFunction, 'hsl', valuesList);
+		var warnings = ((_elm_lang$core$Native_Utils.cmp(hue, 360) > 0) || ((_elm_lang$core$Native_Utils.cmp(hue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 1) > 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(lightness, 1) > 0) || (_elm_lang$core$Native_Utils.cmp(lightness, 0) < 0)))))) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'HSL color values must have an H value between 0 and 360 (as in degrees) and S and L values between 0 and 1. ',
+				A2(_elm_lang$core$Basics_ops['++'], value, ' is not valid.')),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return A6(_rtfeldman$elm_css$Css$hslaToRgba, value, warnings, hue, saturation, lightness, 1);
+	});
+var _rtfeldman$elm_css$Css$hsla = F4(
+	function (hue, saturation, lightness, alpha) {
+		var valuesList = {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$numberToString(hue),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$numericalPercentageToString(saturation),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$numericalPercentageToString(lightness),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$numberToString(alpha),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		};
+		var value = A2(_rtfeldman$elm_css$Css$cssFunction, 'hsla', valuesList);
+		var warnings = ((_elm_lang$core$Native_Utils.cmp(hue, 360) > 0) || ((_elm_lang$core$Native_Utils.cmp(hue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 1) > 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(lightness, 1) > 0) || ((_elm_lang$core$Native_Utils.cmp(lightness, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(alpha, 1) > 0) || (_elm_lang$core$Native_Utils.cmp(alpha, 0) < 0)))))))) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'HSLA color values must have an H value between 0 and 360 (as in degrees) and S, L, and A values between 0 and 1. ',
+				A2(_elm_lang$core$Basics_ops['++'], value, ' is not valid.')),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return A6(_rtfeldman$elm_css$Css$hslaToRgba, value, warnings, hue, saturation, lightness, alpha);
+	});
+var _rtfeldman$elm_css$Css$matrix = F6(
+	function (a, b, c, d, tx, ty) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'matrix',
+				A2(
+					_elm_lang$core$List$map,
+					_rtfeldman$elm_css$Css$numberToString,
+					{
+						ctor: '::',
+						_0: a,
+						_1: {
+							ctor: '::',
+							_0: b,
+							_1: {
+								ctor: '::',
+								_0: c,
+								_1: {
+									ctor: '::',
+									_0: d,
+									_1: {
+										ctor: '::',
+										_0: tx,
+										_1: {
+											ctor: '::',
+											_0: ty,
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					})),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$matrix3d = function (a1) {
+	return function (a2) {
+		return function (a3) {
+			return function (a4) {
+				return function (b1) {
+					return function (b2) {
+						return function (b3) {
+							return function (b4) {
+								return function (c1) {
+									return function (c2) {
+										return function (c3) {
+											return function (c4) {
+												return function (d1) {
+													return function (d2) {
+														return function (d3) {
+															return function (d4) {
+																return {
+																	value: A2(
+																		_rtfeldman$elm_css$Css$cssFunction,
+																		'matrix3d',
+																		A2(
+																			_elm_lang$core$List$map,
+																			_rtfeldman$elm_css$Css$numberToString,
+																			{
+																				ctor: '::',
+																				_0: a1,
+																				_1: {
+																					ctor: '::',
+																					_0: a2,
+																					_1: {
+																						ctor: '::',
+																						_0: a3,
+																						_1: {
+																							ctor: '::',
+																							_0: a4,
+																							_1: {
+																								ctor: '::',
+																								_0: b1,
+																								_1: {
+																									ctor: '::',
+																									_0: b2,
+																									_1: {
+																										ctor: '::',
+																										_0: b3,
+																										_1: {
+																											ctor: '::',
+																											_0: b4,
+																											_1: {
+																												ctor: '::',
+																												_0: c1,
+																												_1: {
+																													ctor: '::',
+																													_0: c2,
+																													_1: {
+																														ctor: '::',
+																														_0: c3,
+																														_1: {
+																															ctor: '::',
+																															_0: c4,
+																															_1: {
+																																ctor: '::',
+																																_0: d1,
+																																_1: {
+																																	ctor: '::',
+																																	_0: d2,
+																																	_1: {
+																																		ctor: '::',
+																																		_0: d3,
+																																		_1: {
+																																			ctor: '::',
+																																			_0: d4,
+																																			_1: {ctor: '[]'}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			})),
+																	transform: _rtfeldman$elm_css$Css_Structure$Compatible
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rtfeldman$elm_css$Css$perspective = function (l) {
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'perspective',
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$numberToString(l),
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$rotate = function (_p38) {
+	var _p39 = _p38;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'rotate',
+			{
+				ctor: '::',
+				_0: _p39.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$rotateX = function (_p40) {
+	var _p41 = _p40;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'rotateX',
+			{
+				ctor: '::',
+				_0: _p41.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$rotateY = function (_p42) {
+	var _p43 = _p42;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'rotateY',
+			{
+				ctor: '::',
+				_0: _p43.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$rotateZ = function (_p44) {
+	var _p45 = _p44;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'rotateZ',
+			{
+				ctor: '::',
+				_0: _p45.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$rotate3d = F4(
+	function (x, y, z, _p46) {
+		var _p47 = _p46;
+		var coordsAsStrings = A2(
+			_elm_lang$core$List$map,
+			_rtfeldman$elm_css$Css$numberToString,
+			{
+				ctor: '::',
+				_0: x,
+				_1: {
+					ctor: '::',
+					_0: y,
+					_1: {
+						ctor: '::',
+						_0: z,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'rotate3d',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					coordsAsStrings,
+					{
+						ctor: '::',
+						_0: _p47.value,
+						_1: {ctor: '[]'}
+					})),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$scale = function (x) {
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'scale',
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$numberToString(x),
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$scale2 = F2(
+	function (x, y) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'scale',
+				A2(
+					_elm_lang$core$List$map,
+					_rtfeldman$elm_css$Css$numberToString,
+					{
+						ctor: '::',
+						_0: x,
+						_1: {
+							ctor: '::',
+							_0: y,
+							_1: {ctor: '[]'}
+						}
+					})),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$scaleX = function (x) {
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'scaleX',
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$numberToString(x),
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$scaleY = function (y) {
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'scaleY',
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$numberToString(y),
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$scale3d = F3(
+	function (x, y, z) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'scale3d',
+				A2(
+					_elm_lang$core$List$map,
+					_rtfeldman$elm_css$Css$numberToString,
+					{
+						ctor: '::',
+						_0: x,
+						_1: {
+							ctor: '::',
+							_0: y,
+							_1: {
+								ctor: '::',
+								_0: z,
+								_1: {ctor: '[]'}
+							}
+						}
+					})),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$skew = function (_p48) {
+	var _p49 = _p48;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'skew',
+			{
+				ctor: '::',
+				_0: _p49.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$skew2 = F2(
+	function (ax, ay) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'skew',
+				{
+					ctor: '::',
+					_0: ax.value,
+					_1: {
+						ctor: '::',
+						_0: ay.value,
+						_1: {ctor: '[]'}
+					}
+				}),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$skewX = function (_p50) {
+	var _p51 = _p50;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'skewX',
+			{
+				ctor: '::',
+				_0: _p51.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$skewY = function (_p52) {
+	var _p53 = _p52;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'skewY',
+			{
+				ctor: '::',
+				_0: _p53.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$translate = function (_p54) {
+	var _p55 = _p54;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'translate',
+			{
+				ctor: '::',
+				_0: _p55.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$translate2 = F2(
+	function (tx, ty) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'translate',
+				{
+					ctor: '::',
+					_0: tx.value,
+					_1: {
+						ctor: '::',
+						_0: ty.value,
+						_1: {ctor: '[]'}
+					}
+				}),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$translateX = function (_p56) {
+	var _p57 = _p56;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'translateX',
+			{
+				ctor: '::',
+				_0: _p57.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$translateY = function (_p58) {
+	var _p59 = _p58;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'translateY',
+			{
+				ctor: '::',
+				_0: _p59.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$translateZ = function (_p60) {
+	var _p61 = _p60;
+	return {
+		value: A2(
+			_rtfeldman$elm_css$Css$cssFunction,
+			'translateZ',
+			{
+				ctor: '::',
+				_0: _p61.value,
+				_1: {ctor: '[]'}
+			}),
+		transform: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css$translate3d = F3(
+	function (tx, ty, tz) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'translate3d',
+				{
+					ctor: '::',
+					_0: tx.value,
+					_1: {
+						ctor: '::',
+						_0: ty.value,
+						_1: {
+							ctor: '::',
+							_0: tz.value,
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$linearGradient = F3(
+	function (stop1, stop2, stops) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'linear-gradient',
+				_rtfeldman$elm_css$Css$collectStops(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
+							ctor: '::',
+							_0: stop1,
+							_1: {
+								ctor: '::',
+								_0: stop2,
+								_1: {ctor: '[]'}
+							}
+						},
+						stops))),
+			backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+			listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$linearGradient2 = F4(
+	function (dir, stop1, stop2, stops) {
+		return {
+			value: A2(
+				_rtfeldman$elm_css$Css$cssFunction,
+				'linear-gradient',
+				A2(
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						}),
+					dir.value,
+					_rtfeldman$elm_css$Css$collectStops(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: stop1,
+								_1: {
+									ctor: '::',
+									_0: stop2,
+									_1: {ctor: '[]'}
+								}
+							},
+							stops)))),
+			backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+			listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible
+		};
+	});
+var _rtfeldman$elm_css$Css$CalculatedLength = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return {value: a, length: b, lengthOrAuto: c, lengthOrNumber: d, lengthOrNone: e, lengthOrMinMaxDimension: f, lengthOrNoneOrMinMaxDimension: g, textIndent: h, flexBasis: i, lengthOrNumberOrAutoOrNoneOrContent: j, fontSize: k, lengthOrAutoOrCoverOrContain: l, calc: m};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rtfeldman$elm_css$Css$ExplicitLength = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return function (q) {
+																	return {value: a, numericValue: b, units: c, unitLabel: d, length: e, lengthOrAuto: f, lengthOrNumber: g, lengthOrNone: h, lengthOrMinMaxDimension: i, lengthOrNoneOrMinMaxDimension: j, textIndent: k, flexBasis: l, absoluteLength: m, lengthOrNumberOrAutoOrNoneOrContent: n, fontSize: o, lengthOrAutoOrCoverOrContain: p, calc: q};
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rtfeldman$elm_css$Css$NonMixable = {};
+var _rtfeldman$elm_css$Css$BasicProperty = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return function (q) {
+																	return function (r) {
+																		return function (s) {
+																			return function (t) {
+																				return function (u) {
+																					return function (v) {
+																						return function (w) {
+																							return function (x) {
+																								return function (y) {
+																									return function (z) {
+																										return function (_1) {
+																											return function (_2) {
+																												return function (_3) {
+																													return function (_4) {
+																														return function (_5) {
+																															return function (_6) {
+																																return function (_7) {
+																																	return function (_8) {
+																																		return function (_9) {
+																																			return function (_10) {
+																																				return function (_11) {
+																																					return function (_12) {
+																																						return function (_13) {
+																																							return function (_14) {
+																																								return function (_15) {
+																																									return function (_16) {
+																																										return function (_17) {
+																																											return function (_18) {
+																																												return function (_19) {
+																																													return function (_20) {
+																																														return function (_21) {
+																																															return function (_22) {
+																																																return function (_23) {
+																																																	return function (_24) {
+																																																		return function (_25) {
+																																																			return function (_26) {
+																																																				return function (_27) {
+																																																					return function (_28) {
+																																																						return {value: a, all: b, alignItems: c, borderStyle: d, boxSizing: e, color: f, cursor: g, display: h, flexBasis: i, flexWrap: j, flexDirection: k, flexDirectionOrWrap: l, justifyContent: m, none: n, number: o, outline: p, overflow: q, pointerEvents: r, visibility: s, textDecorationLine: t, textRendering: u, textIndent: v, textDecorationStyle: w, textTransform: x, length: y, lengthOrAuto: z, lengthOrNone: _1, lengthOrNumber: _2, lengthOrMinMaxDimension: _3, lengthOrNoneOrMinMaxDimension: _4, lengthOrNumberOrAutoOrNoneOrContent: _5, listStyleType: _6, listStylePosition: _7, listStyleTypeOrPositionOrImage: _8, fontFamily: _9, fontSize: _10, fontStyle: _11, fontWeight: _12, fontVariant: _13, units: _14, numericValue: _15, unitLabel: _16, warnings: _17, backgroundRepeat: _18, backgroundRepeatShorthand: _19, backgroundAttachment: _20, backgroundBlendMode: _21, backgroundOrigin: _22, backgroundImage: _23, lengthOrAutoOrCoverOrContain: _24, intOrAuto: _25, touchAction: _26, whiteSpace: _27, tableLayout: _28};
+																																																					};
+																																																				};
+																																																			};
+																																																		};
+																																																	};
+																																																};
+																																															};
+																																														};
+																																													};
+																																												};
+																																											};
+																																										};
+																																									};
+																																								};
+																																							};
+																																						};
+																																					};
+																																				};
+																																			};
+																																		};
+																																	};
+																																};
+																															};
+																														};
+																													};
+																												};
+																											};
+																										};
+																									};
+																								};
+																							};
+																						};
+																					};
+																				};
+																			};
+																		};
+																	};
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rtfeldman$elm_css$Css$Normal = F7(
+	function (a, b, c, d, e, f, g) {
+		return {value: a, warnings: b, fontStyle: c, fontWeight: d, featureTagValue: e, overflowWrap: f, whiteSpace: g};
+	});
+var _rtfeldman$elm_css$Css$Subtraction = {ctor: 'Subtraction'};
+var _rtfeldman$elm_css$Css$minus = _rtfeldman$elm_css$Css$Subtraction;
+var _rtfeldman$elm_css$Css$Addition = {ctor: 'Addition'};
+var _rtfeldman$elm_css$Css$plus = _rtfeldman$elm_css$Css$Addition;
+var _rtfeldman$elm_css$Css$PercentageUnits = {ctor: 'PercentageUnits'};
+var _rtfeldman$elm_css$Css$pct = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PercentageUnits, '%');
+var _rtfeldman$elm_css$Css$EmUnits = {ctor: 'EmUnits'};
+var _rtfeldman$elm_css$Css$em = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$EmUnits, 'em');
+var _rtfeldman$elm_css$Css$ExUnits = {ctor: 'ExUnits'};
+var _rtfeldman$elm_css$Css$ex = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$ExUnits, 'ex');
+var _rtfeldman$elm_css$Css$ChUnits = {ctor: 'ChUnits'};
+var _rtfeldman$elm_css$Css$ch = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$ChUnits, 'ch');
+var _rtfeldman$elm_css$Css$RemUnits = {ctor: 'RemUnits'};
+var _rtfeldman$elm_css$Css$rem = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$RemUnits, 'rem');
+var _rtfeldman$elm_css$Css$VhUnits = {ctor: 'VhUnits'};
+var _rtfeldman$elm_css$Css$vh = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VhUnits, 'vh');
+var _rtfeldman$elm_css$Css$VwUnits = {ctor: 'VwUnits'};
+var _rtfeldman$elm_css$Css$vw = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VwUnits, 'vw');
+var _rtfeldman$elm_css$Css$VMinUnits = {ctor: 'VMinUnits'};
+var _rtfeldman$elm_css$Css$vmin = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VMinUnits, 'vmin');
+var _rtfeldman$elm_css$Css$VMaxUnits = {ctor: 'VMaxUnits'};
+var _rtfeldman$elm_css$Css$vmax = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VMaxUnits, 'vmax');
+var _rtfeldman$elm_css$Css$PxUnits = {ctor: 'PxUnits'};
+var _rtfeldman$elm_css$Css$px = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PxUnits, 'px');
+var _rtfeldman$elm_css$Css$MMUnits = {ctor: 'MMUnits'};
+var _rtfeldman$elm_css$Css$mm = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$MMUnits, 'mm');
+var _rtfeldman$elm_css$Css$CMUnits = {ctor: 'CMUnits'};
+var _rtfeldman$elm_css$Css$cm = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$CMUnits, 'cm');
+var _rtfeldman$elm_css$Css$InchUnits = {ctor: 'InchUnits'};
+var _rtfeldman$elm_css$Css$inches = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$InchUnits, 'in');
+var _rtfeldman$elm_css$Css$PtUnits = {ctor: 'PtUnits'};
+var _rtfeldman$elm_css$Css$pt = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PtUnits, 'pt');
+var _rtfeldman$elm_css$Css$PcUnits = {ctor: 'PcUnits'};
+var _rtfeldman$elm_css$Css$pc = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PcUnits, 'pc');
+var _rtfeldman$elm_css$Css$UnitlessInteger = {ctor: 'UnitlessInteger'};
+var _rtfeldman$elm_css$Css$zero = {value: '0', length: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, number: _rtfeldman$elm_css$Css_Structure$Compatible, outline: _rtfeldman$elm_css$Css_Structure$Compatible, units: _rtfeldman$elm_css$Css$UnitlessInteger, unitLabel: '', numericValue: 0, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css$int = function (val) {
+	return {
+		value: _rtfeldman$elm_css$Css$numberToString(val),
+		lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+		number: _rtfeldman$elm_css$Css_Structure$Compatible,
+		fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+		intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+		numericValue: _elm_lang$core$Basics$toFloat(val),
+		unitLabel: '',
+		units: _rtfeldman$elm_css$Css$UnitlessInteger
+	};
+};
+var _rtfeldman$elm_css$Css$UnitlessFloat = {ctor: 'UnitlessFloat'};
+var _rtfeldman$elm_css$Css$num = function (val) {
+	return {
+		value: _rtfeldman$elm_css$Css$numberToString(val),
+		lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+		number: _rtfeldman$elm_css$Css_Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+		numericValue: val,
+		unitLabel: '',
+		units: _rtfeldman$elm_css$Css$UnitlessFloat
+	};
+};
+var _rtfeldman$elm_css$Css$IncompatibleUnits = {ctor: 'IncompatibleUnits'};
+var _rtfeldman$elm_css$Css$initial = {
+	value: 'initial',
+	overflow: _rtfeldman$elm_css$Css_Structure$Compatible,
+	visibility: _rtfeldman$elm_css$Css_Structure$Compatible,
+	none: _rtfeldman$elm_css$Css_Structure$Compatible,
+	number: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textRendering: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textIndent: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	textTransform: _rtfeldman$elm_css$Css_Structure$Compatible,
+	borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible,
+	color: _rtfeldman$elm_css$Css_Structure$Compatible,
+	cursor: _rtfeldman$elm_css$Css_Structure$Compatible,
+	display: _rtfeldman$elm_css$Css_Structure$Compatible,
+	all: _rtfeldman$elm_css$Css_Structure$Compatible,
+	alignItems: _rtfeldman$elm_css$Css_Structure$Compatible,
+	justifyContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+	length: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
+	listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible,
+	listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible,
+	listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexDirection: _rtfeldman$elm_css$Css_Structure$Compatible,
+	flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontSize: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
+	fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible,
+	outline: _rtfeldman$elm_css$Css_Structure$Compatible,
+	pointerEvents: _rtfeldman$elm_css$Css_Structure$Compatible,
+	units: _rtfeldman$elm_css$Css$IncompatibleUnits,
+	numericValue: 0,
+	unitLabel: '',
+	warnings: {ctor: '[]'},
+	backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundBlendMode: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundOrigin: _rtfeldman$elm_css$Css_Structure$Compatible,
+	backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
+	lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible,
+	intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
+	touchAction: _rtfeldman$elm_css$Css_Structure$Compatible,
+	whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible,
+	tableLayout: _rtfeldman$elm_css$Css_Structure$Compatible
+};
+var _rtfeldman$elm_css$Css$unset = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$initial,
+	{value: 'unset'});
+var _rtfeldman$elm_css$Css$inherit = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Css$initial,
+	{value: 'inherit'});
+var _rtfeldman$elm_css$Css$lengthForOverloadedProperty = A3(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$IncompatibleUnits, '', 0);
+var _rtfeldman$elm_css$Css$alignItems = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'alignItems',
+		'align-items',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$alignSelf = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'alignSelf',
+		'align-self',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$justifyContent = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'justifyContent',
+		'justify-content',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$float = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'float',
+		'float',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$textAlignLast = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'textAlignLast',
+		'text-align-last',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$textAlign = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'textAlign',
+		'text-align',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$verticalAlign = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'verticalAlign',
+		'vertical-align',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$backgroundPosition = function (fn) {
+	return A3(
+		_rtfeldman$elm_css$Css$getOverloadedProperty,
+		'backgroundPosition',
+		'background-position',
+		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
+};
+var _rtfeldman$elm_css$Css$Rtl = {ctor: 'Rtl'};
+var _rtfeldman$elm_css$Css$Ltr = {ctor: 'Ltr'};
+var _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs = {ctor: 'IntentionallyUnsupportedPleaseSeeDocs'};
+var _rtfeldman$elm_css$Css$thin = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
+var _rtfeldman$elm_css$Css$thick = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
+var _rtfeldman$elm_css$Css$blink = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
 
 var _rtfeldman$elm_css$Css_Structure_Output$noIndent = '';
 var _rtfeldman$elm_css$Css_Structure_Output$spaceIndent = '    ';
@@ -12019,431 +14863,235 @@ var _rtfeldman$elm_css$Css_Preprocess_Resolve$DeclarationsAndWarnings = F2(
 		return {declarations: a, warnings: b};
 	});
 
-var _rtfeldman$hex$Hex$toString = function (num) {
-	return _elm_lang$core$String$fromList(
-		(_elm_lang$core$Native_Utils.cmp(num, 0) < 0) ? {
-			ctor: '::',
-			_0: _elm_lang$core$Native_Utils.chr('-'),
-			_1: A2(
-				_rtfeldman$hex$Hex$unsafePositiveToDigits,
-				{ctor: '[]'},
-				_elm_lang$core$Basics$negate(num))
-		} : A2(
-			_rtfeldman$hex$Hex$unsafePositiveToDigits,
-			{ctor: '[]'},
-			num));
-};
-var _rtfeldman$hex$Hex$unsafePositiveToDigits = F2(
-	function (digits, num) {
-		unsafePositiveToDigits:
+var _rtfeldman$elm_css$VirtualDom_Styled$containsKey = F2(
+	function (key, pairs) {
+		containsKey:
 		while (true) {
-			if (_elm_lang$core$Native_Utils.cmp(num, 16) < 0) {
-				return {
-					ctor: '::',
-					_0: _rtfeldman$hex$Hex$unsafeToDigit(num),
-					_1: digits
-				};
+			var _p0 = pairs;
+			if (_p0.ctor === '[]') {
+				return false;
 			} else {
-				var _v0 = {
-					ctor: '::',
-					_0: _rtfeldman$hex$Hex$unsafeToDigit(
-						A2(_elm_lang$core$Basics_ops['%'], num, 16)),
-					_1: digits
-				},
-					_v1 = (num / 16) | 0;
-				digits = _v0;
-				num = _v1;
-				continue unsafePositiveToDigits;
+				if (_elm_lang$core$Native_Utils.eq(key, _p0._0._0)) {
+					return true;
+				} else {
+					var _v1 = key,
+						_v2 = _p0._1;
+					key = _v1;
+					pairs = _v2;
+					continue containsKey;
+				}
 			}
 		}
 	});
-var _rtfeldman$hex$Hex$unsafeToDigit = function (num) {
-	var _p0 = num;
-	switch (_p0) {
-		case 0:
-			return _elm_lang$core$Native_Utils.chr('0');
-		case 1:
-			return _elm_lang$core$Native_Utils.chr('1');
-		case 2:
-			return _elm_lang$core$Native_Utils.chr('2');
-		case 3:
-			return _elm_lang$core$Native_Utils.chr('3');
-		case 4:
-			return _elm_lang$core$Native_Utils.chr('4');
-		case 5:
-			return _elm_lang$core$Native_Utils.chr('5');
-		case 6:
-			return _elm_lang$core$Native_Utils.chr('6');
-		case 7:
-			return _elm_lang$core$Native_Utils.chr('7');
-		case 8:
-			return _elm_lang$core$Native_Utils.chr('8');
-		case 9:
-			return _elm_lang$core$Native_Utils.chr('9');
-		case 10:
-			return _elm_lang$core$Native_Utils.chr('a');
-		case 11:
-			return _elm_lang$core$Native_Utils.chr('b');
-		case 12:
-			return _elm_lang$core$Native_Utils.chr('c');
-		case 13:
-			return _elm_lang$core$Native_Utils.chr('d');
-		case 14:
-			return _elm_lang$core$Native_Utils.chr('e');
-		case 15:
-			return _elm_lang$core$Native_Utils.chr('f');
-		default:
-			return _elm_lang$core$Native_Utils.crashCase(
-				'Hex',
-				{
-					start: {line: 138, column: 5},
-					end: {line: 188, column: 84}
-				},
-				_p0)(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'Tried to convert ',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_rtfeldman$hex$Hex$toString(num),
-						' to hexadecimal.')));
-	}
-};
-var _rtfeldman$hex$Hex$fromStringHelp = F3(
-	function (position, chars, accumulated) {
-		var _p2 = chars;
-		if (_p2.ctor === '[]') {
-			return _elm_lang$core$Result$Ok(accumulated);
-		} else {
-			var recurse = function (additional) {
-				return A3(
-					_rtfeldman$hex$Hex$fromStringHelp,
-					position - 1,
-					_p2._1,
-					accumulated + (additional * Math.pow(16, position)));
-			};
-			var _p3 = _p2._0;
-			switch (_p3.valueOf()) {
-				case '0':
-					return recurse(0);
-				case '1':
-					return recurse(1);
-				case '2':
-					return recurse(2);
-				case '3':
-					return recurse(3);
-				case '4':
-					return recurse(4);
-				case '5':
-					return recurse(5);
-				case '6':
-					return recurse(6);
-				case '7':
-					return recurse(7);
-				case '8':
-					return recurse(8);
-				case '9':
-					return recurse(9);
-				case 'a':
-					return recurse(10);
-				case 'b':
-					return recurse(11);
-				case 'c':
-					return recurse(12);
-				case 'd':
-					return recurse(13);
-				case 'e':
-					return recurse(14);
-				case 'f':
-					return recurse(15);
-				default:
-					return _elm_lang$core$Result$Err(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(_p3),
-							' is not a valid hexadecimal character.'));
-			}
-		}
-	});
-var _rtfeldman$hex$Hex$fromString = function (str) {
-	if (_elm_lang$core$String$isEmpty(str)) {
-		return _elm_lang$core$Result$Err('Empty strings are not valid hexadecimal strings.');
-	} else {
-		var formatError = function (err) {
-			return A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: _elm_lang$core$Basics$toString(str),
-					_1: {
-						ctor: '::',
-						_0: 'is not a valid hexadecimal string because',
-						_1: {
-							ctor: '::',
-							_0: err,
-							_1: {ctor: '[]'}
-						}
-					}
-				});
-		};
-		var result = function () {
-			if (A2(_elm_lang$core$String$startsWith, '-', str)) {
-				var list = A2(
-					_elm_lang$core$Maybe$withDefault,
-					{ctor: '[]'},
-					_elm_lang$core$List$tail(
-						_elm_lang$core$String$toList(str)));
-				return A2(
-					_elm_lang$core$Result$map,
-					_elm_lang$core$Basics$negate,
-					A3(
-						_rtfeldman$hex$Hex$fromStringHelp,
-						_elm_lang$core$List$length(list) - 1,
-						list,
-						0));
-			} else {
-				return A3(
-					_rtfeldman$hex$Hex$fromStringHelp,
-					_elm_lang$core$String$length(str) - 1,
-					_elm_lang$core$String$toList(str),
-					0);
-			}
-		}();
-		return A2(_elm_lang$core$Result$mapError, formatError, result);
-	}
-};
-
-var _rtfeldman$elm_css$Css$manipulation = {value: 'manipulation', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$pinchZoom = {value: 'pinch-zoom', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$panDown = {value: 'pan-down', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$panUp = {value: 'pan-up', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$panY = {value: 'pan-y', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$panRight = {value: 'pan-right', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$panLeft = {value: 'pan-left', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$panX = {value: 'pan-x', touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$asPairs = _rtfeldman$elm_css$Css_Preprocess$toPropertyPairs;
-var _rtfeldman$elm_css$Css$collectSelectors = function (declarations) {
-	collectSelectors:
-	while (true) {
-		var _p0 = declarations;
-		if (_p0.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			if (_p0._0.ctor === 'StyleBlockDeclaration') {
-				return A2(
-					_elm_lang$core$Basics_ops['++'],
-					{ctor: '::', _0: _p0._0._0._0, _1: _p0._0._0._1},
-					_rtfeldman$elm_css$Css$collectSelectors(_p0._1));
-			} else {
-				var _v1 = _p0._1;
-				declarations = _v1;
-				continue collectSelectors;
-			}
-		}
-	}
-};
-var _rtfeldman$elm_css$Css$compile = _rtfeldman$elm_css$Css_Preprocess_Resolve$compile;
-var _rtfeldman$elm_css$Css$stringsToValue = function (list) {
-	return _elm_lang$core$List$isEmpty(list) ? {value: 'none'} : {
-		value: A2(
-			_elm_lang$core$String$join,
-			', ',
-			A2(
-				_elm_lang$core$List$map,
-				function (s) {
-					return s;
-				},
-				list))
-	};
-};
-var _rtfeldman$elm_css$Css$valuesOrNone = function (list) {
-	return _elm_lang$core$List$isEmpty(list) ? {value: 'none'} : {
-		value: A2(
-			_elm_lang$core$String$join,
-			' ',
-			A2(
-				_elm_lang$core$List$map,
-				function (_) {
-					return _.value;
-				},
-				list))
-	};
-};
-var _rtfeldman$elm_css$Css$stringToInt = function (str) {
-	return A2(
-		_elm_lang$core$Result$withDefault,
-		0,
-		_elm_lang$core$String$toInt(str));
-};
-var _rtfeldman$elm_css$Css$numberToString = function (num) {
-	return _elm_lang$core$Basics$toString(num + 0);
-};
-var _rtfeldman$elm_css$Css$numericalPercentageToString = function (value) {
-	return A3(
-		_elm_lang$core$Basics$flip,
-		F2(
-			function (x, y) {
-				return A2(_elm_lang$core$Basics_ops['++'], x, y);
-			}),
-		'%',
-		_rtfeldman$elm_css$Css$numberToString(
-			A2(
-				F2(
-					function (x, y) {
-						return x * y;
-					}),
-				100,
-				value)));
-};
-var _rtfeldman$elm_css$Css$each = F2(
-	function (snippetCreators, styles) {
-		var selectorsToSnippet = function (selectors) {
-			var _p1 = selectors;
+var _rtfeldman$elm_css$VirtualDom_Styled$getUnusedKey = F2(
+	function ($default, pairs) {
+		getUnusedKey:
+		while (true) {
+			var _p1 = pairs;
 			if (_p1.ctor === '[]') {
-				return _rtfeldman$elm_css$Css_Preprocess$Snippet(
-					{ctor: '[]'});
+				return $default;
 			} else {
-				return _rtfeldman$elm_css$Css_Preprocess$Snippet(
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
-							A3(_rtfeldman$elm_css$Css_Preprocess$StyleBlock, _p1._0, _p1._1, styles)),
-						_1: {ctor: '[]'}
-					});
+				var _p2 = _p1._1;
+				var newKey = A2(_elm_lang$core$Basics_ops['++'], '_', _p1._0._0);
+				if (A2(_rtfeldman$elm_css$VirtualDom_Styled$containsKey, newKey, _p2)) {
+					var _v4 = newKey,
+						_v5 = _p2;
+					$default = _v4;
+					pairs = _v5;
+					continue getUnusedKey;
+				} else {
+					return newKey;
+				}
 			}
-		};
-		return selectorsToSnippet(
-			_rtfeldman$elm_css$Css$collectSelectors(
-				A2(
-					_elm_lang$core$List$concatMap,
-					_rtfeldman$elm_css$Css_Preprocess$unwrapSnippet,
-					A2(
-						_elm_lang$core$List$map,
-						F2(
-							function (x, y) {
-								return y(x);
-							})(
-							{ctor: '[]'}),
-						snippetCreators))));
+		}
 	});
-var _rtfeldman$elm_css$Css$generalSiblings = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$GeneralSibling);
-var _rtfeldman$elm_css$Css$adjacentSiblings = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$AdjacentSibling);
-var _rtfeldman$elm_css$Css$descendants = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$Descendant);
-var _rtfeldman$elm_css$Css$withClass = function ($class) {
-	return _rtfeldman$elm_css$Css_Preprocess$ExtendSelector(
-		_rtfeldman$elm_css$Css_Structure$ClassSelector(
-			A2(_rtfeldman$elm_css_util$Css_Helpers$identifierToString, '', $class)));
+var _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty = function (_p3) {
+	var _p4 = _p3;
+	return _p4._0;
 };
-var _rtfeldman$elm_css$Css$children = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$Child);
-var _rtfeldman$elm_css$Css$pseudoElement = function (element) {
-	return _rtfeldman$elm_css$Css_Preprocess$WithPseudoElement(
-		_rtfeldman$elm_css$Css_Structure$PseudoElement(element));
-};
-var _rtfeldman$elm_css$Css$after = _rtfeldman$elm_css$Css$pseudoElement('after');
-var _rtfeldman$elm_css$Css$before = _rtfeldman$elm_css$Css$pseudoElement('before');
-var _rtfeldman$elm_css$Css$firstLetter = _rtfeldman$elm_css$Css$pseudoElement('first-letter');
-var _rtfeldman$elm_css$Css$firstLine = _rtfeldman$elm_css$Css$pseudoElement('first-line');
-var _rtfeldman$elm_css$Css$selection = _rtfeldman$elm_css$Css$pseudoElement('selection');
-var _rtfeldman$elm_css$Css$pseudoClass = function ($class) {
-	return _rtfeldman$elm_css$Css_Preprocess$ExtendSelector(
-		_rtfeldman$elm_css$Css_Structure$PseudoClassSelector($class));
-};
-var _rtfeldman$elm_css$Css$active = _rtfeldman$elm_css$Css$pseudoClass('active');
-var _rtfeldman$elm_css$Css$any = function (str) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'any(',
-			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
-};
-var _rtfeldman$elm_css$Css$checked = _rtfeldman$elm_css$Css$pseudoClass('checked');
-var _rtfeldman$elm_css$Css$disabled = _rtfeldman$elm_css$Css$pseudoClass('disabled');
-var _rtfeldman$elm_css$Css$empty = _rtfeldman$elm_css$Css$pseudoClass('empty');
-var _rtfeldman$elm_css$Css$enabled = _rtfeldman$elm_css$Css$pseudoClass('enabled');
-var _rtfeldman$elm_css$Css$first = _rtfeldman$elm_css$Css$pseudoClass('first');
-var _rtfeldman$elm_css$Css$firstChild = _rtfeldman$elm_css$Css$pseudoClass('first-child');
-var _rtfeldman$elm_css$Css$firstOfType = _rtfeldman$elm_css$Css$pseudoClass('first-of-type');
-var _rtfeldman$elm_css$Css$fullscreen = _rtfeldman$elm_css$Css$pseudoClass('fullscreen');
-var _rtfeldman$elm_css$Css$focus = _rtfeldman$elm_css$Css$pseudoClass('focus');
-var _rtfeldman$elm_css$Css$hover = _rtfeldman$elm_css$Css$pseudoClass('hover');
-var _rtfeldman$elm_css$Css$visited = _rtfeldman$elm_css$Css$pseudoClass('visited');
-var _rtfeldman$elm_css$Css$indeterminate = _rtfeldman$elm_css$Css$pseudoClass('indeterminate');
-var _rtfeldman$elm_css$Css$invalid = _rtfeldman$elm_css$Css$pseudoClass('invalid');
-var _rtfeldman$elm_css$Css$lang = function (str) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'lang(',
-			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
-};
-var _rtfeldman$elm_css$Css$lastChild = _rtfeldman$elm_css$Css$pseudoClass('last-child');
-var _rtfeldman$elm_css$Css$lastOfType = _rtfeldman$elm_css$Css$pseudoClass('last-of-type');
-var _rtfeldman$elm_css$Css$link = _rtfeldman$elm_css$Css$pseudoClass('link');
-var _rtfeldman$elm_css$Css$nthChild = function (str) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'nth-child(',
-			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
-};
-var _rtfeldman$elm_css$Css$nthLastChild = function (str) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'nth-last-child(',
-			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
-};
-var _rtfeldman$elm_css$Css$nthLastOfType = function (str) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'nth-last-of-type(',
-			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
-};
-var _rtfeldman$elm_css$Css$nthOfType = function (str) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'nth-of-type(',
-			A2(_elm_lang$core$Basics_ops['++'], str, ')')));
-};
-var _rtfeldman$elm_css$Css$onlyChild = _rtfeldman$elm_css$Css$pseudoClass('only-child');
-var _rtfeldman$elm_css$Css$onlyOfType = _rtfeldman$elm_css$Css$pseudoClass('only-of-type');
-var _rtfeldman$elm_css$Css$optional = _rtfeldman$elm_css$Css$pseudoClass('optional');
-var _rtfeldman$elm_css$Css$outOfRange = _rtfeldman$elm_css$Css$pseudoClass('out-of-range');
-var _rtfeldman$elm_css$Css$readWrite = _rtfeldman$elm_css$Css$pseudoClass('read-write');
-var _rtfeldman$elm_css$Css$required = _rtfeldman$elm_css$Css$pseudoClass('required');
-var _rtfeldman$elm_css$Css$root = _rtfeldman$elm_css$Css$pseudoClass('root');
-var _rtfeldman$elm_css$Css$scope = _rtfeldman$elm_css$Css$pseudoClass('scope');
-var _rtfeldman$elm_css$Css$target = _rtfeldman$elm_css$Css$pseudoClass('target');
-var _rtfeldman$elm_css$Css$valid = _rtfeldman$elm_css$Css$pseudoClass('valid');
-var _rtfeldman$elm_css$Css$directionalityToString = function (directionality) {
-	var _p2 = directionality;
-	if (_p2.ctor === 'Ltr') {
-		return 'ltr';
+var _rtfeldman$elm_css$VirtualDom_Styled$stylesFromPropertiesHelp = F2(
+	function (candidate, properties) {
+		stylesFromPropertiesHelp:
+		while (true) {
+			var _p5 = properties;
+			if (_p5.ctor === '[]') {
+				return candidate;
+			} else {
+				var _p7 = _p5._1;
+				var _p6 = _p5._0._2;
+				if (_elm_lang$core$String$isEmpty(_p6)) {
+					var _v8 = candidate,
+						_v9 = _p7;
+					candidate = _v8;
+					properties = _v9;
+					continue stylesFromPropertiesHelp;
+				} else {
+					var _v10 = _elm_lang$core$Maybe$Just(
+						{ctor: '_Tuple2', _0: _p6, _1: _p5._0._1}),
+						_v11 = _p7;
+					candidate = _v10;
+					properties = _v11;
+					continue stylesFromPropertiesHelp;
+				}
+			}
+		}
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$stylesFromProperties = function (properties) {
+	var _p8 = A2(_rtfeldman$elm_css$VirtualDom_Styled$stylesFromPropertiesHelp, _elm_lang$core$Maybe$Nothing, properties);
+	if (_p8.ctor === 'Nothing') {
+		return _elm_lang$core$Dict$empty;
 	} else {
-		return 'rtl';
+		return A2(_elm_lang$core$Dict$singleton, _p8._0._0, _p8._0._1);
 	}
 };
-var _rtfeldman$elm_css$Css$dir = function (directionality) {
-	return _rtfeldman$elm_css$Css$pseudoClass(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'dir(',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_rtfeldman$elm_css$Css$directionalityToString(directionality),
-				')')));
-};
-var _rtfeldman$elm_css$Css$propertyWithWarnings = F3(
-	function (warnings, key, value) {
-		return _rtfeldman$elm_css$Css_Preprocess$AppendProperty(
-			{key: key, value: value, important: false, warnings: warnings});
+var _rtfeldman$elm_css$VirtualDom_Styled$accumulateStyles = F2(
+	function (_p9, styles) {
+		var _p10 = _p9;
+		var _p11 = _p10._1;
+		return _elm_lang$core$List$isEmpty(_p11) ? styles : A3(_elm_lang$core$Dict$insert, _p10._2, _p11, styles);
 	});
-var _rtfeldman$elm_css$Css$property = _rtfeldman$elm_css$Css$propertyWithWarnings(
-	{ctor: '[]'});
-var _rtfeldman$elm_css$Css$makeSnippet = F2(
+var _rtfeldman$elm_css$VirtualDom_Styled$accumulateKeyedStyledHtml = F2(
+	function (_p13, _p12) {
+		var _p14 = _p13;
+		var _p23 = _p14._0;
+		var _p15 = _p12;
+		var _p22 = _p15._1;
+		var _p21 = _p15._0;
+		var _p16 = _p14._1;
+		switch (_p16.ctor) {
+			case 'Unstyled':
+				return {
+					ctor: '_Tuple2',
+					_0: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: _p23, _1: _p16._0},
+						_1: _p21
+					},
+					_1: _p22
+				};
+			case 'Element':
+				var _p18 = _p16._1;
+				var combinedStyles = A3(_elm_lang$core$List$foldl, _rtfeldman$elm_css$VirtualDom_Styled$accumulateStyles, _p22, _p18);
+				var _p17 = A3(
+					_elm_lang$core$List$foldl,
+					_rtfeldman$elm_css$VirtualDom_Styled$accumulateStyledHtml,
+					{
+						ctor: '_Tuple2',
+						_0: {ctor: '[]'},
+						_1: combinedStyles
+					},
+					_p16._2);
+				var childNodes = _p17._0;
+				var finalStyles = _p17._1;
+				var vdom = A3(
+					_elm_lang$virtual_dom$VirtualDom$node,
+					_p16._0,
+					A2(_elm_lang$core$List$map, _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty, _p18),
+					_elm_lang$core$List$reverse(childNodes));
+				return {
+					ctor: '_Tuple2',
+					_0: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: _p23, _1: vdom},
+						_1: _p21
+					},
+					_1: finalStyles
+				};
+			default:
+				var _p20 = _p16._1;
+				var combinedStyles = A3(_elm_lang$core$List$foldl, _rtfeldman$elm_css$VirtualDom_Styled$accumulateStyles, _p22, _p20);
+				var _p19 = A3(
+					_elm_lang$core$List$foldl,
+					_rtfeldman$elm_css$VirtualDom_Styled$accumulateKeyedStyledHtml,
+					{
+						ctor: '_Tuple2',
+						_0: {ctor: '[]'},
+						_1: combinedStyles
+					},
+					_p16._2);
+				var childNodes = _p19._0;
+				var finalStyles = _p19._1;
+				var vdom = A3(
+					_elm_lang$virtual_dom$VirtualDom$keyedNode,
+					_p16._0,
+					A2(_elm_lang$core$List$map, _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty, _p20),
+					_elm_lang$core$List$reverse(childNodes));
+				return {
+					ctor: '_Tuple2',
+					_0: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: _p23, _1: vdom},
+						_1: _p21
+					},
+					_1: finalStyles
+				};
+		}
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$accumulateStyledHtml = F2(
+	function (html, _p24) {
+		var _p25 = _p24;
+		var _p32 = _p25._1;
+		var _p31 = _p25._0;
+		var _p26 = html;
+		switch (_p26.ctor) {
+			case 'Unstyled':
+				return {
+					ctor: '_Tuple2',
+					_0: {ctor: '::', _0: _p26._0, _1: _p31},
+					_1: _p32
+				};
+			case 'Element':
+				var _p28 = _p26._1;
+				var combinedStyles = A3(_elm_lang$core$List$foldl, _rtfeldman$elm_css$VirtualDom_Styled$accumulateStyles, _p32, _p28);
+				var _p27 = A3(
+					_elm_lang$core$List$foldl,
+					_rtfeldman$elm_css$VirtualDom_Styled$accumulateStyledHtml,
+					{
+						ctor: '_Tuple2',
+						_0: {ctor: '[]'},
+						_1: combinedStyles
+					},
+					_p26._2);
+				var childNodes = _p27._0;
+				var finalStyles = _p27._1;
+				var node = A3(
+					_elm_lang$virtual_dom$VirtualDom$node,
+					_p26._0,
+					A2(_elm_lang$core$List$map, _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty, _p28),
+					_elm_lang$core$List$reverse(childNodes));
+				return {
+					ctor: '_Tuple2',
+					_0: {ctor: '::', _0: node, _1: _p31},
+					_1: finalStyles
+				};
+			default:
+				var _p30 = _p26._1;
+				var combinedStyles = A3(_elm_lang$core$List$foldl, _rtfeldman$elm_css$VirtualDom_Styled$accumulateStyles, _p32, _p30);
+				var _p29 = A3(
+					_elm_lang$core$List$foldl,
+					_rtfeldman$elm_css$VirtualDom_Styled$accumulateKeyedStyledHtml,
+					{
+						ctor: '_Tuple2',
+						_0: {ctor: '[]'},
+						_1: combinedStyles
+					},
+					_p26._2);
+				var childNodes = _p29._0;
+				var finalStyles = _p29._1;
+				var node = A3(
+					_elm_lang$virtual_dom$VirtualDom$keyedNode,
+					_p26._0,
+					A2(_elm_lang$core$List$map, _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty, _p30),
+					_elm_lang$core$List$reverse(childNodes));
+				return {
+					ctor: '_Tuple2',
+					_0: {ctor: '::', _0: node, _1: _p31},
+					_1: finalStyles
+				};
+		}
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$murmurSeed = 15739;
+var _rtfeldman$elm_css$VirtualDom_Styled$makeSnippet = F2(
 	function (styles, sequence) {
 		var selector = A3(
 			_rtfeldman$elm_css$Css_Structure$Selector,
@@ -12462,2514 +15110,1254 @@ var _rtfeldman$elm_css$Css$makeSnippet = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _rtfeldman$elm_css$Css$class = F2(
-	function ($class, styles) {
-		return A2(
-			_rtfeldman$elm_css$Css$makeSnippet,
-			styles,
-			_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
-				{
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css_Structure$ClassSelector(
-						A2(_rtfeldman$elm_css_util$Css_Helpers$identifierToString, '', $class)),
-					_1: {ctor: '[]'}
-				}));
-	});
-var _rtfeldman$elm_css$Css$selector = F2(
-	function (selectorStr, styles) {
-		return A2(
-			_rtfeldman$elm_css$Css$makeSnippet,
-			styles,
-			A2(
-				_rtfeldman$elm_css$Css_Structure$CustomSelector,
-				selectorStr,
-				{ctor: '[]'}));
-	});
-var _rtfeldman$elm_css$Css$everything = function (styles) {
+var _rtfeldman$elm_css$VirtualDom_Styled$snippetFromPair = function (_p33) {
+	var _p34 = _p33;
 	return A2(
-		_rtfeldman$elm_css$Css$makeSnippet,
-		styles,
+		_rtfeldman$elm_css$VirtualDom_Styled$makeSnippet,
+		_p34._1,
 		_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
-			{ctor: '[]'}));
-};
-var _rtfeldman$elm_css$Css$id = F2(
-	function (identifier, styles) {
-		return A2(
-			_rtfeldman$elm_css$Css$makeSnippet,
-			styles,
-			_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
-				{
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css_Structure$IdSelector(
-						A2(_rtfeldman$elm_css_util$Css_Helpers$identifierToString, '', identifier)),
-					_1: {ctor: '[]'}
-				}));
-	});
-var _rtfeldman$elm_css$Css$batch = _rtfeldman$elm_css$Css_Preprocess$ApplyStyles;
-var _rtfeldman$elm_css$Css$stylesheet = _rtfeldman$elm_css$Css_Preprocess$stylesheet;
-var _rtfeldman$elm_css$Css$animationNames = function (identifiers) {
-	var value = A2(
-		_elm_lang$core$String$join,
-		', ',
-		A2(
-			_elm_lang$core$List$map,
-			_rtfeldman$elm_css_util$Css_Helpers$identifierToString(''),
-			identifiers));
-	return A2(_rtfeldman$elm_css$Css$property, 'animation-name', value);
-};
-var _rtfeldman$elm_css$Css$animationName = function (identifier) {
-	return _rtfeldman$elm_css$Css$animationNames(
-		{
-			ctor: '::',
-			_0: identifier,
-			_1: {ctor: '[]'}
-		});
-};
-var _rtfeldman$elm_css$Css$preLine = {value: 'pre-line', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$preWrap = {value: 'pre-wrap', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$pre = {value: 'pre', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$grabbing = {value: 'grabbing', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$grab = {value: 'grab', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$zoomOut = {value: 'zoom-out', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$zoomIn = {value: 'zoom-in', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$allScroll = {value: 'all-scroll', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$rowResize = {value: 'row-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$colResize = {value: 'col-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$nwseResize = {value: 'nwse-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$neswResize = {value: 'nesw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$nsResize = {value: 'ns-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$ewResize = {value: 'ew-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$wResize = {value: 'w-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$swResize = {value: 'sw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$seResize = {value: 'se-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$sResize = {value: 's-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$nwResize = {value: 'nw-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$neResize = {value: 'ne-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$nResize = {value: 'n-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$eResize = {value: 'e-resize', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$notAllowed = {value: 'not-allowed', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$noDrop = {value: 'no-drop', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$move = {value: 'move', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$copy = {value: 'copy', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$cursorAlias = {value: 'alias', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$verticalText = {value: 'vertical-text', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$text = {value: 'text', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$cell = {value: 'cell', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$wait = {value: 'wait', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$progress = {value: 'progress', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$pointer = {value: 'pointer', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$help = {value: 'help', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$contextMenu = {value: 'context-menu', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$crosshair = {value: 'crosshair', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$default = {value: 'default', cursor: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fontWeight = function (_p3) {
-	var _p4 = _p3;
-	var _p5 = _p4.value;
-	var validWeight = function (weight) {
-		return (!_elm_lang$core$Native_Utils.eq(
-			_p5,
-			_elm_lang$core$Basics$toString(weight))) ? true : A2(
-			_elm_lang$core$List$member,
-			weight,
-			A2(
-				_elm_lang$core$List$map,
-				F2(
-					function (x, y) {
-						return x * y;
-					})(100),
-				A2(_elm_lang$core$List$range, 1, 9)));
-	};
-	var warnings = validWeight(
-		_rtfeldman$elm_css$Css$stringToInt(_p5)) ? {ctor: '[]'} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$core$Basics_ops['++'],
-			'fontWeight ',
-			A2(_elm_lang$core$Basics_ops['++'], _p5, ' is invalid. Valid weights are: 100, 200, 300, 400, 500, 600, 700, 800, 900. Please see https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#Values')),
-		_1: {ctor: '[]'}
-	};
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'font-weight', _p5);
-};
-var _rtfeldman$elm_css$Css$fontFeatureSettingsList = function (featureTagValues) {
-	var warnings = _elm_lang$core$List$concat(
-		A2(
-			_elm_lang$core$List$map,
-			function (_) {
-				return _.warnings;
-			},
-			featureTagValues));
-	var value = A2(
-		_elm_lang$core$String$join,
-		', ',
-		A2(
-			_elm_lang$core$List$map,
-			function (_) {
-				return _.value;
-			},
-			featureTagValues));
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'font-feature-settings', value);
-};
-var _rtfeldman$elm_css$Css$fontFeatureSettings = function (_p6) {
-	var _p7 = _p6;
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, _p7.warnings, 'font-feature-settings', _p7.value);
-};
-var _rtfeldman$elm_css$Css$qt = function (str) {
-	return _elm_lang$core$Basics$toString(str);
-};
-var _rtfeldman$elm_css$Css$fontFace = function (value) {
-	return A2(_elm_lang$core$Basics_ops['++'], 'font-face ', value);
-};
-var _rtfeldman$elm_css$Css$src = function (value) {
-	return _elm_lang$core$Basics$toString(value.value);
-};
-var _rtfeldman$elm_css$Css$color = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'color', c.value);
-};
-var _rtfeldman$elm_css$Css$backgroundColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'background-color', c.value);
-};
-var _rtfeldman$elm_css$Css$outlineColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'outline-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderColor4 = F4(
-	function (c1, c2, c3, c4) {
-		var value = A2(
-			_elm_lang$core$String$join,
-			' ',
 			{
 				ctor: '::',
-				_0: c1.value,
-				_1: {
-					ctor: '::',
-					_0: c2.value,
-					_1: {
-						ctor: '::',
-						_0: c3.value,
-						_1: {
-							ctor: '::',
-							_0: c4.value,
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			});
-		var warnings = A2(
-			_elm_lang$core$Basics_ops['++'],
-			c1.warnings,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				c2.warnings,
-				A2(_elm_lang$core$Basics_ops['++'], c3.warnings, c4.warnings)));
-		return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'border-color', value);
-	});
-var _rtfeldman$elm_css$Css$borderColor3 = F3(
-	function (c1, c2, c3) {
-		var value = A2(
-			_elm_lang$core$String$join,
-			' ',
-			{
-				ctor: '::',
-				_0: c1.value,
-				_1: {
-					ctor: '::',
-					_0: c2.value,
-					_1: {
-						ctor: '::',
-						_0: c3.value,
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-		var warnings = A2(
-			_elm_lang$core$Basics_ops['++'],
-			c1.warnings,
-			A2(_elm_lang$core$Basics_ops['++'], c2.warnings, c3.warnings));
-		return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'border-color', value);
-	});
-var _rtfeldman$elm_css$Css$borderColor2 = F2(
-	function (c1, c2) {
-		var value = A2(
-			_elm_lang$core$String$join,
-			' ',
-			{
-				ctor: '::',
-				_0: c1.value,
-				_1: {
-					ctor: '::',
-					_0: c2.value,
-					_1: {ctor: '[]'}
-				}
-			});
-		var warnings = A2(_elm_lang$core$Basics_ops['++'], c1.warnings, c2.warnings);
-		return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, warnings, 'border-color', value);
-	});
-var _rtfeldman$elm_css$Css$borderColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderBlockEndColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-block-end-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderTopColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-top-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderRightColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-right-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderLeftColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-left-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderInlineEndColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-inline-end-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderInlineStartColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-inline-start-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderBottomColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-bottom-color', c.value);
-};
-var _rtfeldman$elm_css$Css$borderBlockStartColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'border-block-start-color', c.value);
-};
-var _rtfeldman$elm_css$Css$featureTag2 = F2(
-	function (tag, value) {
-		var potentialWarnings = {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: !_elm_lang$core$Native_Utils.eq(
-					_elm_lang$core$String$length(tag),
-					4),
-				_1: A2(
-					_elm_lang$core$Basics_ops['++'],
-					'Feature tags must be exactly 4 characters long. ',
-					A2(_elm_lang$core$Basics_ops['++'], tag, ' is invalid.'))
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.cmp(value, 0) < 0,
-					_1: A2(
-						_elm_lang$core$Basics_ops['++'],
-						'Feature values cannot be negative. ',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(value),
-							' is invalid.'))
-				},
+				_0: _rtfeldman$elm_css$Css_Structure$ClassSelector(_p34._0),
 				_1: {ctor: '[]'}
-			}
-		};
-		var warnings = A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$second,
-			A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$first, potentialWarnings));
-		return {
-			value: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(tag),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					' ',
-					_elm_lang$core$Basics$toString(value))),
-			featureTagValue: _rtfeldman$elm_css$Css_Structure$Compatible,
-			warnings: warnings
-		};
-	});
-var _rtfeldman$elm_css$Css$featureTag = function (tag) {
-	return A2(_rtfeldman$elm_css$Css$featureTag2, tag, 1);
+			}));
 };
-var _rtfeldman$elm_css$Css$featureOff = 0;
-var _rtfeldman$elm_css$Css$featureOn = 1;
-var _rtfeldman$elm_css$Css$slashedZero = {value: 'slashed-zero', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$ordinal = {value: 'ordinal', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$stackedFractions = {value: 'stacked-fractions', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$diagonalFractions = {value: 'diagonal-fractions', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tabularNums = {value: 'tabular-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$proportionalNums = {value: 'proportional-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$oldstyleNums = {value: 'oldstyle-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$liningNums = {value: 'lining-nums', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantNumeric: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$noContextual = {value: 'no-contextual', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$contextual = {value: 'context', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$noHistoricalLigatures = {value: 'no-historical-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$historicalLigatures = {value: 'historical-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$noDiscretionaryLigatures = {value: 'no-discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$discretionaryLigatures = {value: 'discretionary-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$noCommonLigatures = {value: 'no-common-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$commonLigatures = {value: 'common-ligatures', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantLigatures: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$titlingCaps = {value: 'titling-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$unicase = {value: 'unicase', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$allPetiteCaps = {value: 'all-petite-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$petiteCaps = {value: 'petite-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$allSmallCaps = {value: 'all-small-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$smallCaps = {value: 'small-caps', fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible, fontVariantCaps: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$bolder = {value: 'bolder', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lighter = {value: 'lighter', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$bold = {value: 'bold', fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$oblique = {value: 'oblique', fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$italic = {value: 'italic', fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$normal = {
-	value: 'normal',
-	warnings: {ctor: '[]'},
-	fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
-	fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
-	featureTagValue: _rtfeldman$elm_css$Css_Structure$Compatible,
-	overflowWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
-	whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible
-};
-var _rtfeldman$elm_css$Css$larger = {value: 'larger', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$smaller = {value: 'smaller', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$xxLarge = {value: 'xx-large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$xLarge = {value: 'x-large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$large = {value: 'large', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$medium = {value: 'medium', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$small = {value: 'small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$xSmall = {value: 'x-small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$xxSmall = {value: 'xx-small', fontSize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fantasy = {value: 'fantasy', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$cursive = {value: 'cursive', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$monospace = {value: 'monospace', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$sansSerif = {value: 'sans-serif', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$serif = {value: 'serif', fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$absolute = {value: 'absolute', position: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$relative = {value: 'relative', position: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$sticky = {value: 'sticky', position: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fixed = {value: 'fixed', position: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$static = {value: 'static', position: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fillAvailable = {value: 'fill-available', minMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fitContent = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$fillAvailable,
-	{value: 'fit-content'});
-var _rtfeldman$elm_css$Css$minContent = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$fillAvailable,
-	{value: 'min-content'});
-var _rtfeldman$elm_css$Css$maxContent = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$fillAvailable,
-	{value: 'max-content'});
-var _rtfeldman$elm_css$Css$displayFlex = A2(_rtfeldman$elm_css$Css$property, 'display', 'flex');
-var _rtfeldman$elm_css$Css$textEmphasisColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'text-emphasis-color', c.value);
-};
-var _rtfeldman$elm_css$Css$textDecorationColor = function (c) {
-	return A3(_rtfeldman$elm_css$Css$propertyWithWarnings, c.warnings, 'text-decoration-color', c.value);
-};
-var _rtfeldman$elm_css$Css$prop6 = F7(
-	function (key, argA, argB, argC, argD, argE, argF) {
-		return A2(
-			_rtfeldman$elm_css$Css$property,
-			key,
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: argA.value,
-					_1: {
-						ctor: '::',
-						_0: argB.value,
-						_1: {
-							ctor: '::',
-							_0: argC.value,
-							_1: {
-								ctor: '::',
-								_0: argD.value,
-								_1: {
-									ctor: '::',
-									_0: argE.value,
-									_1: {
-										ctor: '::',
-										_0: argF.value,
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}));
-	});
-var _rtfeldman$elm_css$Css$boxShadow6 = _rtfeldman$elm_css$Css$prop6('box-shadow');
-var _rtfeldman$elm_css$Css$prop5 = F6(
-	function (key, argA, argB, argC, argD, argE) {
-		return A2(
-			_rtfeldman$elm_css$Css$property,
-			key,
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: argA.value,
-					_1: {
-						ctor: '::',
-						_0: argB.value,
-						_1: {
-							ctor: '::',
-							_0: argC.value,
-							_1: {
-								ctor: '::',
-								_0: argD.value,
-								_1: {
-									ctor: '::',
-									_0: argE.value,
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}));
-	});
-var _rtfeldman$elm_css$Css$boxShadow5 = _rtfeldman$elm_css$Css$prop5('box-shadow');
-var _rtfeldman$elm_css$Css$prop4 = F5(
-	function (key, argA, argB, argC, argD) {
-		return A2(
-			_rtfeldman$elm_css$Css$property,
-			key,
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: argA.value,
-					_1: {
-						ctor: '::',
-						_0: argB.value,
-						_1: {
-							ctor: '::',
-							_0: argC.value,
-							_1: {
-								ctor: '::',
-								_0: argD.value,
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}));
-	});
-var _rtfeldman$elm_css$Css$textShadow4 = _rtfeldman$elm_css$Css$prop4('text-shadow');
-var _rtfeldman$elm_css$Css$boxShadow4 = _rtfeldman$elm_css$Css$prop4('box-shadow');
-var _rtfeldman$elm_css$Css$padding4 = _rtfeldman$elm_css$Css$prop4('padding');
-var _rtfeldman$elm_css$Css$margin4 = _rtfeldman$elm_css$Css$prop4('margin');
-var _rtfeldman$elm_css$Css$borderImageOutset4 = _rtfeldman$elm_css$Css$prop4('border-image-outset');
-var _rtfeldman$elm_css$Css$borderImageWidth4 = _rtfeldman$elm_css$Css$prop4('border-image-width');
-var _rtfeldman$elm_css$Css$borderWidth4 = _rtfeldman$elm_css$Css$prop4('border-width');
-var _rtfeldman$elm_css$Css$borderRadius4 = _rtfeldman$elm_css$Css$prop4('border-radius');
-var _rtfeldman$elm_css$Css$prop3 = F4(
-	function (key, argA, argB, argC) {
-		return A2(
-			_rtfeldman$elm_css$Css$property,
-			key,
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: argA.value,
-					_1: {
-						ctor: '::',
-						_0: argB.value,
-						_1: {
-							ctor: '::',
-							_0: argC.value,
-							_1: {ctor: '[]'}
-						}
-					}
-				}));
-	});
-var _rtfeldman$elm_css$Css$textShadow3 = _rtfeldman$elm_css$Css$prop3('text-shadow');
-var _rtfeldman$elm_css$Css$boxShadow3 = _rtfeldman$elm_css$Css$prop3('box-shadow');
-var _rtfeldman$elm_css$Css$textIndent3 = _rtfeldman$elm_css$Css$prop3('text-indent');
-var _rtfeldman$elm_css$Css$padding3 = _rtfeldman$elm_css$Css$prop3('padding');
-var _rtfeldman$elm_css$Css$margin3 = _rtfeldman$elm_css$Css$prop3('margin');
-var _rtfeldman$elm_css$Css$border3 = _rtfeldman$elm_css$Css$prop3('border');
-var _rtfeldman$elm_css$Css$borderTop3 = _rtfeldman$elm_css$Css$prop3('border-top');
-var _rtfeldman$elm_css$Css$borderBottom3 = _rtfeldman$elm_css$Css$prop3('border-bottom');
-var _rtfeldman$elm_css$Css$borderLeft3 = _rtfeldman$elm_css$Css$prop3('border-left');
-var _rtfeldman$elm_css$Css$borderRight3 = _rtfeldman$elm_css$Css$prop3('border-right');
-var _rtfeldman$elm_css$Css$borderBlockStart3 = _rtfeldman$elm_css$Css$prop3('border-block-start');
-var _rtfeldman$elm_css$Css$borderBlockEnd3 = _rtfeldman$elm_css$Css$prop3('border-block-end');
-var _rtfeldman$elm_css$Css$borderInlineStart3 = _rtfeldman$elm_css$Css$prop3('border-block-start');
-var _rtfeldman$elm_css$Css$borderInlineEnd3 = _rtfeldman$elm_css$Css$prop3('border-block-end');
-var _rtfeldman$elm_css$Css$borderImageOutset3 = _rtfeldman$elm_css$Css$prop3('border-image-outset');
-var _rtfeldman$elm_css$Css$borderImageWidth3 = _rtfeldman$elm_css$Css$prop3('border-image-width');
-var _rtfeldman$elm_css$Css$borderWidth3 = _rtfeldman$elm_css$Css$prop3('border-width');
-var _rtfeldman$elm_css$Css$borderRadius3 = _rtfeldman$elm_css$Css$prop3('border-radius');
-var _rtfeldman$elm_css$Css$outline3 = _rtfeldman$elm_css$Css$prop3('outline');
-var _rtfeldman$elm_css$Css$fontVariant3 = _rtfeldman$elm_css$Css$prop3('font-variant');
-var _rtfeldman$elm_css$Css$fontVariantNumeric3 = _rtfeldman$elm_css$Css$prop3('font-variant-numeric');
-var _rtfeldman$elm_css$Css$textDecoration3 = _rtfeldman$elm_css$Css$prop3('text-decoration');
-var _rtfeldman$elm_css$Css$textDecorations3 = function (_p8) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop3,
-		'text-decoration',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p8));
-};
-var _rtfeldman$elm_css$Css$prop2 = F3(
-	function (key, argA, argB) {
-		return A2(
-			_rtfeldman$elm_css$Css$property,
-			key,
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: argA.value,
-					_1: {
-						ctor: '::',
-						_0: argB.value,
-						_1: {ctor: '[]'}
-					}
-				}));
-	});
-var _rtfeldman$elm_css$Css$textShadow2 = _rtfeldman$elm_css$Css$prop2('text-shadow');
-var _rtfeldman$elm_css$Css$boxShadow2 = _rtfeldman$elm_css$Css$prop2('box-shadow');
-var _rtfeldman$elm_css$Css$textIndent2 = _rtfeldman$elm_css$Css$prop2('text-indent');
-var _rtfeldman$elm_css$Css$padding2 = _rtfeldman$elm_css$Css$prop2('padding');
-var _rtfeldman$elm_css$Css$margin2 = _rtfeldman$elm_css$Css$prop2('margin');
-var _rtfeldman$elm_css$Css$border2 = _rtfeldman$elm_css$Css$prop2('border');
-var _rtfeldman$elm_css$Css$borderTop2 = _rtfeldman$elm_css$Css$prop2('border-top');
-var _rtfeldman$elm_css$Css$borderBottom2 = _rtfeldman$elm_css$Css$prop2('border-bottom');
-var _rtfeldman$elm_css$Css$borderLeft2 = _rtfeldman$elm_css$Css$prop2('border-left');
-var _rtfeldman$elm_css$Css$borderRight2 = _rtfeldman$elm_css$Css$prop2('border-right');
-var _rtfeldman$elm_css$Css$borderBlockStart2 = _rtfeldman$elm_css$Css$prop2('border-block-start');
-var _rtfeldman$elm_css$Css$borderBlockEnd2 = _rtfeldman$elm_css$Css$prop2('border-block-end');
-var _rtfeldman$elm_css$Css$borderInlineStart2 = _rtfeldman$elm_css$Css$prop2('border-block-start');
-var _rtfeldman$elm_css$Css$borderInlineEnd2 = _rtfeldman$elm_css$Css$prop2('border-block-end');
-var _rtfeldman$elm_css$Css$borderImageOutset2 = _rtfeldman$elm_css$Css$prop2('border-image-outset');
-var _rtfeldman$elm_css$Css$borderImageWidth2 = _rtfeldman$elm_css$Css$prop2('border-image-width');
-var _rtfeldman$elm_css$Css$borderWidth2 = _rtfeldman$elm_css$Css$prop2('border-width');
-var _rtfeldman$elm_css$Css$borderTopWidth2 = _rtfeldman$elm_css$Css$prop2('border-top-width');
-var _rtfeldman$elm_css$Css$borderBottomLeftRadius2 = _rtfeldman$elm_css$Css$prop2('border-bottom-left-radius');
-var _rtfeldman$elm_css$Css$borderBottomRightRadius2 = _rtfeldman$elm_css$Css$prop2('border-bottom-right-radius');
-var _rtfeldman$elm_css$Css$borderTopLeftRadius2 = _rtfeldman$elm_css$Css$prop2('border-top-left-radius');
-var _rtfeldman$elm_css$Css$borderTopRightRadius2 = _rtfeldman$elm_css$Css$prop2('border-top-right-radius');
-var _rtfeldman$elm_css$Css$borderRadius2 = _rtfeldman$elm_css$Css$prop2('border-radius');
-var _rtfeldman$elm_css$Css$borderSpacing2 = _rtfeldman$elm_css$Css$prop2('border-spacing');
-var _rtfeldman$elm_css$Css$backgroundRepeat2 = _rtfeldman$elm_css$Css$prop2('background-repeat');
-var _rtfeldman$elm_css$Css$backgroundPosition2 = _rtfeldman$elm_css$Css$prop2('background-position');
-var _rtfeldman$elm_css$Css$backgroundSize2 = _rtfeldman$elm_css$Css$prop2('background-size');
-var _rtfeldman$elm_css$Css$fontVariant2 = _rtfeldman$elm_css$Css$prop2('font-variant');
-var _rtfeldman$elm_css$Css$fontVariantNumeric2 = _rtfeldman$elm_css$Css$prop2('font-variant-numeric');
-var _rtfeldman$elm_css$Css$textDecoration2 = _rtfeldman$elm_css$Css$prop2('text-decoration');
-var _rtfeldman$elm_css$Css$textDecorations2 = function (_p9) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop2,
-		'text-decoration',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p9));
-};
-var _rtfeldman$elm_css$Css$prop1 = F2(
-	function (key, arg) {
-		return A2(_rtfeldman$elm_css$Css$property, key, arg.value);
-	});
-var _rtfeldman$elm_css$Css$textRendering = _rtfeldman$elm_css$Css$prop1('text-rendering');
-var _rtfeldman$elm_css$Css$textOrientation = _rtfeldman$elm_css$Css$prop1('text-orientation');
-var _rtfeldman$elm_css$Css$textOverflow = _rtfeldman$elm_css$Css$prop1('text-overflow');
-var _rtfeldman$elm_css$Css$textShadow = _rtfeldman$elm_css$Css$prop1('text-shadow');
-var _rtfeldman$elm_css$Css$boxShadow = _rtfeldman$elm_css$Css$prop1('box-shadow');
-var _rtfeldman$elm_css$Css$textIndent = _rtfeldman$elm_css$Css$prop1('text-indent');
-var _rtfeldman$elm_css$Css$textTransform = _rtfeldman$elm_css$Css$prop1('text-transform');
-var _rtfeldman$elm_css$Css$display = _rtfeldman$elm_css$Css$prop1('display');
-var _rtfeldman$elm_css$Css$opacity = _rtfeldman$elm_css$Css$prop1('opacity');
-var _rtfeldman$elm_css$Css$width = _rtfeldman$elm_css$Css$prop1('width');
-var _rtfeldman$elm_css$Css$maxWidth = _rtfeldman$elm_css$Css$prop1('max-width');
-var _rtfeldman$elm_css$Css$minWidth = _rtfeldman$elm_css$Css$prop1('min-width');
-var _rtfeldman$elm_css$Css$height = _rtfeldman$elm_css$Css$prop1('height');
-var _rtfeldman$elm_css$Css$minHeight = _rtfeldman$elm_css$Css$prop1('min-height');
-var _rtfeldman$elm_css$Css$maxHeight = _rtfeldman$elm_css$Css$prop1('max-height');
-var _rtfeldman$elm_css$Css$padding = _rtfeldman$elm_css$Css$prop1('padding');
-var _rtfeldman$elm_css$Css$paddingBlockStart = _rtfeldman$elm_css$Css$prop1('padding-block-start');
-var _rtfeldman$elm_css$Css$paddingBlockEnd = _rtfeldman$elm_css$Css$prop1('padding-block-end');
-var _rtfeldman$elm_css$Css$paddingInlineStart = _rtfeldman$elm_css$Css$prop1('padding-inline-start');
-var _rtfeldman$elm_css$Css$paddingInlineEnd = _rtfeldman$elm_css$Css$prop1('padding-inline-end');
-var _rtfeldman$elm_css$Css$paddingTop = _rtfeldman$elm_css$Css$prop1('padding-top');
-var _rtfeldman$elm_css$Css$paddingBottom = _rtfeldman$elm_css$Css$prop1('padding-bottom');
-var _rtfeldman$elm_css$Css$paddingRight = _rtfeldman$elm_css$Css$prop1('padding-right');
-var _rtfeldman$elm_css$Css$paddingLeft = _rtfeldman$elm_css$Css$prop1('padding-left');
-var _rtfeldman$elm_css$Css$margin = _rtfeldman$elm_css$Css$prop1('margin');
-var _rtfeldman$elm_css$Css$marginTop = _rtfeldman$elm_css$Css$prop1('margin-top');
-var _rtfeldman$elm_css$Css$marginBottom = _rtfeldman$elm_css$Css$prop1('margin-bottom');
-var _rtfeldman$elm_css$Css$marginRight = _rtfeldman$elm_css$Css$prop1('margin-right');
-var _rtfeldman$elm_css$Css$marginLeft = _rtfeldman$elm_css$Css$prop1('margin-left');
-var _rtfeldman$elm_css$Css$marginBlockStart = _rtfeldman$elm_css$Css$prop1('margin-block-start');
-var _rtfeldman$elm_css$Css$marginBlockEnd = _rtfeldman$elm_css$Css$prop1('margin-block-end');
-var _rtfeldman$elm_css$Css$marginInlineStart = _rtfeldman$elm_css$Css$prop1('margin-inline-start');
-var _rtfeldman$elm_css$Css$marginInlineEnd = _rtfeldman$elm_css$Css$prop1('margin-inline-end');
-var _rtfeldman$elm_css$Css$top = _rtfeldman$elm_css$Css$prop1('top');
-var _rtfeldman$elm_css$Css$bottom = _rtfeldman$elm_css$Css$prop1('bottom');
-var _rtfeldman$elm_css$Css$left = _rtfeldman$elm_css$Css$prop1('left');
-var _rtfeldman$elm_css$Css$right = _rtfeldman$elm_css$Css$prop1('right');
-var _rtfeldman$elm_css$Css$border = _rtfeldman$elm_css$Css$prop1('border');
-var _rtfeldman$elm_css$Css$borderTop = _rtfeldman$elm_css$Css$prop1('border-top');
-var _rtfeldman$elm_css$Css$borderBottom = _rtfeldman$elm_css$Css$prop1('border-bottom');
-var _rtfeldman$elm_css$Css$borderLeft = _rtfeldman$elm_css$Css$prop1('border-left');
-var _rtfeldman$elm_css$Css$borderRight = _rtfeldman$elm_css$Css$prop1('border-right');
-var _rtfeldman$elm_css$Css$borderBlockStart = _rtfeldman$elm_css$Css$prop1('border-block-start');
-var _rtfeldman$elm_css$Css$borderBlockEnd = _rtfeldman$elm_css$Css$prop1('border-block-end');
-var _rtfeldman$elm_css$Css$borderInlineStart = _rtfeldman$elm_css$Css$prop1('border-block-start');
-var _rtfeldman$elm_css$Css$borderInlineEnd = _rtfeldman$elm_css$Css$prop1('border-block-end');
-var _rtfeldman$elm_css$Css$borderImageOutset = _rtfeldman$elm_css$Css$prop1('border-image-outset');
-var _rtfeldman$elm_css$Css$borderImageWidth = _rtfeldman$elm_css$Css$prop1('border-image-width');
-var _rtfeldman$elm_css$Css$borderBlockEndStyle = _rtfeldman$elm_css$Css$prop1('border-block-end-style');
-var _rtfeldman$elm_css$Css$borderBlockStartStyle = _rtfeldman$elm_css$Css$prop1('border-block-start-style');
-var _rtfeldman$elm_css$Css$borderInlineEndStyle = _rtfeldman$elm_css$Css$prop1('border-inline-end-style');
-var _rtfeldman$elm_css$Css$borderBottomStyle = _rtfeldman$elm_css$Css$prop1('border-bottom-style');
-var _rtfeldman$elm_css$Css$borderInlineStartStyle = _rtfeldman$elm_css$Css$prop1('border-inline-start-style');
-var _rtfeldman$elm_css$Css$borderLeftStyle = _rtfeldman$elm_css$Css$prop1('border-left-style');
-var _rtfeldman$elm_css$Css$borderRightStyle = _rtfeldman$elm_css$Css$prop1('border-right-style');
-var _rtfeldman$elm_css$Css$borderTopStyle = _rtfeldman$elm_css$Css$prop1('border-top-style');
-var _rtfeldman$elm_css$Css$borderStyle = _rtfeldman$elm_css$Css$prop1('border-style');
-var _rtfeldman$elm_css$Css$borderCollapse = _rtfeldman$elm_css$Css$prop1('border-collapse');
-var _rtfeldman$elm_css$Css$borderWidth = _rtfeldman$elm_css$Css$prop1('border-width');
-var _rtfeldman$elm_css$Css$borderBottomWidth = _rtfeldman$elm_css$Css$prop1('border-bottom-width');
-var _rtfeldman$elm_css$Css$borderInlineEndWidth = _rtfeldman$elm_css$Css$prop1('border-inline-end-width');
-var _rtfeldman$elm_css$Css$borderLeftWidth = _rtfeldman$elm_css$Css$prop1('border-left-width');
-var _rtfeldman$elm_css$Css$borderRightWidth = _rtfeldman$elm_css$Css$prop1('border-right-width');
-var _rtfeldman$elm_css$Css$borderTopWidth = _rtfeldman$elm_css$Css$prop1('border-top-width');
-var _rtfeldman$elm_css$Css$borderBottomLeftRadius = _rtfeldman$elm_css$Css$prop1('border-bottom-left-radius');
-var _rtfeldman$elm_css$Css$borderBottomRightRadius = _rtfeldman$elm_css$Css$prop1('border-bottom-right-radius');
-var _rtfeldman$elm_css$Css$borderTopLeftRadius = _rtfeldman$elm_css$Css$prop1('border-top-left-radius');
-var _rtfeldman$elm_css$Css$borderTopRightRadius = _rtfeldman$elm_css$Css$prop1('border-top-right-radius');
-var _rtfeldman$elm_css$Css$borderRadius = _rtfeldman$elm_css$Css$prop1('border-radius');
-var _rtfeldman$elm_css$Css$borderSpacing = _rtfeldman$elm_css$Css$prop1('border-spacing');
-var _rtfeldman$elm_css$Css$outline = _rtfeldman$elm_css$Css$prop1('outline');
-var _rtfeldman$elm_css$Css$outlineWidth = _rtfeldman$elm_css$Css$prop1('outline-width');
-var _rtfeldman$elm_css$Css$outlineStyle = _rtfeldman$elm_css$Css$prop1('outline-style');
-var _rtfeldman$elm_css$Css$outlineOffset = _rtfeldman$elm_css$Css$prop1('outline-offset');
-var _rtfeldman$elm_css$Css$resize = _rtfeldman$elm_css$Css$prop1('resize');
-var _rtfeldman$elm_css$Css$fill = _rtfeldman$elm_css$Css$prop1('fill');
-var _rtfeldman$elm_css$Css$overflow = _rtfeldman$elm_css$Css$prop1('overflow');
-var _rtfeldman$elm_css$Css$overflowX = _rtfeldman$elm_css$Css$prop1('overflow-x');
-var _rtfeldman$elm_css$Css$overflowY = _rtfeldman$elm_css$Css$prop1('overflow-y');
-var _rtfeldman$elm_css$Css$overflowWrap = _rtfeldman$elm_css$Css$prop1('overflow-wrap');
-var _rtfeldman$elm_css$Css$whiteSpace = _rtfeldman$elm_css$Css$prop1('white-space');
-var _rtfeldman$elm_css$Css$backgroundRepeat = _rtfeldman$elm_css$Css$prop1('background-repeat');
-var _rtfeldman$elm_css$Css$backgroundAttachment = _rtfeldman$elm_css$Css$prop1('background-attachment');
-var _rtfeldman$elm_css$Css$backgroundClip = _rtfeldman$elm_css$Css$prop1('background-clip');
-var _rtfeldman$elm_css$Css$backgroundOrigin = _rtfeldman$elm_css$Css$prop1('background-origin');
-var _rtfeldman$elm_css$Css$backgroundImage = _rtfeldman$elm_css$Css$prop1('background-image');
-var _rtfeldman$elm_css$Css$backgroundSize = _rtfeldman$elm_css$Css$prop1('background-size');
-var _rtfeldman$elm_css$Css$lineHeight = _rtfeldman$elm_css$Css$prop1('line-height');
-var _rtfeldman$elm_css$Css$letterSpacing = _rtfeldman$elm_css$Css$prop1('letter-spacing');
-var _rtfeldman$elm_css$Css$fontFamily = _rtfeldman$elm_css$Css$prop1('font-family');
-var _rtfeldman$elm_css$Css$fontFamilies = function (_p10) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop1,
-		'font-family',
-		_rtfeldman$elm_css$Css$stringsToValue(_p10));
-};
-var _rtfeldman$elm_css$Css$fontSize = _rtfeldman$elm_css$Css$prop1('font-size');
-var _rtfeldman$elm_css$Css$fontStyle = _rtfeldman$elm_css$Css$prop1('font-style');
-var _rtfeldman$elm_css$Css$fontVariant = _rtfeldman$elm_css$Css$prop1('font-variant');
-var _rtfeldman$elm_css$Css$fontVariantLigatures = _rtfeldman$elm_css$Css$prop1('font-variant-ligatures');
-var _rtfeldman$elm_css$Css$fontVariantCaps = _rtfeldman$elm_css$Css$prop1('font-variant-caps');
-var _rtfeldman$elm_css$Css$fontVariantNumeric = _rtfeldman$elm_css$Css$prop1('font-variant-numeric');
-var _rtfeldman$elm_css$Css$fontVariantNumerics = function (_p11) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop1,
-		'font-variant-numeric',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p11));
-};
-var _rtfeldman$elm_css$Css$cursor = _rtfeldman$elm_css$Css$prop1('cursor');
-var _rtfeldman$elm_css$Css$textDecoration = _rtfeldman$elm_css$Css$prop1('text-decoration');
-var _rtfeldman$elm_css$Css$textDecorations = function (_p12) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop1,
-		'text-decoration',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p12));
-};
-var _rtfeldman$elm_css$Css$textDecorationLine = _rtfeldman$elm_css$Css$prop1('text-decoration-line');
-var _rtfeldman$elm_css$Css$textDecorationLines = function (_p13) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop1,
-		'text-decoration-line',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p13));
-};
-var _rtfeldman$elm_css$Css$textDecorationStyle = _rtfeldman$elm_css$Css$prop1('text-decoration-style');
-var _rtfeldman$elm_css$Css$zIndex = _rtfeldman$elm_css$Css$prop1('z-index');
-var _rtfeldman$elm_css$Css$touchAction = _rtfeldman$elm_css$Css$prop1('touch-action');
-var _rtfeldman$elm_css$Css$position = _rtfeldman$elm_css$Css$prop1('position');
-var _rtfeldman$elm_css$Css$textBottom = _rtfeldman$elm_css$Css$prop1('text-bottom');
-var _rtfeldman$elm_css$Css$textTop = _rtfeldman$elm_css$Css$prop1('text-top');
-var _rtfeldman$elm_css$Css$super = _rtfeldman$elm_css$Css$prop1('super');
-var _rtfeldman$elm_css$Css$sub = _rtfeldman$elm_css$Css$prop1('sub');
-var _rtfeldman$elm_css$Css$baseline = _rtfeldman$elm_css$Css$prop1('baseline');
-var _rtfeldman$elm_css$Css$middle = _rtfeldman$elm_css$Css$prop1('middle');
-var _rtfeldman$elm_css$Css$noWrap = {value: 'nowrap', whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible, flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$auto = {value: 'auto', cursor: _rtfeldman$elm_css$Css_Structure$Compatible, flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, overflow: _rtfeldman$elm_css$Css_Structure$Compatible, textRendering: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, alignItemsOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible, justifyContentOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, touchAction: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$none = {value: 'none', cursor: _rtfeldman$elm_css$Css_Structure$Compatible, none: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible, display: _rtfeldman$elm_css$Css_Structure$Compatible, outline: _rtfeldman$elm_css$Css_Structure$Compatible, resize: _rtfeldman$elm_css$Css_Structure$Compatible, transform: _rtfeldman$elm_css$Css_Structure$Compatible, borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible, textTransform: _rtfeldman$elm_css$Css_Structure$Compatible, touchAction: _rtfeldman$elm_css$Css_Structure$Compatible, updateFrequency: _rtfeldman$elm_css$Css_Structure$Compatible, blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, inlineAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, pointerDevice: _rtfeldman$elm_css$Css_Structure$Compatible, hoverCapability: _rtfeldman$elm_css$Css_Structure$Compatible, scriptingSupport: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inlineListItem = {value: 'inline-list-item', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$listItem = {value: 'list-item', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableFooterGroup = {value: 'table-footer-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableHeaderGroup = {value: 'table-header-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableColumnGroup = {value: 'table-column-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableRowGroup = {value: 'table-row-group', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableCaption = {value: 'table-caption', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableColumn = {value: 'table-column', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableCell = {value: 'table-cell', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$tableRow = {value: 'table-row', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inlineTable = {value: 'inline-table', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$table = {value: 'table', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inline = {value: 'inline', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inlineFlex = {value: 'inline-flex', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inlineBlock = {value: 'inline-block', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$block = {value: 'block', display: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toTopLeft = {value: 'top left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toLeft = {value: 'left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toBottomLeft = {value: 'bottom left', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toBottom = {value: 'bottom', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toBottomRight = {value: 'bottom right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toRight = {value: 'right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toTopRight = {value: 'top right', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$toTop = {value: 'top', angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$stop2 = F2(
-	function (c, len) {
-		return {
-			ctor: '_Tuple2',
-			_0: c,
-			_1: _elm_lang$core$Maybe$Just(len)
-		};
-	});
-var _rtfeldman$elm_css$Css$stop = function (c) {
-	return {ctor: '_Tuple2', _0: c, _1: _elm_lang$core$Maybe$Nothing};
-};
-var _rtfeldman$elm_css$Css$collectStops = _elm_lang$core$List$map(
-	function (_p14) {
-		var _p15 = _p14;
-		return A2(
-			_elm_lang$core$String$append,
-			_p15._0.value,
-			A2(
-				_elm_lang$core$Maybe$withDefault,
-				'',
-				A2(
-					_elm_lang$core$Maybe$map,
-					function (_p16) {
-						return A2(
-							_elm_lang$core$String$cons,
-							_elm_lang$core$Native_Utils.chr(' '),
-							function (_) {
-								return _.value;
-							}(_p16));
-					},
-					_p15._1)));
-	});
-var _rtfeldman$elm_css$Css$local = {value: 'local', backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$noRepeat = {value: 'no-repeat', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$round = {value: 'round', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$space = {value: 'space', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$repeat = {value: 'repeat', backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$repeatY = {value: 'repeat-y', backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$repeatX = {value: 'repeat-x', backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lineThrough = {value: 'line-through', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$overline = {value: 'overline', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$underline = {value: 'underline', textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$row = {value: 'row', flexDirection: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$rowReverse = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$row,
-	{value: 'row-reverse'});
-var _rtfeldman$elm_css$Css$column = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$row,
-	{value: 'column'});
-var _rtfeldman$elm_css$Css$columnReverse = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$row,
-	{value: 'column-reverse'});
-var _rtfeldman$elm_css$Css$stretch = _rtfeldman$elm_css$Css$prop1('stretch');
-var _rtfeldman$elm_css$Css$spaceBetween = _rtfeldman$elm_css$Css$prop1('space-between');
-var _rtfeldman$elm_css$Css$spaceAround = _rtfeldman$elm_css$Css$prop1('space-around');
-var _rtfeldman$elm_css$Css$flexEnd = _rtfeldman$elm_css$Css$prop1('flex-end');
-var _rtfeldman$elm_css$Css$flexStart = _rtfeldman$elm_css$Css$prop1('flex-start');
-var _rtfeldman$elm_css$Css$wrap = {value: 'wrap', flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible, flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$wrapReverse = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$wrap,
-	{value: 'wrap-reverse'});
-var _rtfeldman$elm_css$Css$content = {value: 'content', flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$order = _rtfeldman$elm_css$Css$prop1('order');
-var _rtfeldman$elm_css$Css$flexFlow2 = _rtfeldman$elm_css$Css$prop2('flex-flow');
-var _rtfeldman$elm_css$Css$flexFlow1 = _rtfeldman$elm_css$Css$prop1('flex-flow');
-var _rtfeldman$elm_css$Css$flexDirection = _rtfeldman$elm_css$Css$prop1('flex-direction');
-var _rtfeldman$elm_css$Css$flexWrap = _rtfeldman$elm_css$Css$prop1('flex-wrap');
-var _rtfeldman$elm_css$Css$flexShrink = _rtfeldman$elm_css$Css$prop1('flex-shrink');
-var _rtfeldman$elm_css$Css$flexGrow = _rtfeldman$elm_css$Css$prop1('flex-grow');
-var _rtfeldman$elm_css$Css$flexBasis = _rtfeldman$elm_css$Css$prop1('flex-basis');
-var _rtfeldman$elm_css$Css$flex3 = _rtfeldman$elm_css$Css$prop3('flex');
-var _rtfeldman$elm_css$Css$flex2 = _rtfeldman$elm_css$Css$prop2('flex');
-var _rtfeldman$elm_css$Css$flex = _rtfeldman$elm_css$Css$prop1('flex');
-var _rtfeldman$elm_css$Css$listStyle3 = _rtfeldman$elm_css$Css$prop3('list-style');
-var _rtfeldman$elm_css$Css$listStyle2 = _rtfeldman$elm_css$Css$prop2('list-style');
-var _rtfeldman$elm_css$Css$listStyle = _rtfeldman$elm_css$Css$prop1('list-style');
-var _rtfeldman$elm_css$Css$thai = {value: 'thai', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$telugu = {value: 'telugu', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$oriya = {value: 'oriya', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$myanmar = {value: 'myanmar', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$malayalam = {value: 'malayalam', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lao = {value: 'lao', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$khmer = {value: 'khmer', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$kannada = {value: 'kannada', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$gurmukhi = {value: 'gurmukhi', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$gujarati = {value: 'gujarati', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$georgian = {value: 'georgian', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$devanagari = {value: 'devanagari', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$cjkHeavenlyStem = {value: 'cjk-heavenly-stem', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$cjkEarthlyBranch = {value: 'cjk-earthly-branch', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$bengali = {value: 'bengali', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$armenian = {value: 'armenian', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$arabicIndic = {value: 'arabic-indic', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$upperLatin = {value: 'upper-latin', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lowerLatin = {value: 'lower-latin', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$upperAlpha = {value: 'upper-alpha', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lowerAlpha = {value: 'lower-alpha', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$upperGreek = {value: 'upper-greek', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lowerGreek = {value: 'lower-greek', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$upperRoman = {value: 'upper-roman', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lowerRoman = {value: 'lower-roman', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$decimalLeadingZero = {value: 'decimal-leading-zero', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$decimal = {value: 'decimal', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$square = {value: 'square', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$circle = {value: 'circle', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$disc = {value: 'disc', listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$listStyleType = _rtfeldman$elm_css$Css$prop1('list-style-type');
-var _rtfeldman$elm_css$Css$outside = {value: 'outside', listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inside = {value: 'inside', listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible, listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$listStylePosition = _rtfeldman$elm_css$Css$prop1('list-style-position');
-var _rtfeldman$elm_css$Css$transformStyle = _rtfeldman$elm_css$Css$prop1('transform-style');
-var _rtfeldman$elm_css$Css$flat = {value: 'flat', transformStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$preserve3d = {value: 'preserve-3d', transformStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$boxSizing = _rtfeldman$elm_css$Css$prop1('box-sizing');
-var _rtfeldman$elm_css$Css$transformBox = _rtfeldman$elm_css$Css$prop1('transform-box');
-var _rtfeldman$elm_css$Css$viewBox = {value: 'view-box', transformBox: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$borderBox = {value: 'border-box', boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$contentBox = {value: 'content-box', boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fillBox = {value: 'fill-box', transformBox: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$transforms = function (_p17) {
-	return A2(
-		_rtfeldman$elm_css$Css$prop1,
-		'transform',
-		_rtfeldman$elm_css$Css$valuesOrNone(_p17));
-};
-var _rtfeldman$elm_css$Css$transform = function (only) {
-	return _rtfeldman$elm_css$Css$transforms(
-		{
-			ctor: '::',
-			_0: only,
-			_1: {ctor: '[]'}
-		});
-};
-var _rtfeldman$elm_css$Css$angleConverter = F2(
-	function (suffix, num) {
-		return {
-			value: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_rtfeldman$elm_css$Css$numberToString(num),
-				suffix),
-			angle: _rtfeldman$elm_css$Css_Structure$Compatible,
-			angleOrDirection: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$deg = _rtfeldman$elm_css$Css$angleConverter('deg');
-var _rtfeldman$elm_css$Css$grad = _rtfeldman$elm_css$Css$angleConverter('grad');
-var _rtfeldman$elm_css$Css$rad = _rtfeldman$elm_css$Css$angleConverter('rad');
-var _rtfeldman$elm_css$Css$turn = _rtfeldman$elm_css$Css$angleConverter('turn');
-var _rtfeldman$elm_css$Css$lengthConverter = F3(
-	function (units, unitLabel, numericValue) {
-		return {
-			value: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_rtfeldman$elm_css$Css$numberToString(numericValue),
-				unitLabel),
-			numericValue: numericValue,
-			units: units,
-			unitLabel: unitLabel,
-			length: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
-			textIndent: _rtfeldman$elm_css$Css_Structure$Compatible,
-			flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
-			fontSize: _rtfeldman$elm_css$Css_Structure$Compatible,
-			absoluteLength: _rtfeldman$elm_css$Css_Structure$Compatible,
-			lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible,
-			calc: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$true = _rtfeldman$elm_css$Css$prop1('true');
-var _rtfeldman$elm_css$Css$matchParent = _rtfeldman$elm_css$Css$prop1('match-parent');
-var _rtfeldman$elm_css$Css$end = _rtfeldman$elm_css$Css$prop1('end');
-var _rtfeldman$elm_css$Css$start = _rtfeldman$elm_css$Css$prop1('start');
-var _rtfeldman$elm_css$Css$justifyAll = _rtfeldman$elm_css$Css$prop1('justify-all');
-var _rtfeldman$elm_css$Css$justify = _rtfeldman$elm_css$Css$prop1('justify');
-var _rtfeldman$elm_css$Css$center = _rtfeldman$elm_css$Css$prop1('center');
-var _rtfeldman$elm_css$Css$collapse = {value: 'collapse', borderCollapse: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$separate = {value: 'separate', borderCollapse: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$outset = {value: 'outset', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$inset = {value: 'inset', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$ridge = {value: 'ridge', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$groove = {value: 'groove', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$double = {value: 'double', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$solid = {value: 'solid', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$dashed = {value: 'dashed', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$dotted = {value: 'dotted', borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible, textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$wavy = {value: 'wavy', textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$clip = {value: 'clip', textOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$ellipsis = {value: 'ellipsis', textOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$fullWidth = {value: 'full-width', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$lowercase = {value: 'lowercase', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$uppercase = {value: 'uppercase', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$capitalize = {value: 'capitalize', textTransform: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$sideways = {value: 'sideways', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$upright = {value: 'upright', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$mixed = {value: 'mixed', textOrientation: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$eachLine = {value: 'each-line', textIndent: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$hanging = {value: 'hanging', textIndent: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$geometricPrecision = {value: 'geometricPrecision', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$optimizeLegibility = {value: 'optimizeLegibility', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$optimizeSpeed = {value: 'optimizeSpeed', textRendering: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$hslaToRgba = F6(
-	function (value, warnings, hue, saturation, lightness, hslAlpha) {
-		var _p18 = _elm_lang$core$Color$toRgb(
-			A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, hslAlpha));
-		var red = _p18.red;
-		var green = _p18.green;
-		var blue = _p18.blue;
-		var alpha = _p18.alpha;
-		return {value: value, color: _rtfeldman$elm_css$Css_Structure$Compatible, red: red, green: green, blue: blue, alpha: alpha, warnings: warnings};
-	});
-var _rtfeldman$elm_css$Css$withPrecedingHash = function (str) {
-	return A2(_elm_lang$core$String$startsWith, '#', str) ? str : A2(
-		_elm_lang$core$String$cons,
-		_elm_lang$core$Native_Utils.chr('#'),
-		str);
-};
-var _rtfeldman$elm_css$Css$erroneousHex = function (str) {
-	return {
-		value: _rtfeldman$elm_css$Css$withPrecedingHash(str),
-		color: _rtfeldman$elm_css$Css_Structure$Compatible,
-		red: 0,
-		green: 0,
-		blue: 0,
-		alpha: 1,
-		warnings: _elm_lang$core$List$singleton(
-			A2(
-				_elm_lang$core$String$join,
-				' ',
-				{
-					ctor: '::',
-					_0: 'Hex color strings must contain exactly 3, 4, 6, or 8 hexadecimal digits, optionally preceded by \"#\".',
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$core$Basics$toString(str),
-						_1: {
-							ctor: '::',
-							_0: 'is an invalid hex color string.',
-							_1: {
-								ctor: '::',
-								_0: 'Please see: https://drafts.csswg.org/css-color/#hex-notation',
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}))
-	};
-};
-var _rtfeldman$elm_css$Css$validHex = F5(
-	function (str, _p22, _p21, _p20, _p19) {
-		var _p23 = _p22;
-		var _p24 = _p21;
-		var _p25 = _p20;
-		var _p26 = _p19;
-		var toResult = function (_p27) {
-			return _rtfeldman$hex$Hex$fromString(
-				_elm_lang$core$String$toLower(
-					_elm_lang$core$String$fromList(_p27)));
-		};
-		var results = {
-			ctor: '_Tuple4',
-			_0: toResult(
-				{
-					ctor: '::',
-					_0: _p23._0,
-					_1: {
-						ctor: '::',
-						_0: _p23._1,
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: toResult(
-				{
-					ctor: '::',
-					_0: _p24._0,
-					_1: {
-						ctor: '::',
-						_0: _p24._1,
-						_1: {ctor: '[]'}
-					}
-				}),
-			_2: toResult(
-				{
-					ctor: '::',
-					_0: _p25._0,
-					_1: {
-						ctor: '::',
-						_0: _p25._1,
-						_1: {ctor: '[]'}
-					}
-				}),
-			_3: toResult(
-				{
-					ctor: '::',
-					_0: _p26._0,
-					_1: {
-						ctor: '::',
-						_0: _p26._1,
-						_1: {ctor: '[]'}
-					}
-				})
-		};
-		var _p28 = results;
-		if (((((_p28.ctor === '_Tuple4') && (_p28._0.ctor === 'Ok')) && (_p28._1.ctor === 'Ok')) && (_p28._2.ctor === 'Ok')) && (_p28._3.ctor === 'Ok')) {
-			return {
-				value: _rtfeldman$elm_css$Css$withPrecedingHash(str),
-				color: _rtfeldman$elm_css$Css_Structure$Compatible,
-				red: _p28._0._0,
-				green: _p28._1._0,
-				blue: _p28._2._0,
-				alpha: _elm_lang$core$Basics$toFloat(_p28._3._0) / 255,
-				warnings: {ctor: '[]'}
-			};
-		} else {
-			return _rtfeldman$elm_css$Css$erroneousHex(str);
-		}
-	});
-var _rtfeldman$elm_css$Css$hex = function (str) {
-	var withoutHash = A2(_elm_lang$core$String$startsWith, '#', str) ? A2(_elm_lang$core$String$dropLeft, 1, str) : str;
-	var _p29 = _elm_lang$core$String$toList(withoutHash);
-	_v12_4:
-	do {
-		if (((_p29.ctor === '::') && (_p29._1.ctor === '::')) && (_p29._1._1.ctor === '::')) {
-			if (_p29._1._1._1.ctor === '[]') {
-				var _p32 = _p29._0;
-				var _p31 = _p29._1._0;
-				var _p30 = _p29._1._1._0;
-				return A5(
-					_rtfeldman$elm_css$Css$validHex,
-					str,
-					{ctor: '_Tuple2', _0: _p32, _1: _p32},
-					{ctor: '_Tuple2', _0: _p31, _1: _p31},
-					{ctor: '_Tuple2', _0: _p30, _1: _p30},
-					{
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.chr('f'),
-						_1: _elm_lang$core$Native_Utils.chr('f')
-					});
-			} else {
-				if (_p29._1._1._1._1.ctor === '[]') {
-					var _p36 = _p29._0;
-					var _p35 = _p29._1._0;
-					var _p34 = _p29._1._1._0;
-					var _p33 = _p29._1._1._1._0;
-					return A5(
-						_rtfeldman$elm_css$Css$validHex,
-						str,
-						{ctor: '_Tuple2', _0: _p36, _1: _p36},
-						{ctor: '_Tuple2', _0: _p35, _1: _p35},
-						{ctor: '_Tuple2', _0: _p34, _1: _p34},
-						{ctor: '_Tuple2', _0: _p33, _1: _p33});
-				} else {
-					if (_p29._1._1._1._1._1.ctor === '::') {
-						if (_p29._1._1._1._1._1._1.ctor === '[]') {
-							return A5(
-								_rtfeldman$elm_css$Css$validHex,
-								str,
-								{ctor: '_Tuple2', _0: _p29._0, _1: _p29._1._0},
-								{ctor: '_Tuple2', _0: _p29._1._1._0, _1: _p29._1._1._1._0},
-								{ctor: '_Tuple2', _0: _p29._1._1._1._1._0, _1: _p29._1._1._1._1._1._0},
-								{
-									ctor: '_Tuple2',
-									_0: _elm_lang$core$Native_Utils.chr('f'),
-									_1: _elm_lang$core$Native_Utils.chr('f')
-								});
-						} else {
-							if ((_p29._1._1._1._1._1._1._1.ctor === '::') && (_p29._1._1._1._1._1._1._1._1.ctor === '[]')) {
-								return A5(
-									_rtfeldman$elm_css$Css$validHex,
-									str,
-									{ctor: '_Tuple2', _0: _p29._0, _1: _p29._1._0},
-									{ctor: '_Tuple2', _0: _p29._1._1._0, _1: _p29._1._1._1._0},
-									{ctor: '_Tuple2', _0: _p29._1._1._1._1._0, _1: _p29._1._1._1._1._1._0},
-									{ctor: '_Tuple2', _0: _p29._1._1._1._1._1._1._0, _1: _p29._1._1._1._1._1._1._1._0});
-							} else {
-								break _v12_4;
-							}
-						}
-					} else {
-						break _v12_4;
-					}
-				}
-			}
-		} else {
-			break _v12_4;
-		}
-	} while(false);
-	return _rtfeldman$elm_css$Css$erroneousHex(str);
-};
-var _rtfeldman$elm_css$Css$hidden = {value: 'hidden', overflow: _rtfeldman$elm_css$Css_Structure$Compatible, borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$contain = {value: 'contain', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$cover = {value: 'cover', lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$url = function (urlValue) {
-	return {
-		value: A2(
-			_elm_lang$core$Basics_ops['++'],
-			'url(',
-			A2(_elm_lang$core$Basics_ops['++'], urlValue, ')')),
-		backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$paddingBox = {value: 'padding-box', backgroundClip: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$luminosity = _rtfeldman$elm_css$Css$prop1('luminosity');
-var _rtfeldman$elm_css$Css$saturation = _rtfeldman$elm_css$Css$prop1('saturation');
-var _rtfeldman$elm_css$Css$hue = _rtfeldman$elm_css$Css$prop1('hue');
-var _rtfeldman$elm_css$Css$exclusion = _rtfeldman$elm_css$Css$prop1('exclusion');
-var _rtfeldman$elm_css$Css$difference = _rtfeldman$elm_css$Css$prop1('difference');
-var _rtfeldman$elm_css$Css$softLight = _rtfeldman$elm_css$Css$prop1('soft-light');
-var _rtfeldman$elm_css$Css$hardLight = _rtfeldman$elm_css$Css$prop1('hard-light');
-var _rtfeldman$elm_css$Css$colorBurn = _rtfeldman$elm_css$Css$prop1('color-burn');
-var _rtfeldman$elm_css$Css$colorDodge = _rtfeldman$elm_css$Css$prop1('color-dodge');
-var _rtfeldman$elm_css$Css$lighten = _rtfeldman$elm_css$Css$prop1('lighten');
-var _rtfeldman$elm_css$Css$darken = _rtfeldman$elm_css$Css$prop1('darken');
-var _rtfeldman$elm_css$Css$overlay = _rtfeldman$elm_css$Css$prop1('overlay');
-var _rtfeldman$elm_css$Css$screenBlendMode = _rtfeldman$elm_css$Css$prop1('screen');
-var _rtfeldman$elm_css$Css$multiply = _rtfeldman$elm_css$Css$prop1('multiply');
-var _rtfeldman$elm_css$Css$vertical = {value: 'vertical', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$horizontal = {value: 'horizontal', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$both = {value: 'both', resize: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$breakWord = {value: 'break-word', overflowWrap: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$scroll = {value: 'scroll', scroll: _rtfeldman$elm_css$Css_Structure$Compatible, overflow: _rtfeldman$elm_css$Css_Structure$Compatible, backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible, blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible, inlineAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$visible = {value: 'visible', overflow: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$currentColor = {
-	value: 'currentColor',
-	color: _rtfeldman$elm_css$Css_Structure$Compatible,
-	warnings: {ctor: '[]'}
-};
-var _rtfeldman$elm_css$Css$transparent = {
-	value: 'transparent',
-	color: _rtfeldman$elm_css$Css_Structure$Compatible,
-	warnings: {ctor: '[]'}
-};
-var _rtfeldman$elm_css$Css$important = _rtfeldman$elm_css$Css_Preprocess$mapLastProperty(
-	function (property) {
-		return _elm_lang$core$Native_Utils.update(
-			property,
-			{important: true});
-	});
-var _rtfeldman$elm_css$Css$all = _rtfeldman$elm_css$Css$prop1('all');
-var _rtfeldman$elm_css$Css$combineLengths = F3(
-	function (operation, first, second) {
-		var numericValue = A2(operation, first.numericValue, second.numericValue);
-		var value = A2(
-			_elm_lang$core$String$join,
-			'',
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p37) {
-					return !_elm_lang$core$String$isEmpty(_p37);
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$core$Basics$toString(numericValue),
-					_1: {
-						ctor: '::',
-						_0: first.unitLabel,
-						_1: {ctor: '[]'}
-					}
-				}));
-		return _elm_lang$core$Native_Utils.update(
-			first,
-			{value: value, numericValue: numericValue});
-	});
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|*|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x * y;
-		}));
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|/|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x / y;
-		}));
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|-|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x - y;
-		}));
-var _rtfeldman$elm_css$Css_ops = _rtfeldman$elm_css$Css_ops || {};
-_rtfeldman$elm_css$Css_ops['|+|'] = _rtfeldman$elm_css$Css$combineLengths(
-	F2(
-		function (x, y) {
-			return x + y;
-		}));
-var _rtfeldman$elm_css$Css$calcExpressionToString = function (expression) {
-	var _p38 = expression;
-	if (_p38.ctor === 'Addition') {
-		return '+';
-	} else {
-		return '-';
-	}
-};
-var _rtfeldman$elm_css$Css$colorValueForOverloadedProperty = _rtfeldman$elm_css$Css$transparent;
-var _rtfeldman$elm_css$Css$getOverloadedProperty = F3(
-	function (functionName, desiredKey, style) {
-		getOverloadedProperty:
-		while (true) {
-			var _p39 = style;
-			switch (_p39.ctor) {
-				case 'AppendProperty':
-					return A2(_rtfeldman$elm_css$Css$property, desiredKey, _p39._0.key);
-				case 'ExtendSelector':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable Style for selector ',
-										_elm_lang$core$Basics$toString(_p39._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				case 'NestSnippet':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable Style for combinator ',
-										_elm_lang$core$Basics$toString(_p39._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				case 'WithPseudoElement':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable Style for pseudo-element setter ',
-										_elm_lang$core$Basics$toString(_p39._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				case 'WithMedia':
-					return A3(
-						_rtfeldman$elm_css$Css$propertyWithWarnings,
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Cannot apply ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									functionName,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' with inapplicable Style for media query ',
-										_elm_lang$core$Basics$toString(_p39._0)))),
-							_1: {ctor: '[]'}
-						},
-						desiredKey,
-						'');
-				default:
-					if (_p39._0.ctor === '[]') {
-						return A3(
-							_rtfeldman$elm_css$Css$propertyWithWarnings,
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$core$Basics_ops['++'],
-									'Cannot apply ',
-									A2(_elm_lang$core$Basics_ops['++'], functionName, ' with empty Style. ')),
-								_1: {ctor: '[]'}
-							},
-							desiredKey,
-							'');
-					} else {
-						if (_p39._0._1.ctor === '[]') {
-							var _v15 = functionName,
-								_v16 = desiredKey,
-								_v17 = _p39._0._0;
-							functionName = _v15;
-							desiredKey = _v16;
-							style = _v17;
-							continue getOverloadedProperty;
-						} else {
-							var _v18 = functionName,
-								_v19 = desiredKey,
-								_v20 = _rtfeldman$elm_css$Css_Preprocess$ApplyStyles(_p39._0._1);
-							functionName = _v18;
-							desiredKey = _v19;
-							style = _v20;
-							continue getOverloadedProperty;
-						}
-					}
-			}
-		}
-	});
-var _rtfeldman$elm_css$Css$backgroundBlendMode = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'backgroundBlendMode',
-		'background-blend-mode',
-		fn(_rtfeldman$elm_css$Css$colorValueForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$cssFunction = F2(
-	function (funcName, args) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			funcName,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'(',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(_elm_lang$core$String$join, ', ', args),
-					')')));
-	});
-var _rtfeldman$elm_css$Css$calc = F3(
-	function (first, expression, second) {
-		var grab = function (l) {
-			return A2(_elm_lang$core$String$startsWith, 'calc(', l.value) ? A2(_elm_lang$core$String$dropLeft, 4, l.value) : l.value;
-		};
-		var calcs = A2(
-			_elm_lang$core$String$join,
-			' ',
-			{
-				ctor: '::',
-				_0: grab(first),
-				_1: {
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$calcExpressionToString(expression),
-					_1: {
-						ctor: '::',
-						_0: grab(second),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-		var value = A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'calc',
-			{
-				ctor: '::',
-				_0: calcs,
-				_1: {ctor: '[]'}
-			});
-		return {value: value, length: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, textIndent: _rtfeldman$elm_css$Css_Structure$Compatible, flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible, fontSize: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible, calc: _rtfeldman$elm_css$Css_Structure$Compatible};
-	});
-var _rtfeldman$elm_css$Css$rgb = F3(
-	function (red, green, blue) {
-		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(blue, 255) > 0)))))) ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'RGB color values must be between 0 and 255. rgb(',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(red),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						', ',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(green),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								', ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(blue),
-									') is not valid.')))))),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'};
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'rgb',
-				A2(
-					_elm_lang$core$List$map,
-					_rtfeldman$elm_css$Css$numberToString,
-					{
-						ctor: '::',
-						_0: red,
-						_1: {
-							ctor: '::',
-							_0: green,
-							_1: {
-								ctor: '::',
-								_0: blue,
-								_1: {ctor: '[]'}
-							}
-						}
-					})),
-			color: _rtfeldman$elm_css$Css_Structure$Compatible,
-			warnings: warnings,
-			red: red,
-			green: green,
-			blue: blue,
-			alpha: 1
-		};
-	});
-var _rtfeldman$elm_css$Css$rgba = F4(
-	function (red, green, blue, alpha) {
-		var warnings = ((_elm_lang$core$Native_Utils.cmp(red, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(red, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(green, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(green, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(blue, 255) > 0) || ((_elm_lang$core$Native_Utils.cmp(alpha, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(alpha, 1) > 0)))))))) ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'RGB color values must be between 0 and 255, and the alpha in RGBA must be between 0 and 1. rgba(',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(red),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						', ',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(green),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								', ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(blue),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										', ',
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Basics$toString(alpha),
-											') is not valid.')))))))),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'};
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'rgba',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
+var _rtfeldman$elm_css$VirtualDom_Styled$toDeclaration = function (dict) {
+	return function (_) {
+		return _.css;
+	}(
+		_rtfeldman$elm_css$Css_Preprocess_Resolve$compile(
+			_elm_lang$core$List$singleton(
+				_rtfeldman$elm_css$Css_Preprocess$stylesheet(
 					A2(
 						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css$numberToString,
-						{
-							ctor: '::',
-							_0: red,
-							_1: {
-								ctor: '::',
-								_0: green,
-								_1: {
-									ctor: '::',
-									_0: blue,
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$numberToString(alpha),
-						_1: {ctor: '[]'}
-					})),
-			color: _rtfeldman$elm_css$Css_Structure$Compatible,
-			warnings: warnings,
-			red: red,
-			green: green,
-			blue: blue,
-			alpha: alpha
-		};
-	});
-var _rtfeldman$elm_css$Css$hsl = F3(
-	function (hue, saturation, lightness) {
-		var valuesList = {
-			ctor: '::',
-			_0: _rtfeldman$elm_css$Css$numberToString(hue),
-			_1: {
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$numericalPercentageToString(saturation),
-				_1: {
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$numericalPercentageToString(lightness),
-					_1: {ctor: '[]'}
-				}
-			}
-		};
-		var value = A2(_rtfeldman$elm_css$Css$cssFunction, 'hsl', valuesList);
-		var warnings = ((_elm_lang$core$Native_Utils.cmp(hue, 360) > 0) || ((_elm_lang$core$Native_Utils.cmp(hue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 1) > 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(lightness, 1) > 0) || (_elm_lang$core$Native_Utils.cmp(lightness, 0) < 0)))))) ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'HSL color values must have an H value between 0 and 360 (as in degrees) and S and L values between 0 and 1. ',
-				A2(_elm_lang$core$Basics_ops['++'], value, ' is not valid.')),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'};
-		return A6(_rtfeldman$elm_css$Css$hslaToRgba, value, warnings, hue, saturation, lightness, 1);
-	});
-var _rtfeldman$elm_css$Css$hsla = F4(
-	function (hue, saturation, lightness, alpha) {
-		var valuesList = {
-			ctor: '::',
-			_0: _rtfeldman$elm_css$Css$numberToString(hue),
-			_1: {
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$numericalPercentageToString(saturation),
-				_1: {
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$numericalPercentageToString(lightness),
-					_1: {
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$numberToString(alpha),
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		};
-		var value = A2(_rtfeldman$elm_css$Css$cssFunction, 'hsla', valuesList);
-		var warnings = ((_elm_lang$core$Native_Utils.cmp(hue, 360) > 0) || ((_elm_lang$core$Native_Utils.cmp(hue, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 1) > 0) || ((_elm_lang$core$Native_Utils.cmp(saturation, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(lightness, 1) > 0) || ((_elm_lang$core$Native_Utils.cmp(lightness, 0) < 0) || ((_elm_lang$core$Native_Utils.cmp(alpha, 1) > 0) || (_elm_lang$core$Native_Utils.cmp(alpha, 0) < 0)))))))) ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'HSLA color values must have an H value between 0 and 360 (as in degrees) and S, L, and A values between 0 and 1. ',
-				A2(_elm_lang$core$Basics_ops['++'], value, ' is not valid.')),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'};
-		return A6(_rtfeldman$elm_css$Css$hslaToRgba, value, warnings, hue, saturation, lightness, alpha);
-	});
-var _rtfeldman$elm_css$Css$matrix = F6(
-	function (a, b, c, d, tx, ty) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'matrix',
-				A2(
-					_elm_lang$core$List$map,
-					_rtfeldman$elm_css$Css$numberToString,
-					{
-						ctor: '::',
-						_0: a,
-						_1: {
-							ctor: '::',
-							_0: b,
-							_1: {
-								ctor: '::',
-								_0: c,
-								_1: {
-									ctor: '::',
-									_0: d,
-									_1: {
-										ctor: '::',
-										_0: tx,
-										_1: {
-											ctor: '::',
-											_0: ty,
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						}
-					})),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$matrix3d = function (a1) {
-	return function (a2) {
-		return function (a3) {
-			return function (a4) {
-				return function (b1) {
-					return function (b2) {
-						return function (b3) {
-							return function (b4) {
-								return function (c1) {
-									return function (c2) {
-										return function (c3) {
-											return function (c4) {
-												return function (d1) {
-													return function (d2) {
-														return function (d3) {
-															return function (d4) {
-																return {
-																	value: A2(
-																		_rtfeldman$elm_css$Css$cssFunction,
-																		'matrix3d',
-																		A2(
-																			_elm_lang$core$List$map,
-																			_rtfeldman$elm_css$Css$numberToString,
-																			{
-																				ctor: '::',
-																				_0: a1,
-																				_1: {
-																					ctor: '::',
-																					_0: a2,
-																					_1: {
-																						ctor: '::',
-																						_0: a3,
-																						_1: {
-																							ctor: '::',
-																							_0: a4,
-																							_1: {
-																								ctor: '::',
-																								_0: b1,
-																								_1: {
-																									ctor: '::',
-																									_0: b2,
-																									_1: {
-																										ctor: '::',
-																										_0: b3,
-																										_1: {
-																											ctor: '::',
-																											_0: b4,
-																											_1: {
-																												ctor: '::',
-																												_0: c1,
-																												_1: {
-																													ctor: '::',
-																													_0: c2,
-																													_1: {
-																														ctor: '::',
-																														_0: c3,
-																														_1: {
-																															ctor: '::',
-																															_0: c4,
-																															_1: {
-																																ctor: '::',
-																																_0: d1,
-																																_1: {
-																																	ctor: '::',
-																																	_0: d2,
-																																	_1: {
-																																		ctor: '::',
-																																		_0: d3,
-																																		_1: {
-																																			ctor: '::',
-																																			_0: d4,
-																																			_1: {ctor: '[]'}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			})),
-																	transform: _rtfeldman$elm_css$Css_Structure$Compatible
-																};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
+						_rtfeldman$elm_css$VirtualDom_Styled$snippetFromPair,
+						_elm_lang$core$Dict$toList(dict))))));
 };
-var _rtfeldman$elm_css$Css$perspective = function (l) {
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'perspective',
+var _rtfeldman$elm_css$VirtualDom_Styled$toStyleNode = function (styles) {
+	return A3(
+		_elm_lang$virtual_dom$VirtualDom$node,
+		'style',
+		{ctor: '[]'},
+		_elm_lang$core$List$singleton(
+			_elm_lang$virtual_dom$VirtualDom$text(
+				_rtfeldman$elm_css$VirtualDom_Styled$toDeclaration(styles))));
+};
+var _rtfeldman$elm_css$VirtualDom_Styled$unstyle = F3(
+	function (elemType, properties, children) {
+		var unstyledProperties = A2(_elm_lang$core$List$map, _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty, properties);
+		var initialStyles = _rtfeldman$elm_css$VirtualDom_Styled$stylesFromProperties(properties);
+		var _p35 = A3(
+			_elm_lang$core$List$foldl,
+			_rtfeldman$elm_css$VirtualDom_Styled$accumulateStyledHtml,
+			{
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: initialStyles
+			},
+			children);
+		var childNodes = _p35._0;
+		var styles = _p35._1;
+		var styleNode = _rtfeldman$elm_css$VirtualDom_Styled$toStyleNode(styles);
+		return A3(
+			_elm_lang$virtual_dom$VirtualDom$node,
+			elemType,
+			unstyledProperties,
 			{
 				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$numberToString(l),
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$rotate = function (_p40) {
-	var _p41 = _p40;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'rotate',
-			{
-				ctor: '::',
-				_0: _p41.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$rotateX = function (_p42) {
-	var _p43 = _p42;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'rotateX',
-			{
-				ctor: '::',
-				_0: _p43.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$rotateY = function (_p44) {
-	var _p45 = _p44;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'rotateY',
-			{
-				ctor: '::',
-				_0: _p45.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$rotateZ = function (_p46) {
-	var _p47 = _p46;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'rotateZ',
-			{
-				ctor: '::',
-				_0: _p47.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$rotate3d = F4(
-	function (x, y, z, _p48) {
-		var _p49 = _p48;
-		var coordsAsStrings = A2(
-			_elm_lang$core$List$map,
-			_rtfeldman$elm_css$Css$numberToString,
-			{
-				ctor: '::',
-				_0: x,
-				_1: {
-					ctor: '::',
-					_0: y,
-					_1: {
-						ctor: '::',
-						_0: z,
-						_1: {ctor: '[]'}
-					}
-				}
+				_0: styleNode,
+				_1: _elm_lang$core$List$reverse(childNodes)
 			});
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$toKeyedStyleNode = F2(
+	function (allStyles, keyedChildNodes) {
+		var finalNode = _rtfeldman$elm_css$VirtualDom_Styled$toStyleNode(allStyles);
+		var styleNodeKey = A2(_rtfeldman$elm_css$VirtualDom_Styled$getUnusedKey, '_', keyedChildNodes);
+		return {ctor: '_Tuple2', _0: styleNodeKey, _1: finalNode};
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$unstyleKeyed = F3(
+	function (elemType, properties, keyedChildren) {
+		var unstyledProperties = A2(_elm_lang$core$List$map, _rtfeldman$elm_css$VirtualDom_Styled$extractUnstyledProperty, properties);
+		var initialStyles = _rtfeldman$elm_css$VirtualDom_Styled$stylesFromProperties(properties);
+		var _p36 = A3(
+			_elm_lang$core$List$foldl,
+			_rtfeldman$elm_css$VirtualDom_Styled$accumulateKeyedStyledHtml,
+			{
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: initialStyles
+			},
+			keyedChildren);
+		var keyedChildNodes = _p36._0;
+		var styles = _p36._1;
+		var keyedStyleNode = A2(_rtfeldman$elm_css$VirtualDom_Styled$toKeyedStyleNode, styles, keyedChildNodes);
+		return A3(
+			_elm_lang$virtual_dom$VirtualDom$keyedNode,
+			elemType,
+			unstyledProperties,
+			{
+				ctor: '::',
+				_0: keyedStyleNode,
+				_1: _elm_lang$core$List$reverse(keyedChildNodes)
+			});
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$getClassname = function (styles) {
+	return _elm_lang$core$List$isEmpty(styles) ? 'unstyled' : A2(
+		_elm_lang$core$String$cons,
+		_elm_lang$core$Native_Utils.chr('_'),
+		_rtfeldman$hex$Hex$toString(
+			A2(
+				_Skinney$murmur3$Murmur3$hashString,
+				_rtfeldman$elm_css$VirtualDom_Styled$murmurSeed,
+				function (_) {
+					return _.css;
+				}(
+					_rtfeldman$elm_css$Css_Preprocess_Resolve$compile(
+						_elm_lang$core$List$singleton(
+							_rtfeldman$elm_css$Css_Preprocess$stylesheet(
+								_elm_lang$core$List$singleton(
+									A2(
+										_rtfeldman$elm_css$VirtualDom_Styled$makeSnippet,
+										styles,
+										_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
+											{ctor: '[]'}))))))))));
+};
+var _rtfeldman$elm_css$VirtualDom_Styled$toUnstyled = function (node) {
+	var _p37 = node;
+	switch (_p37.ctor) {
+		case 'Unstyled':
+			return _p37._0;
+		case 'Element':
+			return A3(_rtfeldman$elm_css$VirtualDom_Styled$unstyle, _p37._0, _p37._1, _p37._2);
+		default:
+			return A3(_rtfeldman$elm_css$VirtualDom_Styled$unstyleKeyed, _p37._0, _p37._1, _p37._2);
+	}
+};
+var _rtfeldman$elm_css$VirtualDom_Styled$Unstyled = function (a) {
+	return {ctor: 'Unstyled', _0: a};
+};
+var _rtfeldman$elm_css$VirtualDom_Styled$unstyledNode = _rtfeldman$elm_css$VirtualDom_Styled$Unstyled;
+var _rtfeldman$elm_css$VirtualDom_Styled$text = function (_p38) {
+	return _rtfeldman$elm_css$VirtualDom_Styled$Unstyled(
+		_elm_lang$virtual_dom$VirtualDom$text(_p38));
+};
+var _rtfeldman$elm_css$VirtualDom_Styled$lazy = F2(
+	function (fn, arg) {
+		return _rtfeldman$elm_css$VirtualDom_Styled$Unstyled(
+			A2(_elm_lang$virtual_dom$VirtualDom$lazy, fn, arg));
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$lazy2 = F3(
+	function (fn, arg1, arg2) {
+		return _rtfeldman$elm_css$VirtualDom_Styled$Unstyled(
+			A3(_elm_lang$virtual_dom$VirtualDom$lazy2, fn, arg1, arg2));
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$lazy3 = F4(
+	function (fn, arg1, arg2, arg3) {
+		return _rtfeldman$elm_css$VirtualDom_Styled$Unstyled(
+			A4(_elm_lang$virtual_dom$VirtualDom$lazy3, fn, arg1, arg2, arg3));
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$KeyedElement = F3(
+	function (a, b, c) {
+		return {ctor: 'KeyedElement', _0: a, _1: b, _2: c};
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$keyedNode = _rtfeldman$elm_css$VirtualDom_Styled$KeyedElement;
+var _rtfeldman$elm_css$VirtualDom_Styled$Element = F3(
+	function (a, b, c) {
+		return {ctor: 'Element', _0: a, _1: b, _2: c};
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$node = _rtfeldman$elm_css$VirtualDom_Styled$Element;
+var _rtfeldman$elm_css$VirtualDom_Styled$Property = F3(
+	function (a, b, c) {
+		return {ctor: 'Property', _0: a, _1: b, _2: c};
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$property = F2(
+	function (key, value) {
+		return A3(
+			_rtfeldman$elm_css$VirtualDom_Styled$Property,
+			A2(_elm_lang$virtual_dom$VirtualDom$property, key, value),
+			{ctor: '[]'},
+			'');
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$attribute = F2(
+	function (key, value) {
+		return A3(
+			_rtfeldman$elm_css$VirtualDom_Styled$Property,
+			A2(_elm_lang$virtual_dom$VirtualDom$attribute, key, value),
+			{ctor: '[]'},
+			'');
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$attributeNS = F3(
+	function (namespace, key, value) {
+		return A3(
+			_rtfeldman$elm_css$VirtualDom_Styled$Property,
+			A3(_elm_lang$virtual_dom$VirtualDom$attributeNS, namespace, key, value),
+			{ctor: '[]'},
+			'');
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$unstyledProperty = function (prop) {
+	return A3(
+		_rtfeldman$elm_css$VirtualDom_Styled$Property,
+		prop,
+		{ctor: '[]'},
+		'');
+};
+var _rtfeldman$elm_css$VirtualDom_Styled$on = F2(
+	function (eventName, decoder) {
+		return A3(
+			_rtfeldman$elm_css$VirtualDom_Styled$Property,
+			A2(_elm_lang$virtual_dom$VirtualDom$on, eventName, decoder),
+			{ctor: '[]'},
+			'');
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$onWithOptions = F3(
+	function (eventName, options, decoder) {
+		return A3(
+			_rtfeldman$elm_css$VirtualDom_Styled$Property,
+			A3(_elm_lang$virtual_dom$VirtualDom$onWithOptions, eventName, options, decoder),
+			{ctor: '[]'},
+			'');
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$mapProperty = F2(
+	function (transform, _p39) {
+		var _p40 = _p39;
+		return A3(
+			_rtfeldman$elm_css$VirtualDom_Styled$Property,
+			A2(_elm_lang$virtual_dom$VirtualDom$mapProperty, transform, _p40._0),
+			_p40._1,
+			_p40._2);
+	});
+var _rtfeldman$elm_css$VirtualDom_Styled$map = F2(
+	function (transform, node) {
+		var _p41 = node;
+		switch (_p41.ctor) {
+			case 'Element':
+				return A3(
+					_rtfeldman$elm_css$VirtualDom_Styled$Element,
+					_p41._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$VirtualDom_Styled$mapProperty(transform),
+						_p41._1),
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$VirtualDom_Styled$map(transform),
+						_p41._2));
+			case 'KeyedElement':
+				return A3(
+					_rtfeldman$elm_css$VirtualDom_Styled$KeyedElement,
+					_p41._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$VirtualDom_Styled$mapProperty(transform),
+						_p41._1),
+					A2(
+						_elm_lang$core$List$map,
+						function (_p42) {
+							var _p43 = _p42;
+							return {
+								ctor: '_Tuple2',
+								_0: _p43._0,
+								_1: A2(_rtfeldman$elm_css$VirtualDom_Styled$map, transform, _p43._1)
+							};
+						},
+						_p41._2));
+			default:
+				return _rtfeldman$elm_css$VirtualDom_Styled$Unstyled(
+					A2(_elm_lang$virtual_dom$VirtualDom$map, transform, _p41._0));
+		}
+	});
+
+var _rtfeldman$elm_css$Html_Styled_Internal$css = function (styles) {
+	var classname = _rtfeldman$elm_css$VirtualDom_Styled$getClassname(styles);
+	var classProperty = A2(
+		_elm_lang$virtual_dom$VirtualDom$property,
+		'className',
+		_elm_lang$core$Json_Encode$string(classname));
+	return A3(_rtfeldman$elm_css$VirtualDom_Styled$Property, classProperty, styles, classname);
+};
+
+var _rtfeldman$elm_css$Html_Styled$fromUnstyled = _rtfeldman$elm_css$VirtualDom_Styled$unstyledNode;
+var _rtfeldman$elm_css$Html_Styled$toUnstyled = _rtfeldman$elm_css$VirtualDom_Styled$toUnstyled;
+var _rtfeldman$elm_css$Html_Styled$program = function (config) {
+	return _elm_lang$virtual_dom$VirtualDom$program(
+		_elm_lang$core$Native_Utils.update(
+			config,
+			{
+				view: function (_p0) {
+					return _rtfeldman$elm_css$Html_Styled$toUnstyled(
+						config.view(_p0));
+				}
+			}));
+};
+var _rtfeldman$elm_css$Html_Styled$beginnerProgram = function (_p1) {
+	var _p2 = _p1;
+	return _rtfeldman$elm_css$Html_Styled$program(
+		{
+			init: A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_p2.model,
+				{ctor: '[]'}),
+			update: F2(
+				function (msg, model) {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(_p2.update, msg, model),
+						{ctor: '[]'});
+				}),
+			view: _p2.view,
+			subscriptions: function (_p3) {
+				return _elm_lang$core$Platform_Sub$none;
+			}
+		});
+};
+var _rtfeldman$elm_css$Html_Styled$programWithFlags = function (config) {
+	return _elm_lang$virtual_dom$VirtualDom$programWithFlags(
+		_elm_lang$core$Native_Utils.update(
+			config,
+			{
+				view: function (_p4) {
+					return _rtfeldman$elm_css$Html_Styled$toUnstyled(
+						config.view(_p4));
+				}
+			}));
+};
+var _rtfeldman$elm_css$Html_Styled$styled = F4(
+	function (fn, styles, attrs, children) {
+		return A2(
+			fn,
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Html_Styled_Internal$css(styles),
+				_1: attrs
+			},
+			children);
+	});
+var _rtfeldman$elm_css$Html_Styled$map = _rtfeldman$elm_css$VirtualDom_Styled$map;
+var _rtfeldman$elm_css$Html_Styled$text = _rtfeldman$elm_css$VirtualDom_Styled$text;
+var _rtfeldman$elm_css$Html_Styled$node = _rtfeldman$elm_css$VirtualDom_Styled$node;
+var _rtfeldman$elm_css$Html_Styled$body = _rtfeldman$elm_css$Html_Styled$node('body');
+var _rtfeldman$elm_css$Html_Styled$section = _rtfeldman$elm_css$Html_Styled$node('section');
+var _rtfeldman$elm_css$Html_Styled$nav = _rtfeldman$elm_css$Html_Styled$node('nav');
+var _rtfeldman$elm_css$Html_Styled$article = _rtfeldman$elm_css$Html_Styled$node('article');
+var _rtfeldman$elm_css$Html_Styled$aside = _rtfeldman$elm_css$Html_Styled$node('aside');
+var _rtfeldman$elm_css$Html_Styled$h1 = _rtfeldman$elm_css$Html_Styled$node('h1');
+var _rtfeldman$elm_css$Html_Styled$h2 = _rtfeldman$elm_css$Html_Styled$node('h2');
+var _rtfeldman$elm_css$Html_Styled$h3 = _rtfeldman$elm_css$Html_Styled$node('h3');
+var _rtfeldman$elm_css$Html_Styled$h4 = _rtfeldman$elm_css$Html_Styled$node('h4');
+var _rtfeldman$elm_css$Html_Styled$h5 = _rtfeldman$elm_css$Html_Styled$node('h5');
+var _rtfeldman$elm_css$Html_Styled$h6 = _rtfeldman$elm_css$Html_Styled$node('h6');
+var _rtfeldman$elm_css$Html_Styled$header = _rtfeldman$elm_css$Html_Styled$node('header');
+var _rtfeldman$elm_css$Html_Styled$footer = _rtfeldman$elm_css$Html_Styled$node('footer');
+var _rtfeldman$elm_css$Html_Styled$address = _rtfeldman$elm_css$Html_Styled$node('address');
+var _rtfeldman$elm_css$Html_Styled$main_ = _rtfeldman$elm_css$Html_Styled$node('main');
+var _rtfeldman$elm_css$Html_Styled$p = _rtfeldman$elm_css$Html_Styled$node('p');
+var _rtfeldman$elm_css$Html_Styled$hr = _rtfeldman$elm_css$Html_Styled$node('hr');
+var _rtfeldman$elm_css$Html_Styled$pre = _rtfeldman$elm_css$Html_Styled$node('pre');
+var _rtfeldman$elm_css$Html_Styled$blockquote = _rtfeldman$elm_css$Html_Styled$node('blockquote');
+var _rtfeldman$elm_css$Html_Styled$ol = _rtfeldman$elm_css$Html_Styled$node('ol');
+var _rtfeldman$elm_css$Html_Styled$ul = _rtfeldman$elm_css$Html_Styled$node('ul');
+var _rtfeldman$elm_css$Html_Styled$li = _rtfeldman$elm_css$Html_Styled$node('li');
+var _rtfeldman$elm_css$Html_Styled$dl = _rtfeldman$elm_css$Html_Styled$node('dl');
+var _rtfeldman$elm_css$Html_Styled$dt = _rtfeldman$elm_css$Html_Styled$node('dt');
+var _rtfeldman$elm_css$Html_Styled$dd = _rtfeldman$elm_css$Html_Styled$node('dd');
+var _rtfeldman$elm_css$Html_Styled$figure = _rtfeldman$elm_css$Html_Styled$node('figure');
+var _rtfeldman$elm_css$Html_Styled$figcaption = _rtfeldman$elm_css$Html_Styled$node('figcaption');
+var _rtfeldman$elm_css$Html_Styled$div = _rtfeldman$elm_css$Html_Styled$node('div');
+var _rtfeldman$elm_css$Html_Styled$a = _rtfeldman$elm_css$Html_Styled$node('a');
+var _rtfeldman$elm_css$Html_Styled$em = _rtfeldman$elm_css$Html_Styled$node('em');
+var _rtfeldman$elm_css$Html_Styled$strong = _rtfeldman$elm_css$Html_Styled$node('strong');
+var _rtfeldman$elm_css$Html_Styled$small = _rtfeldman$elm_css$Html_Styled$node('small');
+var _rtfeldman$elm_css$Html_Styled$s = _rtfeldman$elm_css$Html_Styled$node('s');
+var _rtfeldman$elm_css$Html_Styled$cite = _rtfeldman$elm_css$Html_Styled$node('cite');
+var _rtfeldman$elm_css$Html_Styled$q = _rtfeldman$elm_css$Html_Styled$node('q');
+var _rtfeldman$elm_css$Html_Styled$dfn = _rtfeldman$elm_css$Html_Styled$node('dfn');
+var _rtfeldman$elm_css$Html_Styled$abbr = _rtfeldman$elm_css$Html_Styled$node('abbr');
+var _rtfeldman$elm_css$Html_Styled$time = _rtfeldman$elm_css$Html_Styled$node('time');
+var _rtfeldman$elm_css$Html_Styled$code = _rtfeldman$elm_css$Html_Styled$node('code');
+var _rtfeldman$elm_css$Html_Styled$var = _rtfeldman$elm_css$Html_Styled$node('var');
+var _rtfeldman$elm_css$Html_Styled$samp = _rtfeldman$elm_css$Html_Styled$node('samp');
+var _rtfeldman$elm_css$Html_Styled$kbd = _rtfeldman$elm_css$Html_Styled$node('kbd');
+var _rtfeldman$elm_css$Html_Styled$sub = _rtfeldman$elm_css$Html_Styled$node('sub');
+var _rtfeldman$elm_css$Html_Styled$sup = _rtfeldman$elm_css$Html_Styled$node('sup');
+var _rtfeldman$elm_css$Html_Styled$i = _rtfeldman$elm_css$Html_Styled$node('i');
+var _rtfeldman$elm_css$Html_Styled$b = _rtfeldman$elm_css$Html_Styled$node('b');
+var _rtfeldman$elm_css$Html_Styled$u = _rtfeldman$elm_css$Html_Styled$node('u');
+var _rtfeldman$elm_css$Html_Styled$mark = _rtfeldman$elm_css$Html_Styled$node('mark');
+var _rtfeldman$elm_css$Html_Styled$ruby = _rtfeldman$elm_css$Html_Styled$node('ruby');
+var _rtfeldman$elm_css$Html_Styled$rt = _rtfeldman$elm_css$Html_Styled$node('rt');
+var _rtfeldman$elm_css$Html_Styled$rp = _rtfeldman$elm_css$Html_Styled$node('rp');
+var _rtfeldman$elm_css$Html_Styled$bdi = _rtfeldman$elm_css$Html_Styled$node('bdi');
+var _rtfeldman$elm_css$Html_Styled$bdo = _rtfeldman$elm_css$Html_Styled$node('bdo');
+var _rtfeldman$elm_css$Html_Styled$span = _rtfeldman$elm_css$Html_Styled$node('span');
+var _rtfeldman$elm_css$Html_Styled$br = _rtfeldman$elm_css$Html_Styled$node('br');
+var _rtfeldman$elm_css$Html_Styled$wbr = _rtfeldman$elm_css$Html_Styled$node('wbr');
+var _rtfeldman$elm_css$Html_Styled$ins = _rtfeldman$elm_css$Html_Styled$node('ins');
+var _rtfeldman$elm_css$Html_Styled$del = _rtfeldman$elm_css$Html_Styled$node('del');
+var _rtfeldman$elm_css$Html_Styled$img = _rtfeldman$elm_css$Html_Styled$node('img');
+var _rtfeldman$elm_css$Html_Styled$iframe = _rtfeldman$elm_css$Html_Styled$node('iframe');
+var _rtfeldman$elm_css$Html_Styled$embed = _rtfeldman$elm_css$Html_Styled$node('embed');
+var _rtfeldman$elm_css$Html_Styled$object = _rtfeldman$elm_css$Html_Styled$node('object');
+var _rtfeldman$elm_css$Html_Styled$param = _rtfeldman$elm_css$Html_Styled$node('param');
+var _rtfeldman$elm_css$Html_Styled$video = _rtfeldman$elm_css$Html_Styled$node('video');
+var _rtfeldman$elm_css$Html_Styled$audio = _rtfeldman$elm_css$Html_Styled$node('audio');
+var _rtfeldman$elm_css$Html_Styled$source = _rtfeldman$elm_css$Html_Styled$node('source');
+var _rtfeldman$elm_css$Html_Styled$track = _rtfeldman$elm_css$Html_Styled$node('track');
+var _rtfeldman$elm_css$Html_Styled$canvas = _rtfeldman$elm_css$Html_Styled$node('canvas');
+var _rtfeldman$elm_css$Html_Styled$math = _rtfeldman$elm_css$Html_Styled$node('math');
+var _rtfeldman$elm_css$Html_Styled$table = _rtfeldman$elm_css$Html_Styled$node('table');
+var _rtfeldman$elm_css$Html_Styled$caption = _rtfeldman$elm_css$Html_Styled$node('caption');
+var _rtfeldman$elm_css$Html_Styled$colgroup = _rtfeldman$elm_css$Html_Styled$node('colgroup');
+var _rtfeldman$elm_css$Html_Styled$col = _rtfeldman$elm_css$Html_Styled$node('col');
+var _rtfeldman$elm_css$Html_Styled$tbody = _rtfeldman$elm_css$Html_Styled$node('tbody');
+var _rtfeldman$elm_css$Html_Styled$thead = _rtfeldman$elm_css$Html_Styled$node('thead');
+var _rtfeldman$elm_css$Html_Styled$tfoot = _rtfeldman$elm_css$Html_Styled$node('tfoot');
+var _rtfeldman$elm_css$Html_Styled$tr = _rtfeldman$elm_css$Html_Styled$node('tr');
+var _rtfeldman$elm_css$Html_Styled$td = _rtfeldman$elm_css$Html_Styled$node('td');
+var _rtfeldman$elm_css$Html_Styled$th = _rtfeldman$elm_css$Html_Styled$node('th');
+var _rtfeldman$elm_css$Html_Styled$form = _rtfeldman$elm_css$Html_Styled$node('form');
+var _rtfeldman$elm_css$Html_Styled$fieldset = _rtfeldman$elm_css$Html_Styled$node('fieldset');
+var _rtfeldman$elm_css$Html_Styled$legend = _rtfeldman$elm_css$Html_Styled$node('legend');
+var _rtfeldman$elm_css$Html_Styled$label = _rtfeldman$elm_css$Html_Styled$node('label');
+var _rtfeldman$elm_css$Html_Styled$input = _rtfeldman$elm_css$Html_Styled$node('input');
+var _rtfeldman$elm_css$Html_Styled$button = _rtfeldman$elm_css$Html_Styled$node('button');
+var _rtfeldman$elm_css$Html_Styled$select = _rtfeldman$elm_css$Html_Styled$node('select');
+var _rtfeldman$elm_css$Html_Styled$datalist = _rtfeldman$elm_css$Html_Styled$node('datalist');
+var _rtfeldman$elm_css$Html_Styled$optgroup = _rtfeldman$elm_css$Html_Styled$node('optgroup');
+var _rtfeldman$elm_css$Html_Styled$option = _rtfeldman$elm_css$Html_Styled$node('option');
+var _rtfeldman$elm_css$Html_Styled$textarea = _rtfeldman$elm_css$Html_Styled$node('textarea');
+var _rtfeldman$elm_css$Html_Styled$keygen = _rtfeldman$elm_css$Html_Styled$node('keygen');
+var _rtfeldman$elm_css$Html_Styled$output = _rtfeldman$elm_css$Html_Styled$node('output');
+var _rtfeldman$elm_css$Html_Styled$progress = _rtfeldman$elm_css$Html_Styled$node('progress');
+var _rtfeldman$elm_css$Html_Styled$meter = _rtfeldman$elm_css$Html_Styled$node('meter');
+var _rtfeldman$elm_css$Html_Styled$details = _rtfeldman$elm_css$Html_Styled$node('details');
+var _rtfeldman$elm_css$Html_Styled$summary = _rtfeldman$elm_css$Html_Styled$node('summary');
+var _rtfeldman$elm_css$Html_Styled$menuitem = _rtfeldman$elm_css$Html_Styled$node('menuitem');
+var _rtfeldman$elm_css$Html_Styled$menu = _rtfeldman$elm_css$Html_Styled$node('menu');
+
+var _rtfeldman$elm_css$Html_Styled_Attributes$css = _rtfeldman$elm_css$Html_Styled_Internal$css;
+var _rtfeldman$elm_css$Html_Styled_Attributes$map = _rtfeldman$elm_css$VirtualDom_Styled$mapProperty;
+var _rtfeldman$elm_css$Html_Styled_Attributes$attribute = _rtfeldman$elm_css$VirtualDom_Styled$attribute;
+var _rtfeldman$elm_css$Html_Styled_Attributes$contextmenu = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'contextmenu', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$draggable = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'draggable', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$itemprop = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'itemprop', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$tabindex = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'tabIndex',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$charset = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'charset', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$height = function (value) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'height',
+		_elm_lang$core$Basics$toString(value));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$width = function (value) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'width',
+		_elm_lang$core$Basics$toString(value));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$formaction = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'formAction', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$list = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'list', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$minlength = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'minLength',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$maxlength = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'maxlength',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$size = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'size',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$form = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'form', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$cols = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'cols',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$rows = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'rows',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$challenge = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'challenge', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$media = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'media', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$rel = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'rel', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$datetime = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'datetime', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$pubdate = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'pubdate', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$colspan = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'colspan',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$rowspan = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$attribute,
+		'rowspan',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$manifest = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$attribute, 'manifest', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$property = _rtfeldman$elm_css$VirtualDom_Styled$property;
+var _rtfeldman$elm_css$Html_Styled_Attributes$stringProperty = F2(
+	function (name, string) {
+		return A2(
+			_rtfeldman$elm_css$Html_Styled_Attributes$property,
+			name,
+			_elm_lang$core$Json_Encode$string(string));
+	});
+var _rtfeldman$elm_css$Html_Styled_Attributes$class = function (name) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'className', name);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$id = function (name) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'id', name);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$title = function (name) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'title', name);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$accesskey = function ($char) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty,
+		'accessKey',
+		_elm_lang$core$String$fromChar($char));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$dir = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'dir', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$dropzone = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'dropzone', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$lang = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'lang', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$content = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'content', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$httpEquiv = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'httpEquiv', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$language = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'language', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$src = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'src', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$alt = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'alt', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$preload = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'preload', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$poster = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'poster', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$kind = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'kind', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$srclang = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'srclang', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$sandbox = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'sandbox', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$srcdoc = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'srcdoc', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$type_ = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'type', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$value = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'value', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$defaultValue = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'defaultValue', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$placeholder = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'placeholder', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$accept = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'accept', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$acceptCharset = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'acceptCharset', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$action = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'action', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$autocomplete = function (bool) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty,
+		'autocomplete',
+		bool ? 'on' : 'off');
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$enctype = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'enctype', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$method = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'method', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$name = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'name', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$pattern = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'pattern', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$for = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'htmlFor', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$max = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'max', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$min = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'min', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$step = function (n) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'step', n);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$wrap = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'wrap', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$usemap = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'useMap', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$shape = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'shape', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$coords = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'coords', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$keytype = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'keytype', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$align = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'align', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$cite = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'cite', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$href = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'href', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$target = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'target', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$downloadAs = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'download', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$hreflang = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'hreflang', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$ping = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'ping', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$start = function (n) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty,
+		'start',
+		_elm_lang$core$Basics$toString(n));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$headers = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'headers', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$scope = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$stringProperty, 'scope', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$boolProperty = F2(
+	function (name, bool) {
+		return A2(
+			_rtfeldman$elm_css$Html_Styled_Attributes$property,
+			name,
+			_elm_lang$core$Json_Encode$bool(bool));
+	});
+var _rtfeldman$elm_css$Html_Styled_Attributes$hidden = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'hidden', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$contenteditable = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'contentEditable', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$spellcheck = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'spellcheck', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$async = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'async', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$defer = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'defer', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$scoped = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'scoped', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$autoplay = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'autoplay', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$controls = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'controls', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$loop = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'loop', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$default = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'default', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$seamless = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'seamless', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$checked = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'checked', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$selected = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'selected', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$autofocus = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'autofocus', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$disabled = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'disabled', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$multiple = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'multiple', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$novalidate = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'noValidate', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$readonly = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'readOnly', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$required = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'required', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$ismap = function (value) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'isMap', value);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$download = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'download', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$reversed = function (bool) {
+	return A2(_rtfeldman$elm_css$Html_Styled_Attributes$boolProperty, 'reversed', bool);
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$classList = function (list) {
+	return _rtfeldman$elm_css$Html_Styled_Attributes$class(
+		A2(
+			_elm_lang$core$String$join,
+			' ',
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$second, list))));
+};
+var _rtfeldman$elm_css$Html_Styled_Attributes$fromUnstyled = _rtfeldman$elm_css$VirtualDom_Styled$unstyledProperty;
+var _rtfeldman$elm_css$Html_Styled_Attributes$style = function (_p0) {
+	return _rtfeldman$elm_css$Html_Styled_Attributes$fromUnstyled(
+		_elm_lang$virtual_dom$VirtualDom$style(_p0));
+};
+
+var _rtfeldman$elm_css$Html_Styled_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _rtfeldman$elm_css$Html_Styled_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'checked',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$bool);
+var _rtfeldman$elm_css$Html_Styled_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'value',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _rtfeldman$elm_css$Html_Styled_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _rtfeldman$elm_css$Html_Styled_Events$onWithOptions = _rtfeldman$elm_css$VirtualDom_Styled$onWithOptions;
+var _rtfeldman$elm_css$Html_Styled_Events$on = _rtfeldman$elm_css$VirtualDom_Styled$on;
+var _rtfeldman$elm_css$Html_Styled_Events$onFocus = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onBlur = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_rtfeldman$elm_css$Html_Styled_Events$defaultOptions,
+	{preventDefault: true});
+var _rtfeldman$elm_css$Html_Styled_Events$onSubmit = function (msg) {
+	return A3(
+		_rtfeldman$elm_css$Html_Styled_Events$onWithOptions,
+		'submit',
+		_rtfeldman$elm_css$Html_Styled_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onCheck = function (tagger) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _rtfeldman$elm_css$Html_Styled_Events$targetChecked));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onInput = function (tagger) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _rtfeldman$elm_css$Html_Styled_Events$targetValue));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onMouseOut = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onMouseOver = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onMouseLeave = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onMouseEnter = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onMouseUp = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onMouseDown = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onDoubleClick = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$onClick = function (msg) {
+	return A2(
+		_rtfeldman$elm_css$Html_Styled_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _rtfeldman$elm_css$Html_Styled_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
+
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$tab = 9;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$backspace = 8;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$end = 35;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$home = 36;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageDown = 34;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$pageUp = 33;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$downArrow = 40;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$upArrow = 38;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$escape = 27;
+var _inkuzmin$elm_multiselect$Multiselect_Keycodes$return = 13;
+
+var _rtfeldman$elm_css$Css_Media$unparameterizedFeature = function (key) {
+	return {feature: key, value: _elm_lang$core$Maybe$Nothing};
+};
+var _rtfeldman$elm_css$Css_Media$feature = F2(
+	function (key, _p0) {
+		var _p1 = _p0;
+		return {
+			feature: key,
+			value: _elm_lang$core$Maybe$Just(_p1.value)
+		};
+	});
+var _rtfeldman$elm_css$Css_Media$scripting = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'scripting', value);
+};
+var _rtfeldman$elm_css$Css_Media$enabled = {value: 'enabled', scriptingSupport: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$initialOnly = {value: 'initial-only', scriptingSupport: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$anyHover = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'any-hover', value);
+};
+var _rtfeldman$elm_css$Css_Media$hover = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'hover', value);
+};
+var _rtfeldman$elm_css$Css_Media$canHover = {value: 'hover', hoverCapability: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$anyPointer = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'any-pointer', value);
+};
+var _rtfeldman$elm_css$Css_Media$pointer = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'pointer', value);
+};
+var _rtfeldman$elm_css$Css_Media$coarse = {value: 'coarse', pointerDevice: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$fine = {value: 'fine', pointerDevice: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$colorGamut = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'color-gamut', value);
+};
+var _rtfeldman$elm_css$Css_Media$rec2020 = {value: 'rec2020', colorGamut: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$p3 = {value: 'p3', colorGamut: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$srgb = {value: 'srgb', colorGamut: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$maxColorIndex = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-color-index', value);
+};
+var _rtfeldman$elm_css$Css_Media$minColorIndex = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-color-index', value);
+};
+var _rtfeldman$elm_css$Css_Media$colorIndex = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'color-index', value);
+};
+var _rtfeldman$elm_css$Css_Media$maxMonochrome = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-monochrome', value);
+};
+var _rtfeldman$elm_css$Css_Media$minMonochrome = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-monochrome', value);
+};
+var _rtfeldman$elm_css$Css_Media$monochrome = _rtfeldman$elm_css$Css_Media$unparameterizedFeature('monochrome');
+var _rtfeldman$elm_css$Css_Media$maxColor = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-color', value);
+};
+var _rtfeldman$elm_css$Css_Media$color = _rtfeldman$elm_css$Css_Media$unparameterizedFeature('color');
+var _rtfeldman$elm_css$Css_Media$minColor = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-color', value);
+};
+var _rtfeldman$elm_css$Css_Media$bits = function (value) {
+	return {
+		value: _elm_lang$core$Basics$toString(value),
+		bits: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css_Media$overflowInline = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'overflow-inline', value);
+};
+var _rtfeldman$elm_css$Css_Media$overflowBlock = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'overflow-block', value);
+};
+var _rtfeldman$elm_css$Css_Media$optionalPaged = {value: 'optional-paged', blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$paged = {value: 'paged', blockAxisOverflow: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$update = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'update', value);
+};
+var _rtfeldman$elm_css$Css_Media$fast = {value: 'fast', updateFrequency: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$slow = {value: 'slow', updateFrequency: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$grid = _rtfeldman$elm_css$Css_Media$unparameterizedFeature('grid');
+var _rtfeldman$elm_css$Css_Media$scan = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'scan', value);
+};
+var _rtfeldman$elm_css$Css_Media$interlace = {value: 'interlace', scanningProcess: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$progressive = {value: 'progressive', scanningProcess: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$maxResolution = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-resolution', value);
+};
+var _rtfeldman$elm_css$Css_Media$resolution = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'resolution', value);
+};
+var _rtfeldman$elm_css$Css_Media$minResolution = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-resolution', value);
+};
+var _rtfeldman$elm_css$Css_Media$dppx = function (value) {
+	return {
+		value: A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(value),
+			'dppx'),
+		resolution: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css_Media$dpcm = function (value) {
+	return {
+		value: A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(value),
+			'dpcm'),
+		resolution: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css_Media$dpi = function (value) {
+	return {
+		value: A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(value),
+			'dpi'),
+		resolution: _rtfeldman$elm_css$Css_Structure$Compatible
+	};
+};
+var _rtfeldman$elm_css$Css_Media$orientation = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'orientation', value);
+};
+var _rtfeldman$elm_css$Css_Media$portrait = {value: 'portrait', orientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$landscape = {value: 'landscape', orientation: _rtfeldman$elm_css$Css_Structure$Compatible};
+var _rtfeldman$elm_css$Css_Media$maxAspectRatio = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-aspect-ratio', value);
+};
+var _rtfeldman$elm_css$Css_Media$aspectRatio = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'aspect-ratio', value);
+};
+var _rtfeldman$elm_css$Css_Media$minAspectRatio = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-aspect-ratio', value);
+};
+var _rtfeldman$elm_css$Css_Media$ratio = F2(
+	function (numerator, denominator) {
 		return {
 			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'rotate3d',
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(numerator),
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					coordsAsStrings,
-					{
-						ctor: '::',
-						_0: _p49.value,
-						_1: {ctor: '[]'}
-					})),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
+					'/',
+					_elm_lang$core$Basics$toString(denominator))),
+			ratio: _rtfeldman$elm_css$Css_Structure$Compatible
 		};
 	});
-var _rtfeldman$elm_css$Css$scale = function (x) {
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'scale',
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$numberToString(x),
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
+var _rtfeldman$elm_css$Css_Media$maxHeight = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-height', value);
 };
-var _rtfeldman$elm_css$Css$scale2 = F2(
-	function (x, y) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'scale',
-				A2(
-					_elm_lang$core$List$map,
-					_rtfeldman$elm_css$Css$numberToString,
-					{
-						ctor: '::',
-						_0: x,
-						_1: {
-							ctor: '::',
-							_0: y,
-							_1: {ctor: '[]'}
-						}
-					})),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
+var _rtfeldman$elm_css$Css_Media$height = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'height', value);
+};
+var _rtfeldman$elm_css$Css_Media$minHeight = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-height', value);
+};
+var _rtfeldman$elm_css$Css_Media$maxWidth = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'max-width', value);
+};
+var _rtfeldman$elm_css$Css_Media$width = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'width', value);
+};
+var _rtfeldman$elm_css$Css_Media$minWidth = function (value) {
+	return A2(_rtfeldman$elm_css$Css_Media$feature, 'min-width', value);
+};
+var _rtfeldman$elm_css$Css_Media$speech = _rtfeldman$elm_css$Css_Structure$Speech;
+var _rtfeldman$elm_css$Css_Media$screen = _rtfeldman$elm_css$Css_Structure$Screen;
+var _rtfeldman$elm_css$Css_Media$print = _rtfeldman$elm_css$Css_Structure$Print;
+var _rtfeldman$elm_css$Css_Media$connectWith = F2(
+	function (connect, queries) {
+		var _p2 = queries;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = A2(_rtfeldman$elm_css$Css_Media$connectWith, connect, _p2._1);
+			if (_p3.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Just(_p4);
+			} else {
+				return _elm_lang$core$Maybe$Just(
+					A2(connect, _p4, _p3._0));
+			}
+		}
 	});
-var _rtfeldman$elm_css$Css$scaleX = function (x) {
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'scaleX',
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$numberToString(x),
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
+var _rtfeldman$elm_css$Css_Media$not = _rtfeldman$elm_css$Css_Structure$NotQuery;
+var _rtfeldman$elm_css$Css_Media$only = _rtfeldman$elm_css$Css_Structure$OnlyQuery;
+var _rtfeldman$elm_css$Css_Media$all = _rtfeldman$elm_css$Css_Structure$AllQuery;
+var _rtfeldman$elm_css$Css_Media$withMediaQuery = function (queries) {
+	return _rtfeldman$elm_css$Css_Preprocess$WithMedia(
+		A2(_elm_lang$core$List$map, _rtfeldman$elm_css$Css_Structure$CustomQuery, queries));
 };
-var _rtfeldman$elm_css$Css$scaleY = function (y) {
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'scaleY',
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$numberToString(y),
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
+var _rtfeldman$elm_css$Css_Media$withMedia = function (queries) {
+	return _rtfeldman$elm_css$Css_Preprocess$WithMedia(queries);
 };
-var _rtfeldman$elm_css$Css$scale3d = F3(
-	function (x, y, z) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'scale3d',
-				A2(
-					_elm_lang$core$List$map,
-					_rtfeldman$elm_css$Css$numberToString,
-					{
-						ctor: '::',
-						_0: x,
-						_1: {
-							ctor: '::',
-							_0: y,
-							_1: {
-								ctor: '::',
-								_0: z,
-								_1: {ctor: '[]'}
-							}
-						}
-					})),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$skew = function (_p50) {
-	var _p51 = _p50;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'skew',
-			{
-				ctor: '::',
-				_0: _p51.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$skew2 = F2(
-	function (ax, ay) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'skew',
-				{
-					ctor: '::',
-					_0: ax.value,
-					_1: {
-						ctor: '::',
-						_0: ay.value,
-						_1: {ctor: '[]'}
-					}
-				}),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$skewX = function (_p52) {
-	var _p53 = _p52;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'skewX',
-			{
-				ctor: '::',
-				_0: _p53.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$skewY = function (_p54) {
-	var _p55 = _p54;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'skewY',
-			{
-				ctor: '::',
-				_0: _p55.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$translate = function (_p56) {
-	var _p57 = _p56;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'translate',
-			{
-				ctor: '::',
-				_0: _p57.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$translate2 = F2(
-	function (tx, ty) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'translate',
-				{
-					ctor: '::',
-					_0: tx.value,
-					_1: {
-						ctor: '::',
-						_0: ty.value,
-						_1: {ctor: '[]'}
-					}
-				}),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$translateX = function (_p58) {
-	var _p59 = _p58;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'translateX',
-			{
-				ctor: '::',
-				_0: _p59.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$translateY = function (_p60) {
-	var _p61 = _p60;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'translateY',
-			{
-				ctor: '::',
-				_0: _p61.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$translateZ = function (_p62) {
-	var _p63 = _p62;
-	return {
-		value: A2(
-			_rtfeldman$elm_css$Css$cssFunction,
-			'translateZ',
-			{
-				ctor: '::',
-				_0: _p63.value,
-				_1: {ctor: '[]'}
-			}),
-		transform: _rtfeldman$elm_css$Css_Structure$Compatible
-	};
-};
-var _rtfeldman$elm_css$Css$translate3d = F3(
-	function (tx, ty, tz) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'translate3d',
-				{
-					ctor: '::',
-					_0: tx.value,
-					_1: {
-						ctor: '::',
-						_0: ty.value,
-						_1: {
-							ctor: '::',
-							_0: tz.value,
-							_1: {ctor: '[]'}
-						}
-					}
-				}),
-			transform: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$linearGradient = F3(
-	function (stop1, stop2, stops) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'linear-gradient',
-				_rtfeldman$elm_css$Css$collectStops(
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						{
-							ctor: '::',
-							_0: stop1,
-							_1: {
-								ctor: '::',
-								_0: stop2,
-								_1: {ctor: '[]'}
-							}
-						},
-						stops))),
-			backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
-			listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$linearGradient2 = F4(
-	function (dir, stop1, stop2, stops) {
-		return {
-			value: A2(
-				_rtfeldman$elm_css$Css$cssFunction,
-				'linear-gradient',
-				A2(
-					F2(
-						function (x, y) {
-							return {ctor: '::', _0: x, _1: y};
-						}),
-					A2(_elm_lang$core$Basics_ops['++'], 'to ', dir.value),
-					_rtfeldman$elm_css$Css$collectStops(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: stop1,
-								_1: {
-									ctor: '::',
-									_0: stop2,
-									_1: {ctor: '[]'}
-								}
-							},
-							stops)))),
-			backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
-			listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible
-		};
-	});
-var _rtfeldman$elm_css$Css$CalculatedLength = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return {value: a, length: b, lengthOrAuto: c, lengthOrNumber: d, lengthOrNone: e, lengthOrMinMaxDimension: f, lengthOrNoneOrMinMaxDimension: g, textIndent: h, flexBasis: i, lengthOrNumberOrAutoOrNoneOrContent: j, fontSize: k, lengthOrAutoOrCoverOrContain: l, calc: m};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _rtfeldman$elm_css$Css$ExplicitLength = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return function (n) {
-														return function (o) {
-															return function (p) {
-																return function (q) {
-																	return {value: a, numericValue: b, units: c, unitLabel: d, length: e, lengthOrAuto: f, lengthOrNumber: g, lengthOrNone: h, lengthOrMinMaxDimension: i, lengthOrNoneOrMinMaxDimension: j, textIndent: k, flexBasis: l, absoluteLength: m, lengthOrNumberOrAutoOrNoneOrContent: n, fontSize: o, lengthOrAutoOrCoverOrContain: p, calc: q};
-																};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _rtfeldman$elm_css$Css$NonMixable = {};
-var _rtfeldman$elm_css$Css$BasicProperty = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return function (n) {
-														return function (o) {
-															return function (p) {
-																return function (q) {
-																	return function (r) {
-																		return function (s) {
-																			return function (t) {
-																				return function (u) {
-																					return function (v) {
-																						return function (w) {
-																							return function (x) {
-																								return function (y) {
-																									return function (z) {
-																										return function (_1) {
-																											return function (_2) {
-																												return function (_3) {
-																													return function (_4) {
-																														return function (_5) {
-																															return function (_6) {
-																																return function (_7) {
-																																	return function (_8) {
-																																		return function (_9) {
-																																			return function (_10) {
-																																				return function (_11) {
-																																					return function (_12) {
-																																						return function (_13) {
-																																							return function (_14) {
-																																								return function (_15) {
-																																									return function (_16) {
-																																										return function (_17) {
-																																											return function (_18) {
-																																												return function (_19) {
-																																													return function (_20) {
-																																														return function (_21) {
-																																															return function (_22) {
-																																																return function (_23) {
-																																																	return function (_24) {
-																																																		return function (_25) {
-																																																			return {value: a, all: b, alignItems: c, borderStyle: d, boxSizing: e, color: f, cursor: g, display: h, flexBasis: i, flexWrap: j, flexDirection: k, flexDirectionOrWrap: l, justifyContent: m, none: n, number: o, outline: p, overflow: q, textDecorationLine: r, textRendering: s, textIndent: t, textDecorationStyle: u, textTransform: v, length: w, lengthOrAuto: x, lengthOrNone: y, lengthOrNumber: z, lengthOrMinMaxDimension: _1, lengthOrNoneOrMinMaxDimension: _2, lengthOrNumberOrAutoOrNoneOrContent: _3, listStyleType: _4, listStylePosition: _5, listStyleTypeOrPositionOrImage: _6, fontFamily: _7, fontSize: _8, fontStyle: _9, fontWeight: _10, fontVariant: _11, units: _12, numericValue: _13, unitLabel: _14, warnings: _15, backgroundRepeat: _16, backgroundRepeatShorthand: _17, backgroundAttachment: _18, backgroundBlendMode: _19, backgroundOrigin: _20, backgroundImage: _21, lengthOrAutoOrCoverOrContain: _22, intOrAuto: _23, touchAction: _24, whiteSpace: _25};
-																																																		};
-																																																	};
-																																																};
-																																															};
-																																														};
-																																													};
-																																												};
-																																											};
-																																										};
-																																									};
-																																								};
-																																							};
-																																						};
-																																					};
-																																				};
-																																			};
-																																		};
-																																	};
-																																};
-																															};
-																														};
-																													};
-																												};
-																											};
-																										};
-																									};
-																								};
-																							};
-																						};
-																					};
-																				};
-																			};
-																		};
-																	};
-																};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _rtfeldman$elm_css$Css$Normal = F7(
-	function (a, b, c, d, e, f, g) {
-		return {value: a, warnings: b, fontStyle: c, fontWeight: d, featureTagValue: e, overflowWrap: f, whiteSpace: g};
-	});
-var _rtfeldman$elm_css$Css$PseudoClass = F2(
+var _rtfeldman$elm_css$Css_Media$Ratio = F2(
 	function (a, b) {
-		return {ctor: 'PseudoClass', _0: a, _1: b};
+		return {value: a, ratio: b};
 	});
-var _rtfeldman$elm_css$Css$PseudoElement = F2(
+var _rtfeldman$elm_css$Css_Media$Landscape = F2(
 	function (a, b) {
-		return {ctor: 'PseudoElement', _0: a, _1: b};
+		return {value: a, orientation: b};
 	});
-var _rtfeldman$elm_css$Css$Subtraction = {ctor: 'Subtraction'};
-var _rtfeldman$elm_css$Css$minus = _rtfeldman$elm_css$Css$Subtraction;
-var _rtfeldman$elm_css$Css$Addition = {ctor: 'Addition'};
-var _rtfeldman$elm_css$Css$plus = _rtfeldman$elm_css$Css$Addition;
-var _rtfeldman$elm_css$Css$PercentageUnits = {ctor: 'PercentageUnits'};
-var _rtfeldman$elm_css$Css$pct = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PercentageUnits, '%');
-var _rtfeldman$elm_css$Css$EmUnits = {ctor: 'EmUnits'};
-var _rtfeldman$elm_css$Css$em = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$EmUnits, 'em');
-var _rtfeldman$elm_css$Css$ExUnits = {ctor: 'ExUnits'};
-var _rtfeldman$elm_css$Css$ex = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$ExUnits, 'ex');
-var _rtfeldman$elm_css$Css$ChUnits = {ctor: 'ChUnits'};
-var _rtfeldman$elm_css$Css$ch = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$ChUnits, 'ch');
-var _rtfeldman$elm_css$Css$RemUnits = {ctor: 'RemUnits'};
-var _rtfeldman$elm_css$Css$rem = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$RemUnits, 'rem');
-var _rtfeldman$elm_css$Css$VhUnits = {ctor: 'VhUnits'};
-var _rtfeldman$elm_css$Css$vh = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VhUnits, 'vh');
-var _rtfeldman$elm_css$Css$VwUnits = {ctor: 'VwUnits'};
-var _rtfeldman$elm_css$Css$vw = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VwUnits, 'vw');
-var _rtfeldman$elm_css$Css$VMinUnits = {ctor: 'VMinUnits'};
-var _rtfeldman$elm_css$Css$vmin = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VMinUnits, 'vmin');
-var _rtfeldman$elm_css$Css$VMaxUnits = {ctor: 'VMaxUnits'};
-var _rtfeldman$elm_css$Css$vmax = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$VMaxUnits, 'vmax');
-var _rtfeldman$elm_css$Css$PxUnits = {ctor: 'PxUnits'};
-var _rtfeldman$elm_css$Css$px = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PxUnits, 'px');
-var _rtfeldman$elm_css$Css$MMUnits = {ctor: 'MMUnits'};
-var _rtfeldman$elm_css$Css$mm = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$MMUnits, 'mm');
-var _rtfeldman$elm_css$Css$CMUnits = {ctor: 'CMUnits'};
-var _rtfeldman$elm_css$Css$cm = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$CMUnits, 'cm');
-var _rtfeldman$elm_css$Css$InchUnits = {ctor: 'InchUnits'};
-var _rtfeldman$elm_css$Css$inches = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$InchUnits, 'in');
-var _rtfeldman$elm_css$Css$PtUnits = {ctor: 'PtUnits'};
-var _rtfeldman$elm_css$Css$pt = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PtUnits, 'pt');
-var _rtfeldman$elm_css$Css$PcUnits = {ctor: 'PcUnits'};
-var _rtfeldman$elm_css$Css$pc = A2(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$PcUnits, 'pc');
-var _rtfeldman$elm_css$Css$UnitlessInteger = {ctor: 'UnitlessInteger'};
-var _rtfeldman$elm_css$Css$zero = {value: '0', length: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible, number: _rtfeldman$elm_css$Css_Structure$Compatible, outline: _rtfeldman$elm_css$Css_Structure$Compatible, units: _rtfeldman$elm_css$Css$UnitlessInteger, unitLabel: '', numericValue: 0, lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible};
-var _rtfeldman$elm_css$Css$int = function (val) {
-	return {
-		value: _rtfeldman$elm_css$Css$numberToString(val),
-		lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
-		number: _rtfeldman$elm_css$Css_Structure$Compatible,
-		fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
-		intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
-		numericValue: _elm_lang$core$Basics$toFloat(val),
-		unitLabel: '',
-		units: _rtfeldman$elm_css$Css$UnitlessInteger
-	};
-};
-var _rtfeldman$elm_css$Css$UnitlessFloat = {ctor: 'UnitlessFloat'};
-var _rtfeldman$elm_css$Css$num = function (val) {
-	return {
-		value: _rtfeldman$elm_css$Css$numberToString(val),
-		lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
-		number: _rtfeldman$elm_css$Css_Structure$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
-		numericValue: val,
-		unitLabel: '',
-		units: _rtfeldman$elm_css$Css$UnitlessFloat
-	};
-};
-var _rtfeldman$elm_css$Css$IncompatibleUnits = {ctor: 'IncompatibleUnits'};
-var _rtfeldman$elm_css$Css$initial = {
-	value: 'initial',
-	overflow: _rtfeldman$elm_css$Css_Structure$Compatible,
-	none: _rtfeldman$elm_css$Css_Structure$Compatible,
-	number: _rtfeldman$elm_css$Css_Structure$Compatible,
-	textDecorationLine: _rtfeldman$elm_css$Css_Structure$Compatible,
-	textRendering: _rtfeldman$elm_css$Css_Structure$Compatible,
-	textIndent: _rtfeldman$elm_css$Css_Structure$Compatible,
-	textDecorationStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
-	textTransform: _rtfeldman$elm_css$Css_Structure$Compatible,
-	borderStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
-	boxSizing: _rtfeldman$elm_css$Css_Structure$Compatible,
-	color: _rtfeldman$elm_css$Css_Structure$Compatible,
-	cursor: _rtfeldman$elm_css$Css_Structure$Compatible,
-	display: _rtfeldman$elm_css$Css_Structure$Compatible,
-	all: _rtfeldman$elm_css$Css_Structure$Compatible,
-	alignItems: _rtfeldman$elm_css$Css_Structure$Compatible,
-	justifyContent: _rtfeldman$elm_css$Css_Structure$Compatible,
-	length: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrNone: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrNumber: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrNoneOrMinMaxDimension: _rtfeldman$elm_css$Css_Structure$Compatible,
-	listStyleType: _rtfeldman$elm_css$Css_Structure$Compatible,
-	listStylePosition: _rtfeldman$elm_css$Css_Structure$Compatible,
-	listStyleTypeOrPositionOrImage: _rtfeldman$elm_css$Css_Structure$Compatible,
-	flexBasis: _rtfeldman$elm_css$Css_Structure$Compatible,
-	flexWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
-	flexDirection: _rtfeldman$elm_css$Css_Structure$Compatible,
-	flexDirectionOrWrap: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrNumberOrAutoOrNoneOrContent: _rtfeldman$elm_css$Css_Structure$Compatible,
-	fontFamily: _rtfeldman$elm_css$Css_Structure$Compatible,
-	fontSize: _rtfeldman$elm_css$Css_Structure$Compatible,
-	fontStyle: _rtfeldman$elm_css$Css_Structure$Compatible,
-	fontWeight: _rtfeldman$elm_css$Css_Structure$Compatible,
-	fontVariant: _rtfeldman$elm_css$Css_Structure$Compatible,
-	outline: _rtfeldman$elm_css$Css_Structure$Compatible,
-	units: _rtfeldman$elm_css$Css$IncompatibleUnits,
-	numericValue: 0,
-	unitLabel: '',
-	warnings: {ctor: '[]'},
-	backgroundRepeat: _rtfeldman$elm_css$Css_Structure$Compatible,
-	backgroundRepeatShorthand: _rtfeldman$elm_css$Css_Structure$Compatible,
-	backgroundAttachment: _rtfeldman$elm_css$Css_Structure$Compatible,
-	backgroundBlendMode: _rtfeldman$elm_css$Css_Structure$Compatible,
-	backgroundOrigin: _rtfeldman$elm_css$Css_Structure$Compatible,
-	backgroundImage: _rtfeldman$elm_css$Css_Structure$Compatible,
-	lengthOrAutoOrCoverOrContain: _rtfeldman$elm_css$Css_Structure$Compatible,
-	intOrAuto: _rtfeldman$elm_css$Css_Structure$Compatible,
-	touchAction: _rtfeldman$elm_css$Css_Structure$Compatible,
-	whiteSpace: _rtfeldman$elm_css$Css_Structure$Compatible
-};
-var _rtfeldman$elm_css$Css$unset = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$initial,
-	{value: 'unset'});
-var _rtfeldman$elm_css$Css$inherit = _elm_lang$core$Native_Utils.update(
-	_rtfeldman$elm_css$Css$initial,
-	{value: 'inherit'});
-var _rtfeldman$elm_css$Css$lengthForOverloadedProperty = A3(_rtfeldman$elm_css$Css$lengthConverter, _rtfeldman$elm_css$Css$IncompatibleUnits, '', 0);
-var _rtfeldman$elm_css$Css$alignItems = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'alignItems',
-		'align-items',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$alignSelf = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'alignSelf',
-		'align-self',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$justifyContent = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'justifyContent',
-		'justify-content',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$float = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'float',
-		'float',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$textAlignLast = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'textAlignLast',
-		'text-align-last',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$textAlign = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'textAlign',
-		'text-align',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$verticalAlign = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'verticalAlign',
-		'vertical-align',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$backgroundPosition = function (fn) {
-	return A3(
-		_rtfeldman$elm_css$Css$getOverloadedProperty,
-		'backgroundPosition',
-		'background-position',
-		fn(_rtfeldman$elm_css$Css$lengthForOverloadedProperty));
-};
-var _rtfeldman$elm_css$Css$Rtl = {ctor: 'Rtl'};
-var _rtfeldman$elm_css$Css$Ltr = {ctor: 'Ltr'};
-var _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs = {ctor: 'IntentionallyUnsupportedPleaseSeeDocs'};
-var _rtfeldman$elm_css$Css$thin = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
-var _rtfeldman$elm_css$Css$thick = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
-var _rtfeldman$elm_css$Css$blink = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
+var _rtfeldman$elm_css$Css_Media$Portrait = F2(
+	function (a, b) {
+		return {value: a, orientation: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Resolution = F2(
+	function (a, b) {
+		return {value: a, resolution: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Progressive = F2(
+	function (a, b) {
+		return {value: a, scanningProcess: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Interlace = F2(
+	function (a, b) {
+		return {value: a, scanningProcess: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Slow = F2(
+	function (a, b) {
+		return {value: a, updateFrequency: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Fast = F2(
+	function (a, b) {
+		return {value: a, updateFrequency: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Paged = F2(
+	function (a, b) {
+		return {value: a, blockAxisOverflow: b};
+	});
+var _rtfeldman$elm_css$Css_Media$OptionalPaged = F2(
+	function (a, b) {
+		return {value: a, blockAxisOverflow: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Bits = F2(
+	function (a, b) {
+		return {value: a, bits: b};
+	});
+var _rtfeldman$elm_css$Css_Media$SRGB = F2(
+	function (a, b) {
+		return {value: a, colorGamut: b};
+	});
+var _rtfeldman$elm_css$Css_Media$P3 = F2(
+	function (a, b) {
+		return {value: a, colorGamut: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Rec2020 = F2(
+	function (a, b) {
+		return {value: a, colorGamut: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Fine = F2(
+	function (a, b) {
+		return {value: a, pointerDevice: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Coarse = F2(
+	function (a, b) {
+		return {value: a, pointerDevice: b};
+	});
+var _rtfeldman$elm_css$Css_Media$CanHover = F2(
+	function (a, b) {
+		return {value: a, hoverCapability: b};
+	});
+var _rtfeldman$elm_css$Css_Media$InitialOnly = F2(
+	function (a, b) {
+		return {value: a, scriptingSupport: b};
+	});
+var _rtfeldman$elm_css$Css_Media$Enabled = F2(
+	function (a, b) {
+		return {value: a, scriptingSupport: b};
+	});
 
-var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
+var _rtfeldman$elm_css$Css_Foreign$collectSelectors = function (declarations) {
+	collectSelectors:
+	while (true) {
+		var _p0 = declarations;
+		if (_p0.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p0._0.ctor === 'StyleBlockDeclaration') {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: A2(_rtfeldman$elm_css$Css_Foreign$unwrapSelector, _p0._0._0._0, _p0._0._0._2),
+						_1: _p0._0._0._1
+					},
+					_rtfeldman$elm_css$Css_Foreign$collectSelectors(_p0._1));
+			} else {
+				var _v1 = _p0._1;
+				declarations = _v1;
+				continue collectSelectors;
+			}
+		}
+	}
+};
+var _rtfeldman$elm_css$Css_Foreign$unwrapSelector = F2(
+	function (_p1, styles) {
+		var _p2 = _p1;
+		var unwrapCombinatorSelector = F2(
+			function (style, cs) {
+				var _p3 = style;
+				if (_p3.ctor === 'NestSnippet') {
+					return A2(
+						_elm_lang$core$List$append,
+						cs,
+						A2(
+							_elm_lang$core$List$map,
+							function (_p4) {
+								var _p5 = _p4;
+								return {ctor: '_Tuple2', _0: _p3._0, _1: _p5._0};
+							},
+							A2(
+								_elm_lang$core$List$concatMap,
+								function (_p6) {
+									return _rtfeldman$elm_css$Css_Foreign$collectSelectors(
+										_rtfeldman$elm_css$Css_Preprocess$unwrapSnippet(_p6));
+								},
+								_p3._1)));
+				} else {
+					return cs;
+				}
+			});
+		var unwrapSequenceSelector = F2(
+			function (style, s) {
+				var _p7 = style;
+				if (_p7.ctor === 'ExtendSelector') {
+					return A3(
+						_elm_lang$core$List$foldr,
+						unwrapSequenceSelector,
+						A2(_rtfeldman$elm_css$Css_Structure$appendRepeatable, _p7._0, s),
+						_p7._1);
+				} else {
+					return s;
+				}
+			});
+		return A3(
+			_rtfeldman$elm_css$Css_Structure$Selector,
+			A3(_elm_lang$core$List$foldr, unwrapSequenceSelector, _p2._0, styles),
+			A3(_elm_lang$core$List$foldr, unwrapCombinatorSelector, _p2._1, styles),
+			_p2._2);
+	});
+var _rtfeldman$elm_css$Css_Foreign$typeSelector = F2(
 	function (selectorStr, styles) {
 		var sequence = A2(
 			_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
@@ -14992,1070 +16380,825 @@ var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _rtfeldman$elm_css$Css_Elements$html = _rtfeldman$elm_css$Css_Elements$typeSelector('html');
-var _rtfeldman$elm_css$Css_Elements$body = _rtfeldman$elm_css$Css_Elements$typeSelector('body');
-var _rtfeldman$elm_css$Css_Elements$article = _rtfeldman$elm_css$Css_Elements$typeSelector('article');
-var _rtfeldman$elm_css$Css_Elements$header = _rtfeldman$elm_css$Css_Elements$typeSelector('header');
-var _rtfeldman$elm_css$Css_Elements$footer = _rtfeldman$elm_css$Css_Elements$typeSelector('footer');
-var _rtfeldman$elm_css$Css_Elements$h1 = _rtfeldman$elm_css$Css_Elements$typeSelector('h1');
-var _rtfeldman$elm_css$Css_Elements$h2 = _rtfeldman$elm_css$Css_Elements$typeSelector('h2');
-var _rtfeldman$elm_css$Css_Elements$h3 = _rtfeldman$elm_css$Css_Elements$typeSelector('h3');
-var _rtfeldman$elm_css$Css_Elements$h4 = _rtfeldman$elm_css$Css_Elements$typeSelector('h4');
-var _rtfeldman$elm_css$Css_Elements$h5 = _rtfeldman$elm_css$Css_Elements$typeSelector('h5');
-var _rtfeldman$elm_css$Css_Elements$h6 = _rtfeldman$elm_css$Css_Elements$typeSelector('h6');
-var _rtfeldman$elm_css$Css_Elements$nav = _rtfeldman$elm_css$Css_Elements$typeSelector('nav');
-var _rtfeldman$elm_css$Css_Elements$menu = _rtfeldman$elm_css$Css_Elements$typeSelector('menu');
-var _rtfeldman$elm_css$Css_Elements$section = _rtfeldman$elm_css$Css_Elements$typeSelector('section');
-var _rtfeldman$elm_css$Css_Elements$aside = _rtfeldman$elm_css$Css_Elements$typeSelector('aside');
-var _rtfeldman$elm_css$Css_Elements$time = _rtfeldman$elm_css$Css_Elements$typeSelector('time');
-var _rtfeldman$elm_css$Css_Elements$div = _rtfeldman$elm_css$Css_Elements$typeSelector('div');
-var _rtfeldman$elm_css$Css_Elements$hr = _rtfeldman$elm_css$Css_Elements$typeSelector('hr');
-var _rtfeldman$elm_css$Css_Elements$li = _rtfeldman$elm_css$Css_Elements$typeSelector('li');
-var _rtfeldman$elm_css$Css_Elements$main_ = _rtfeldman$elm_css$Css_Elements$typeSelector('main');
-var _rtfeldman$elm_css$Css_Elements$ol = _rtfeldman$elm_css$Css_Elements$typeSelector('ol');
-var _rtfeldman$elm_css$Css_Elements$p = _rtfeldman$elm_css$Css_Elements$typeSelector('p');
-var _rtfeldman$elm_css$Css_Elements$ul = _rtfeldman$elm_css$Css_Elements$typeSelector('ul');
-var _rtfeldman$elm_css$Css_Elements$pre = _rtfeldman$elm_css$Css_Elements$typeSelector('pre');
-var _rtfeldman$elm_css$Css_Elements$dl = _rtfeldman$elm_css$Css_Elements$typeSelector('dl');
-var _rtfeldman$elm_css$Css_Elements$dt = _rtfeldman$elm_css$Css_Elements$typeSelector('dt');
-var _rtfeldman$elm_css$Css_Elements$dd = _rtfeldman$elm_css$Css_Elements$typeSelector('dd');
-var _rtfeldman$elm_css$Css_Elements$a = _rtfeldman$elm_css$Css_Elements$typeSelector('a');
-var _rtfeldman$elm_css$Css_Elements$code = _rtfeldman$elm_css$Css_Elements$typeSelector('code');
-var _rtfeldman$elm_css$Css_Elements$small = _rtfeldman$elm_css$Css_Elements$typeSelector('small');
-var _rtfeldman$elm_css$Css_Elements$span = _rtfeldman$elm_css$Css_Elements$typeSelector('span');
-var _rtfeldman$elm_css$Css_Elements$strong = _rtfeldman$elm_css$Css_Elements$typeSelector('strong');
-var _rtfeldman$elm_css$Css_Elements$i = _rtfeldman$elm_css$Css_Elements$typeSelector('i');
-var _rtfeldman$elm_css$Css_Elements$em = _rtfeldman$elm_css$Css_Elements$typeSelector('em');
-var _rtfeldman$elm_css$Css_Elements$q = _rtfeldman$elm_css$Css_Elements$typeSelector('q');
-var _rtfeldman$elm_css$Css_Elements$img = _rtfeldman$elm_css$Css_Elements$typeSelector('img');
-var _rtfeldman$elm_css$Css_Elements$audio = _rtfeldman$elm_css$Css_Elements$typeSelector('audio');
-var _rtfeldman$elm_css$Css_Elements$video = _rtfeldman$elm_css$Css_Elements$typeSelector('video');
-var _rtfeldman$elm_css$Css_Elements$canvas = _rtfeldman$elm_css$Css_Elements$typeSelector('canvas');
-var _rtfeldman$elm_css$Css_Elements$caption = _rtfeldman$elm_css$Css_Elements$typeSelector('caption');
-var _rtfeldman$elm_css$Css_Elements$col = _rtfeldman$elm_css$Css_Elements$typeSelector('col');
-var _rtfeldman$elm_css$Css_Elements$colgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('colgroup');
-var _rtfeldman$elm_css$Css_Elements$table = _rtfeldman$elm_css$Css_Elements$typeSelector('table');
-var _rtfeldman$elm_css$Css_Elements$tbody = _rtfeldman$elm_css$Css_Elements$typeSelector('tbody');
-var _rtfeldman$elm_css$Css_Elements$td = _rtfeldman$elm_css$Css_Elements$typeSelector('td');
-var _rtfeldman$elm_css$Css_Elements$tfoot = _rtfeldman$elm_css$Css_Elements$typeSelector('tfoot');
-var _rtfeldman$elm_css$Css_Elements$th = _rtfeldman$elm_css$Css_Elements$typeSelector('th');
-var _rtfeldman$elm_css$Css_Elements$thead = _rtfeldman$elm_css$Css_Elements$typeSelector('thead');
-var _rtfeldman$elm_css$Css_Elements$tr = _rtfeldman$elm_css$Css_Elements$typeSelector('tr');
-var _rtfeldman$elm_css$Css_Elements$button = _rtfeldman$elm_css$Css_Elements$typeSelector('button');
-var _rtfeldman$elm_css$Css_Elements$fieldset = _rtfeldman$elm_css$Css_Elements$typeSelector('fieldset');
-var _rtfeldman$elm_css$Css_Elements$form = _rtfeldman$elm_css$Css_Elements$typeSelector('form');
-var _rtfeldman$elm_css$Css_Elements$input = _rtfeldman$elm_css$Css_Elements$typeSelector('input');
-var _rtfeldman$elm_css$Css_Elements$label = _rtfeldman$elm_css$Css_Elements$typeSelector('label');
-var _rtfeldman$elm_css$Css_Elements$legend = _rtfeldman$elm_css$Css_Elements$typeSelector('legend');
-var _rtfeldman$elm_css$Css_Elements$optgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('optgroup');
-var _rtfeldman$elm_css$Css_Elements$option = _rtfeldman$elm_css$Css_Elements$typeSelector('option');
-var _rtfeldman$elm_css$Css_Elements$progress = _rtfeldman$elm_css$Css_Elements$typeSelector('progress');
-var _rtfeldman$elm_css$Css_Elements$select = _rtfeldman$elm_css$Css_Elements$typeSelector('select');
-var _rtfeldman$elm_css$Css_Elements$textarea = _rtfeldman$elm_css$Css_Elements$typeSelector('textarea');
-var _rtfeldman$elm_css$Css_Elements$blockquote = _rtfeldman$elm_css$Css_Elements$typeSelector('blockquote');
-var _rtfeldman$elm_css$Css_Elements$svg = _rtfeldman$elm_css$Css_Elements$typeSelector('svg');
-var _rtfeldman$elm_css$Css_Elements$path = _rtfeldman$elm_css$Css_Elements$typeSelector('path');
-var _rtfeldman$elm_css$Css_Elements$rect = _rtfeldman$elm_css$Css_Elements$typeSelector('rect');
-var _rtfeldman$elm_css$Css_Elements$circle = _rtfeldman$elm_css$Css_Elements$typeSelector('circle');
-var _rtfeldman$elm_css$Css_Elements$ellipse = _rtfeldman$elm_css$Css_Elements$typeSelector('ellipse');
-var _rtfeldman$elm_css$Css_Elements$line = _rtfeldman$elm_css$Css_Elements$typeSelector('line');
-var _rtfeldman$elm_css$Css_Elements$polyline = _rtfeldman$elm_css$Css_Elements$typeSelector('polyline');
-var _rtfeldman$elm_css$Css_Elements$polygon = _rtfeldman$elm_css$Css_Elements$typeSelector('polygon');
-
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToProperty = F2(
-	function (name, property) {
-		var _p0 = property.key;
-		if (_p0 === 'animation-name') {
-			return _elm_lang$core$Native_Utils.update(
-				property,
-				{
-					value: A2(_elm_lang$core$Basics_ops['++'], name, property.value)
-				});
-		} else {
-			return property;
-		}
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable = F2(
-	function (name, selector) {
-		var _p1 = selector;
-		switch (_p1.ctor) {
-			case 'ClassSelector':
-				return _rtfeldman$elm_css$Css_Structure$ClassSelector(
-					A2(_elm_lang$core$Basics_ops['++'], name, _p1._0));
-			case 'IdSelector':
-				return _rtfeldman$elm_css$Css_Structure$IdSelector(_p1._0);
-			default:
-				return _rtfeldman$elm_css$Css_Structure$PseudoClassSelector(_p1._0);
-		}
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSequence = F2(
-	function (name, sequence) {
-		var _p2 = sequence;
-		switch (_p2.ctor) {
-			case 'TypeSelectorSequence':
-				return A2(
-					_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
-					_p2._0,
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable(name),
-						_p2._1));
-			case 'UniversalSelectorSequence':
-				return _rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable(name),
-						_p2._0));
-			default:
-				return A2(
-					_rtfeldman$elm_css$Css_Structure$CustomSelector,
-					_p2._0,
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable(name),
-						_p2._1));
-		}
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector = F2(
-	function (name, _p3) {
-		var _p4 = _p3;
-		var apply = _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSequence(name);
-		return A3(
-			_rtfeldman$elm_css$Css_Structure$Selector,
-			apply(_p4._0),
-			A2(
-				_elm_lang$core$List$map,
-				function (_p5) {
-					var _p6 = _p5;
-					return {
-						ctor: '_Tuple2',
-						_0: _p6._0,
-						_1: apply(_p6._1)
-					};
-				},
-				_p4._1),
-			_p4._2);
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle = F2(
-	function (name, style) {
-		var _p7 = style;
-		switch (_p7.ctor) {
-			case 'AppendProperty':
-				return _rtfeldman$elm_css$Css_Preprocess$AppendProperty(
-					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToProperty, name, _p7._0));
-			case 'ExtendSelector':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$ExtendSelector,
-					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable, name, _p7._0),
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
-						_p7._1));
-			case 'NestSnippet':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$NestSnippet,
-					_p7._0,
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSnippet(name),
-						_p7._1));
-			case 'WithPseudoElement':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$WithPseudoElement,
-					_p7._0,
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
-						_p7._1));
-			case 'WithMedia':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$WithMedia,
-					_p7._0,
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
-						_p7._1));
-			default:
-				return _rtfeldman$elm_css$Css_Preprocess$ApplyStyles(
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
-						_p7._0));
-		}
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSnippet = F2(
-	function (name, _p8) {
-		var _p9 = _p8;
-		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
-			A2(
-				_elm_lang$core$List$map,
-				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToDeclaration(name),
-				_p9._0));
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToDeclaration = F2(
-	function (name, declaration) {
-		var _p10 = declaration;
-		switch (_p10.ctor) {
-			case 'StyleBlockDeclaration':
-				return _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
-					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock, name, _p10._0));
-			case 'MediaRule':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$MediaRule,
-					_p10._0,
-					A2(
-						_elm_lang$core$List$map,
-						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock(name),
-						_p10._1));
-			case 'SupportsRule':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$SupportsRule,
-					_p10._0,
-					function (declarations) {
-						return {
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css_Preprocess$Snippet(declarations),
-							_1: {ctor: '[]'}
-						};
-					}(
-						A2(
-							_elm_lang$core$List$map,
-							_rtfeldman$elm_css$Css_Namespace$applyNamespaceToDeclaration(name),
-							A2(_elm_lang$core$List$concatMap, _rtfeldman$elm_css$Css_Preprocess$unwrapSnippet, _p10._1))));
-			case 'DocumentRule':
-				return A5(
-					_rtfeldman$elm_css$Css_Preprocess$DocumentRule,
-					_p10._0,
-					_p10._1,
-					_p10._2,
-					_p10._3,
-					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock, name, _p10._4));
-			case 'PageRule':
-				return declaration;
-			case 'FontFace':
-				return declaration;
-			case 'Keyframes':
-				return A2(
-					_rtfeldman$elm_css$Css_Preprocess$Keyframes,
-					A2(_elm_lang$core$Basics_ops['++'], name, _p10._0),
-					_p10._1);
-			case 'Viewport':
-				return declaration;
-			case 'CounterStyle':
-				return declaration;
-			default:
-				return declaration;
-		}
-	});
-var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock = F2(
-	function (name, _p11) {
-		var _p12 = _p11;
-		return A3(
-			_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
-			A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector, name, _p12._0),
-			A2(
-				_elm_lang$core$List$map,
-				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector(name),
-				_p12._1),
-			A2(
-				_elm_lang$core$List$map,
-				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyle(name),
-				_p12._2));
-	});
-var _rtfeldman$elm_css$Css_Namespace$namespace = F2(
-	function (rawIdentifier, snippets) {
-		return A2(
-			_elm_lang$core$List$map,
-			_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSnippet(
-				_rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier(rawIdentifier)),
-			snippets);
-	});
-
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight = 200;
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight = 32;
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$boxShadowCustom = function (p) {
-	return A2(_rtfeldman$elm_css$Css$property, 'box-shadow', p);
-};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputMirrow = {ctor: 'InputMirrow'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Opened = {ctor: 'Opened'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Focused = {ctor: 'Focused'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItemHovered = {ctor: 'MenuItemHovered'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem = {ctor: 'MenuItem'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Menu = {ctor: 'Menu'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside = {ctor: 'ArrowUpside'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow = {ctor: 'Arrow'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowWrap = {ctor: 'ArrowWrap'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Clear = {ctor: 'Clear'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$ClearWrap = {ctor: 'ClearWrap'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagLabel = {ctor: 'TagLabel'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagIcon = {ctor: 'TagIcon'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Tag = {ctor: 'Tag'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagWrap = {ctor: 'TagWrap'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Input = {ctor: 'Input'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputWrap = {ctor: 'InputWrap'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container = {ctor: 'Container'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$Wrap = {ctor: 'Wrap'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$css = function (_p0) {
-	return _rtfeldman$elm_css$Css$stylesheet(
-		A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'multiselect', _p0));
-}(
-	{
-		ctor: '::',
-		_0: _rtfeldman$elm_css$Css_Elements$body(
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$fontSize(
-					_rtfeldman$elm_css$Css$px(14)),
-				_1: {
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$fontFamilies(
-						{
-							ctor: '::',
-							_0: 'Helvetica Neue',
-							_1: {
-								ctor: '::',
-								_0: 'Helvetica',
-								_1: {
-									ctor: '::',
-									_0: 'Arial',
-									_1: {
-										ctor: '::',
-										_0: 'sans-serif',
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_rtfeldman$elm_css$Css$class,
-				_inkuzmin$elm_multiselect$Multiselect_SelectCss$Wrap,
-				{
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-					_1: {
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$width(
-							_rtfeldman$elm_css$Css$pct(100)),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_rtfeldman$elm_css$Css$class,
-					_inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
+var _rtfeldman$elm_css$Css_Foreign$html = _rtfeldman$elm_css$Css_Foreign$typeSelector('html');
+var _rtfeldman$elm_css$Css_Foreign$body = _rtfeldman$elm_css$Css_Foreign$typeSelector('body');
+var _rtfeldman$elm_css$Css_Foreign$article = _rtfeldman$elm_css$Css_Foreign$typeSelector('article');
+var _rtfeldman$elm_css$Css_Foreign$header = _rtfeldman$elm_css$Css_Foreign$typeSelector('header');
+var _rtfeldman$elm_css$Css_Foreign$footer = _rtfeldman$elm_css$Css_Foreign$typeSelector('footer');
+var _rtfeldman$elm_css$Css_Foreign$h1 = _rtfeldman$elm_css$Css_Foreign$typeSelector('h1');
+var _rtfeldman$elm_css$Css_Foreign$h2 = _rtfeldman$elm_css$Css_Foreign$typeSelector('h2');
+var _rtfeldman$elm_css$Css_Foreign$h3 = _rtfeldman$elm_css$Css_Foreign$typeSelector('h3');
+var _rtfeldman$elm_css$Css_Foreign$h4 = _rtfeldman$elm_css$Css_Foreign$typeSelector('h4');
+var _rtfeldman$elm_css$Css_Foreign$h5 = _rtfeldman$elm_css$Css_Foreign$typeSelector('h5');
+var _rtfeldman$elm_css$Css_Foreign$h6 = _rtfeldman$elm_css$Css_Foreign$typeSelector('h6');
+var _rtfeldman$elm_css$Css_Foreign$nav = _rtfeldman$elm_css$Css_Foreign$typeSelector('nav');
+var _rtfeldman$elm_css$Css_Foreign$menu = _rtfeldman$elm_css$Css_Foreign$typeSelector('menu');
+var _rtfeldman$elm_css$Css_Foreign$section = _rtfeldman$elm_css$Css_Foreign$typeSelector('section');
+var _rtfeldman$elm_css$Css_Foreign$aside = _rtfeldman$elm_css$Css_Foreign$typeSelector('aside');
+var _rtfeldman$elm_css$Css_Foreign$time = _rtfeldman$elm_css$Css_Foreign$typeSelector('time');
+var _rtfeldman$elm_css$Css_Foreign$div = _rtfeldman$elm_css$Css_Foreign$typeSelector('div');
+var _rtfeldman$elm_css$Css_Foreign$hr = _rtfeldman$elm_css$Css_Foreign$typeSelector('hr');
+var _rtfeldman$elm_css$Css_Foreign$li = _rtfeldman$elm_css$Css_Foreign$typeSelector('li');
+var _rtfeldman$elm_css$Css_Foreign$main_ = _rtfeldman$elm_css$Css_Foreign$typeSelector('main');
+var _rtfeldman$elm_css$Css_Foreign$ol = _rtfeldman$elm_css$Css_Foreign$typeSelector('ol');
+var _rtfeldman$elm_css$Css_Foreign$p = _rtfeldman$elm_css$Css_Foreign$typeSelector('p');
+var _rtfeldman$elm_css$Css_Foreign$ul = _rtfeldman$elm_css$Css_Foreign$typeSelector('ul');
+var _rtfeldman$elm_css$Css_Foreign$pre = _rtfeldman$elm_css$Css_Foreign$typeSelector('pre');
+var _rtfeldman$elm_css$Css_Foreign$dl = _rtfeldman$elm_css$Css_Foreign$typeSelector('dl');
+var _rtfeldman$elm_css$Css_Foreign$dt = _rtfeldman$elm_css$Css_Foreign$typeSelector('dt');
+var _rtfeldman$elm_css$Css_Foreign$dd = _rtfeldman$elm_css$Css_Foreign$typeSelector('dd');
+var _rtfeldman$elm_css$Css_Foreign$a = _rtfeldman$elm_css$Css_Foreign$typeSelector('a');
+var _rtfeldman$elm_css$Css_Foreign$code = _rtfeldman$elm_css$Css_Foreign$typeSelector('code');
+var _rtfeldman$elm_css$Css_Foreign$small = _rtfeldman$elm_css$Css_Foreign$typeSelector('small');
+var _rtfeldman$elm_css$Css_Foreign$span = _rtfeldman$elm_css$Css_Foreign$typeSelector('span');
+var _rtfeldman$elm_css$Css_Foreign$strong = _rtfeldman$elm_css$Css_Foreign$typeSelector('strong');
+var _rtfeldman$elm_css$Css_Foreign$i = _rtfeldman$elm_css$Css_Foreign$typeSelector('i');
+var _rtfeldman$elm_css$Css_Foreign$em = _rtfeldman$elm_css$Css_Foreign$typeSelector('em');
+var _rtfeldman$elm_css$Css_Foreign$q = _rtfeldman$elm_css$Css_Foreign$typeSelector('q');
+var _rtfeldman$elm_css$Css_Foreign$img = _rtfeldman$elm_css$Css_Foreign$typeSelector('img');
+var _rtfeldman$elm_css$Css_Foreign$audio = _rtfeldman$elm_css$Css_Foreign$typeSelector('audio');
+var _rtfeldman$elm_css$Css_Foreign$video = _rtfeldman$elm_css$Css_Foreign$typeSelector('video');
+var _rtfeldman$elm_css$Css_Foreign$canvas = _rtfeldman$elm_css$Css_Foreign$typeSelector('canvas');
+var _rtfeldman$elm_css$Css_Foreign$caption = _rtfeldman$elm_css$Css_Foreign$typeSelector('caption');
+var _rtfeldman$elm_css$Css_Foreign$col = _rtfeldman$elm_css$Css_Foreign$typeSelector('col');
+var _rtfeldman$elm_css$Css_Foreign$colgroup = _rtfeldman$elm_css$Css_Foreign$typeSelector('colgroup');
+var _rtfeldman$elm_css$Css_Foreign$table = _rtfeldman$elm_css$Css_Foreign$typeSelector('table');
+var _rtfeldman$elm_css$Css_Foreign$tbody = _rtfeldman$elm_css$Css_Foreign$typeSelector('tbody');
+var _rtfeldman$elm_css$Css_Foreign$td = _rtfeldman$elm_css$Css_Foreign$typeSelector('td');
+var _rtfeldman$elm_css$Css_Foreign$tfoot = _rtfeldman$elm_css$Css_Foreign$typeSelector('tfoot');
+var _rtfeldman$elm_css$Css_Foreign$th = _rtfeldman$elm_css$Css_Foreign$typeSelector('th');
+var _rtfeldman$elm_css$Css_Foreign$thead = _rtfeldman$elm_css$Css_Foreign$typeSelector('thead');
+var _rtfeldman$elm_css$Css_Foreign$tr = _rtfeldman$elm_css$Css_Foreign$typeSelector('tr');
+var _rtfeldman$elm_css$Css_Foreign$button = _rtfeldman$elm_css$Css_Foreign$typeSelector('button');
+var _rtfeldman$elm_css$Css_Foreign$fieldset = _rtfeldman$elm_css$Css_Foreign$typeSelector('fieldset');
+var _rtfeldman$elm_css$Css_Foreign$form = _rtfeldman$elm_css$Css_Foreign$typeSelector('form');
+var _rtfeldman$elm_css$Css_Foreign$input = _rtfeldman$elm_css$Css_Foreign$typeSelector('input');
+var _rtfeldman$elm_css$Css_Foreign$label = _rtfeldman$elm_css$Css_Foreign$typeSelector('label');
+var _rtfeldman$elm_css$Css_Foreign$legend = _rtfeldman$elm_css$Css_Foreign$typeSelector('legend');
+var _rtfeldman$elm_css$Css_Foreign$optgroup = _rtfeldman$elm_css$Css_Foreign$typeSelector('optgroup');
+var _rtfeldman$elm_css$Css_Foreign$option = _rtfeldman$elm_css$Css_Foreign$typeSelector('option');
+var _rtfeldman$elm_css$Css_Foreign$progress = _rtfeldman$elm_css$Css_Foreign$typeSelector('progress');
+var _rtfeldman$elm_css$Css_Foreign$select = _rtfeldman$elm_css$Css_Foreign$typeSelector('select');
+var _rtfeldman$elm_css$Css_Foreign$textarea = _rtfeldman$elm_css$Css_Foreign$typeSelector('textarea');
+var _rtfeldman$elm_css$Css_Foreign$blockquote = _rtfeldman$elm_css$Css_Foreign$typeSelector('blockquote');
+var _rtfeldman$elm_css$Css_Foreign$svg = _rtfeldman$elm_css$Css_Foreign$typeSelector('svg');
+var _rtfeldman$elm_css$Css_Foreign$path = _rtfeldman$elm_css$Css_Foreign$typeSelector('path');
+var _rtfeldman$elm_css$Css_Foreign$rect = _rtfeldman$elm_css$Css_Foreign$typeSelector('rect');
+var _rtfeldman$elm_css$Css_Foreign$circle = _rtfeldman$elm_css$Css_Foreign$typeSelector('circle');
+var _rtfeldman$elm_css$Css_Foreign$ellipse = _rtfeldman$elm_css$Css_Foreign$typeSelector('ellipse');
+var _rtfeldman$elm_css$Css_Foreign$line = _rtfeldman$elm_css$Css_Foreign$typeSelector('line');
+var _rtfeldman$elm_css$Css_Foreign$polyline = _rtfeldman$elm_css$Css_Foreign$typeSelector('polyline');
+var _rtfeldman$elm_css$Css_Foreign$polygon = _rtfeldman$elm_css$Css_Foreign$typeSelector('polygon');
+var _rtfeldman$elm_css$Css_Foreign$each = F2(
+	function (snippetCreators, styles) {
+		var selectorsToSnippet = function (selectors) {
+			var _p8 = selectors;
+			if (_p8.ctor === '[]') {
+				return _rtfeldman$elm_css$Css_Preprocess$Snippet(
+					{ctor: '[]'});
+			} else {
+				return _rtfeldman$elm_css$Css_Preprocess$Snippet(
 					{
 						ctor: '::',
-						_0: A3(
-							_rtfeldman$elm_css$Css$border3,
-							_rtfeldman$elm_css$Css$px(1),
-							_rtfeldman$elm_css$Css$solid,
-							_rtfeldman$elm_css$Css$hex('#ccc')),
+						_0: _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
+							A3(_rtfeldman$elm_css$Css_Preprocess$StyleBlock, _p8._0, _p8._1, styles)),
+						_1: {ctor: '[]'}
+					});
+			}
+		};
+		return selectorsToSnippet(
+			_rtfeldman$elm_css$Css_Foreign$collectSelectors(
+				A2(
+					_elm_lang$core$List$concatMap,
+					_rtfeldman$elm_css$Css_Preprocess$unwrapSnippet,
+					A2(
+						_elm_lang$core$List$map,
+						F2(
+							function (x, y) {
+								return y(x);
+							})(
+							{ctor: '[]'}),
+						snippetCreators))));
+	});
+var _rtfeldman$elm_css$Css_Foreign$generalSiblings = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$GeneralSibling);
+var _rtfeldman$elm_css$Css_Foreign$adjacentSiblings = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$AdjacentSibling);
+var _rtfeldman$elm_css$Css_Foreign$descendants = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$Descendant);
+var _rtfeldman$elm_css$Css_Foreign$withClass = function ($class) {
+	return _rtfeldman$elm_css$Css_Preprocess$ExtendSelector(
+		_rtfeldman$elm_css$Css_Structure$ClassSelector(
+			A2(_rtfeldman$elm_css_util$Css_Helpers$identifierToString, '', $class)));
+};
+var _rtfeldman$elm_css$Css_Foreign$children = _rtfeldman$elm_css$Css_Preprocess$NestSnippet(_rtfeldman$elm_css$Css_Structure$Child);
+var _rtfeldman$elm_css$Css_Foreign$media = F2(
+	function (queries, snippets) {
+		var nestedMediaRules = function (declarations) {
+			nestedMediaRules:
+			while (true) {
+				var _p9 = declarations;
+				if (_p9.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					switch (_p9._0.ctor) {
+						case 'StyleBlockDeclaration':
+							var _v8 = _p9._1;
+							declarations = _v8;
+							continue nestedMediaRules;
+						case 'MediaRule':
+							return {
+								ctor: '::',
+								_0: A2(
+									_rtfeldman$elm_css$Css_Preprocess$MediaRule,
+									A2(_elm_lang$core$List$append, queries, _p9._0._0),
+									_p9._0._1),
+								_1: nestedMediaRules(_p9._1)
+							};
+						default:
+							return {
+								ctor: '::',
+								_0: _p9._0,
+								_1: nestedMediaRules(_p9._1)
+							};
+					}
+				}
+			}
+		};
+		var extractStyleBlocks = function (declarations) {
+			extractStyleBlocks:
+			while (true) {
+				var _p10 = declarations;
+				if (_p10.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					if (_p10._0.ctor === 'StyleBlockDeclaration') {
+						return {
+							ctor: '::',
+							_0: _p10._0._0,
+							_1: extractStyleBlocks(_p10._1)
+						};
+					} else {
+						var _v10 = _p10._1;
+						declarations = _v10;
+						continue extractStyleBlocks;
+					}
+				}
+			}
+		};
+		var snippetDeclarations = A2(_elm_lang$core$List$concatMap, _rtfeldman$elm_css$Css_Preprocess$unwrapSnippet, snippets);
+		var mediaRuleFromStyleBlocks = A2(
+			_rtfeldman$elm_css$Css_Preprocess$MediaRule,
+			queries,
+			extractStyleBlocks(snippetDeclarations));
+		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
+			{
+				ctor: '::',
+				_0: mediaRuleFromStyleBlocks,
+				_1: nestedMediaRules(snippetDeclarations)
+			});
+	});
+var _rtfeldman$elm_css$Css_Foreign$mediaQuery = F2(
+	function (stringQueries, snippets) {
+		return A2(
+			_rtfeldman$elm_css$Css_Foreign$media,
+			A2(_elm_lang$core$List$map, _rtfeldman$elm_css$Css_Structure$CustomQuery, stringQueries),
+			snippets);
+	});
+var _rtfeldman$elm_css$Css_Foreign$everything = function (styles) {
+	return A2(
+		_rtfeldman$elm_css$VirtualDom_Styled$makeSnippet,
+		styles,
+		_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
+			{ctor: '[]'}));
+};
+var _rtfeldman$elm_css$Css_Foreign$selector = F2(
+	function (selectorStr, styles) {
+		return A2(
+			_rtfeldman$elm_css$VirtualDom_Styled$makeSnippet,
+			styles,
+			A2(
+				_rtfeldman$elm_css$Css_Structure$CustomSelector,
+				selectorStr,
+				{ctor: '[]'}));
+	});
+var _rtfeldman$elm_css$Css_Foreign$class = F2(
+	function ($class, styles) {
+		return A2(
+			_rtfeldman$elm_css$VirtualDom_Styled$makeSnippet,
+			styles,
+			_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css_Structure$ClassSelector(
+						A2(_rtfeldman$elm_css_util$Css_Helpers$identifierToString, '', $class)),
+					_1: {ctor: '[]'}
+				}));
+	});
+var _rtfeldman$elm_css$Css_Foreign$id = F2(
+	function (identifier, styles) {
+		return A2(
+			_rtfeldman$elm_css$VirtualDom_Styled$makeSnippet,
+			styles,
+			_rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css_Structure$IdSelector(
+						A2(_rtfeldman$elm_css_util$Css_Helpers$identifierToString, '', identifier)),
+					_1: {ctor: '[]'}
+				}));
+	});
+var _rtfeldman$elm_css$Css_Foreign$global = function (snippets) {
+	return _rtfeldman$elm_css$VirtualDom_Styled$unstyledNode(
+		A3(
+			_elm_lang$virtual_dom$VirtualDom$node,
+			'style',
+			{ctor: '[]'},
+			_elm_lang$core$List$singleton(
+				_elm_lang$virtual_dom$VirtualDom$text(
+					function (_) {
+						return _.css;
+					}(
+						_rtfeldman$elm_css$Css_Preprocess_Resolve$compile(
+							_elm_lang$core$List$singleton(
+								_rtfeldman$elm_css$Css_Preprocess$stylesheet(snippets))))))));
+};
+
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuItemHovered = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$backgroundColor(
+			A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 8.0e-2)),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$color(
+				_rtfeldman$elm_css$Css$hex('#333')),
+			_1: {ctor: '[]'}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrowUpside = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: A3(
+			_rtfeldman$elm_css$Css$borderColor3,
+			_rtfeldman$elm_css$Css$transparent,
+			_rtfeldman$elm_css$Css$transparent,
+			_rtfeldman$elm_css$Css$hex('#999')),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$solid),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$borderTopWidth(
+					_rtfeldman$elm_css$Css$px(2.5)),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$borderLeftWidth(
+						_rtfeldman$elm_css$Css$px(5)),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$borderRightWidth(
+							_rtfeldman$elm_css$Css$px(5)),
 						_1: {
 							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$borderRadius(
-								_rtfeldman$elm_css$Css$px(4)),
+							_0: _rtfeldman$elm_css$Css$borderBottomWidth(
+								_rtfeldman$elm_css$Css$px(5)),
 							_1: {
 								ctor: '::',
-								_0: A3(
-									_rtfeldman$elm_css$Css$borderColor3,
-									_rtfeldman$elm_css$Css$hex('#d9d9d9'),
-									_rtfeldman$elm_css$Css$hex('#ccc'),
-									_rtfeldman$elm_css$Css$hex('#b3b3b3')),
+								_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
 								_1: {
 									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$backgroundColor(
-										_rtfeldman$elm_css$Css$hex('#fff')),
+									_0: _rtfeldman$elm_css$Css$height(_rtfeldman$elm_css$Css$zero),
 									_1: {
 										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$color(
-											_rtfeldman$elm_css$Css$hex('#333')),
+										_0: _rtfeldman$elm_css$Css$width(_rtfeldman$elm_css$Css$zero),
 										_1: {
 											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$height(
-												_rtfeldman$elm_css$Css$px(34)),
+											_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
 											_1: {
 												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$width(
-													_rtfeldman$elm_css$Css$pct(100)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$table),
-													_1: {ctor: '[]'}
-												}
+												_0: _rtfeldman$elm_css$Css$top(
+													_rtfeldman$elm_css$Css$px(-2.5)),
+												_1: {ctor: '[]'}
 											}
 										}
 									}
 								}
 							}
 						}
-					}),
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrow = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: A3(
+			_rtfeldman$elm_css$Css$borderColor3,
+			_rtfeldman$elm_css$Css$hex('#999'),
+			_rtfeldman$elm_css$Css$transparent,
+			_rtfeldman$elm_css$Css$transparent),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$solid),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$borderTopWidth(
+					_rtfeldman$elm_css$Css$px(5)),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_rtfeldman$elm_css$Css$class,
-						_inkuzmin$elm_multiselect$Multiselect_SelectCss$InputWrap,
-						{
+					_0: _rtfeldman$elm_css$Css$borderLeftWidth(
+						_rtfeldman$elm_css$Css$px(5)),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$borderRightWidth(
+							_rtfeldman$elm_css$Css$px(5)),
+						_1: {
 							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
+							_0: _rtfeldman$elm_css$Css$borderBottomWidth(
+								_rtfeldman$elm_css$Css$px(2.5)),
 							_1: {
 								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$marginLeft(
-									_rtfeldman$elm_css$Css$px(5)),
+								_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
 								_1: {
 									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$padding(_rtfeldman$elm_css$Css$zero),
+									_0: _rtfeldman$elm_css$Css$height(_rtfeldman$elm_css$Css$zero),
 									_1: {
 										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
+										_0: _rtfeldman$elm_css$Css$width(_rtfeldman$elm_css$Css$zero),
 										_1: {
 											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$paddingBottom(
-												_rtfeldman$elm_css$Css$px(8)),
+											_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
 											_1: {ctor: '[]'}
 										}
 									}
 								}
 							}
-						}),
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrowWrap = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$tableCell),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_rtfeldman$elm_css$Css$class,
-							_inkuzmin$elm_multiselect$Multiselect_SelectCss$Input,
-							{
+						_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$width(
+								_rtfeldman$elm_css$Css$px(25)),
+							_1: {
 								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$none),
+								_0: _rtfeldman$elm_css$Css$paddingRight(
+									_rtfeldman$elm_css$Css$px(5)),
 								_1: {
 									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$border(_rtfeldman$elm_css$Css$zero),
+									_0: _rtfeldman$elm_css$Css$hover(
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css_Foreign$children(
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css_Foreign$everything(
+														{
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$borderTopColor(
+																_rtfeldman$elm_css$Css$hex('#666')),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$borderBottomColor(
+																	_rtfeldman$elm_css$Css$hex('#666')),
+																_1: {ctor: '[]'}
+															}
+														}),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$clear = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$fontSize(
+				_rtfeldman$elm_css$Css$px(18)),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$lineHeight(
+					_rtfeldman$elm_css$Css$num(1)),
+				_1: {ctor: '[]'}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$clearWrap = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$width(
+			_rtfeldman$elm_css$Css$px(17)),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$color(
+				_rtfeldman$elm_css$Css$hex('#999')),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$tableCell),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$hover(
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$color(
+												_rtfeldman$elm_css$Css$hex('#D0021B')),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$tagLabel = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: A2(
+			_rtfeldman$elm_css$Css$padding2,
+			_rtfeldman$elm_css$Css$px(2),
+			_rtfeldman$elm_css$Css$px(5)),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
+				_1: {ctor: '[]'}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$tagIcon = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$hover(
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$backgroundColor(
+					_rtfeldman$elm_css$Css$hex('#d8eafd')),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+			_1: {
+				ctor: '::',
+				_0: A3(
+					_rtfeldman$elm_css$Css$borderRight3,
+					_rtfeldman$elm_css$Css$px(1),
+					_rtfeldman$elm_css$Css$solid,
+					A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 0.24)),
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_rtfeldman$elm_css$Css$padding3,
+						_rtfeldman$elm_css$Css$px(1),
+						_rtfeldman$elm_css$Css$px(5),
+						_rtfeldman$elm_css$Css$px(3)),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$tag = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$color(
+			_rtfeldman$elm_css$Css$hex('#007eff')),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_rtfeldman$elm_css$Css$border2,
+				_rtfeldman$elm_css$Css$px(1),
+				_rtfeldman$elm_css$Css$solid),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$borderColor(
+					A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 0.24)),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$borderRadius(
+						_rtfeldman$elm_css$Css$px(2)),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$backgroundColor(
+							A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 8.0e-2)),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$fontSize(
+									_rtfeldman$elm_css$Css$em(0.9)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$lineHeight(
+										_rtfeldman$elm_css$Css$num(1.4)),
 									_1: {
 										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$lineHeight(
-											_rtfeldman$elm_css$Css$px(14)),
+										_0: _rtfeldman$elm_css$Css$marginLeft(
+											_rtfeldman$elm_css$Css$px(5)),
 										_1: {
 											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$outlineStyle(_rtfeldman$elm_css$Css$none),
+											_0: _rtfeldman$elm_css$Css$marginTop(
+												_rtfeldman$elm_css$Css$px(5)),
 											_1: {
 												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$fontSize(_rtfeldman$elm_css$Css$inherit),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$lineHeight(
-														_rtfeldman$elm_css$Css$int(1)),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$padding(_rtfeldman$elm_css$Css$zero),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$paddingTop(
-																_rtfeldman$elm_css$Css$px(8)),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
+												_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$top),
+												_1: {ctor: '[]'}
 											}
 										}
 									}
 								}
-							}),
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$tagWrap = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inline),
+		_1: {ctor: '[]'}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$opened = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$borderBottomLeftRadius(_rtfeldman$elm_css$Css$zero),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$borderBottomRightRadius(_rtfeldman$elm_css$Css$zero),
+			_1: {ctor: '[]'}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$inputMirrow = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$top(
+				_rtfeldman$elm_css$Css$px(-100)),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$left(
+					_rtfeldman$elm_css$Css$px(-100)),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$height(_rtfeldman$elm_css$Css$zero),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$overflow(_rtfeldman$elm_css$Css$scroll),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_rtfeldman$elm_css$Css$class,
-								_inkuzmin$elm_multiselect$Multiselect_SelectCss$InputMirrow,
-								{
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$top(
-											_rtfeldman$elm_css$Css$px(-100)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$left(
-												_rtfeldman$elm_css$Css$px(-100)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$height(_rtfeldman$elm_css$Css$zero),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$overflow(_rtfeldman$elm_css$Css$scroll),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$fontWeight(_rtfeldman$elm_css$Css$normal),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$fontStyle(_rtfeldman$elm_css$Css$normal),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$fontSize(_rtfeldman$elm_css$Css$inherit),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$lineHeight(
-																		_rtfeldman$elm_css$Css$int(1)),
-																	_1: {ctor: '[]'}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}),
+							_0: _rtfeldman$elm_css$Css$fontWeight(_rtfeldman$elm_css$Css$normal),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_rtfeldman$elm_css$Css$class,
-									_inkuzmin$elm_multiselect$Multiselect_SelectCss$Focused,
-									{
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$borderColor(
-											_rtfeldman$elm_css$Css$hex('#007eff')),
-										_1: {
-											ctor: '::',
-											_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$boxShadowCustom('inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(0, 126, 255, 0.1)'),
-											_1: {ctor: '[]'}
-										}
-									}),
+								_0: _rtfeldman$elm_css$Css$fontStyle(_rtfeldman$elm_css$Css$normal),
 								_1: {
 									ctor: '::',
-									_0: A2(
-										_rtfeldman$elm_css$Css$class,
-										_inkuzmin$elm_multiselect$Multiselect_SelectCss$Opened,
-										{
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$borderBottomLeftRadius(_rtfeldman$elm_css$Css$zero),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$borderBottomRightRadius(_rtfeldman$elm_css$Css$zero),
-												_1: {ctor: '[]'}
-											}
-										}),
+									_0: _rtfeldman$elm_css$Css$fontSize(_rtfeldman$elm_css$Css$inherit),
 									_1: {
 										ctor: '::',
-										_0: A2(
-											_rtfeldman$elm_css$Css$class,
-											_inkuzmin$elm_multiselect$Multiselect_SelectCss$TagWrap,
-											{
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inline),
-												_1: {ctor: '[]'}
-											}),
+										_0: _rtfeldman$elm_css$Css$lineHeight(
+											_rtfeldman$elm_css$Css$int(1)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$input = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$none),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$border(_rtfeldman$elm_css$Css$zero),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$lineHeight(
+					_rtfeldman$elm_css$Css$px(14)),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$outlineStyle(_rtfeldman$elm_css$Css$none),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$fontSize(_rtfeldman$elm_css$Css$inherit),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$lineHeight(
+								_rtfeldman$elm_css$Css$int(1)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$padding(_rtfeldman$elm_css$Css$zero),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$paddingTop(
+										_rtfeldman$elm_css$Css$px(8)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$inputWrap = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$marginLeft(
+				_rtfeldman$elm_css$Css$px(5)),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$padding(_rtfeldman$elm_css$Css$zero),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$paddingBottom(
+							_rtfeldman$elm_css$Css$px(8)),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$container = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: A3(
+			_rtfeldman$elm_css$Css$border3,
+			_rtfeldman$elm_css$Css$px(1),
+			_rtfeldman$elm_css$Css$solid,
+			_rtfeldman$elm_css$Css$hex('#ccc')),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$borderRadius(
+				_rtfeldman$elm_css$Css$px(4)),
+			_1: {
+				ctor: '::',
+				_0: A3(
+					_rtfeldman$elm_css$Css$borderColor3,
+					_rtfeldman$elm_css$Css$hex('#d9d9d9'),
+					_rtfeldman$elm_css$Css$hex('#ccc'),
+					_rtfeldman$elm_css$Css$hex('#b3b3b3')),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$backgroundColor(
+						_rtfeldman$elm_css$Css$hex('#fff')),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$color(
+							_rtfeldman$elm_css$Css$hex('#333')),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$height(
+								_rtfeldman$elm_css$Css$px(34)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$width(
+									_rtfeldman$elm_css$Css$pct(100)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$table),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$wrap = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$width(
+				_rtfeldman$elm_css$Css$pct(100)),
+			_1: {ctor: '[]'}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight = 200;
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$menu = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$borderBottomRightRadius(
+			_rtfeldman$elm_css$Css$px(4)),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$borderBottomLeftRadius(
+				_rtfeldman$elm_css$Css$px(4)),
+			_1: {
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$backgroundColor(
+					_rtfeldman$elm_css$Css$hex('#fff')),
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_rtfeldman$elm_css$Css$border3,
+						_rtfeldman$elm_css$Css$px(1),
+						_rtfeldman$elm_css$Css$solid,
+						_rtfeldman$elm_css$Css$hex('#ccc')),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$borderTopColor(
+							_rtfeldman$elm_css$Css$hex('#e6e6e6')),
+						_1: {
+							ctor: '::',
+							_0: A4(
+								_rtfeldman$elm_css$Css$boxShadow4,
+								_rtfeldman$elm_css$Css$zero,
+								_rtfeldman$elm_css$Css$px(1),
+								_rtfeldman$elm_css$Css$zero,
+								A4(_rtfeldman$elm_css$Css$rgba, 0, 0, 0, 6.0e-2)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$marginTop(
+									_rtfeldman$elm_css$Css$px(-1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$maxHeight(
+										_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
 										_1: {
 											ctor: '::',
-											_0: A2(
-												_rtfeldman$elm_css$Css$class,
-												_inkuzmin$elm_multiselect$Multiselect_SelectCss$Tag,
-												{
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$color(
-														_rtfeldman$elm_css$Css$hex('#007eff')),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_rtfeldman$elm_css$Css$border2,
-															_rtfeldman$elm_css$Css$px(1),
-															_rtfeldman$elm_css$Css$solid),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$borderColor(
-																A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 0.24)),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$borderRadius(
-																	_rtfeldman$elm_css$Css$px(2)),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$backgroundColor(
-																		A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 8.0e-2)),
-																	_1: {
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
-																		_1: {
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$fontSize(
-																				_rtfeldman$elm_css$Css$em(0.9)),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$lineHeight(
-																					_rtfeldman$elm_css$Css$num(1.4)),
-																				_1: {
-																					ctor: '::',
-																					_0: _rtfeldman$elm_css$Css$marginLeft(
-																						_rtfeldman$elm_css$Css$px(5)),
-																					_1: {
-																						ctor: '::',
-																						_0: _rtfeldman$elm_css$Css$marginTop(
-																							_rtfeldman$elm_css$Css$px(5)),
-																						_1: {
-																							ctor: '::',
-																							_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$top),
-																							_1: {ctor: '[]'}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}),
+											_0: _rtfeldman$elm_css$Css$width(
+												_rtfeldman$elm_css$Css$pct(100)),
 											_1: {
 												ctor: '::',
-												_0: A2(
-													_rtfeldman$elm_css$Css$class,
-													_inkuzmin$elm_multiselect$Multiselect_SelectCss$TagIcon,
-													{
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$hover(
-															{
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$backgroundColor(
-																	_rtfeldman$elm_css$Css$hex('#d8eafd')),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-															_1: {
-																ctor: '::',
-																_0: A3(
-																	_rtfeldman$elm_css$Css$borderRight3,
-																	_rtfeldman$elm_css$Css$px(1),
-																	_rtfeldman$elm_css$Css$solid,
-																	A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 0.24)),
-																_1: {
-																	ctor: '::',
-																	_0: A3(
-																		_rtfeldman$elm_css$Css$padding3,
-																		_rtfeldman$elm_css$Css$px(1),
-																		_rtfeldman$elm_css$Css$px(5),
-																		_rtfeldman$elm_css$Css$px(3)),
-																	_1: {
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
-																		_1: {
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}
-															}
-														}
-													}),
+												_0: _rtfeldman$elm_css$Css$zIndex(
+													_rtfeldman$elm_css$Css$int(1)),
 												_1: {
 													ctor: '::',
-													_0: A2(
-														_rtfeldman$elm_css$Css$class,
-														_inkuzmin$elm_multiselect$Multiselect_SelectCss$TagLabel,
-														{
-															ctor: '::',
-															_0: A2(
-																_rtfeldman$elm_css$Css$padding2,
-																_rtfeldman$elm_css$Css$px(2),
-																_rtfeldman$elm_css$Css$px(5)),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
-																	_1: {ctor: '[]'}
-																}
-															}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_rtfeldman$elm_css$Css$class,
-															_inkuzmin$elm_multiselect$Multiselect_SelectCss$ClearWrap,
-															{
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$width(
-																	_rtfeldman$elm_css$Css$px(17)),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$color(
-																		_rtfeldman$elm_css$Css$hex('#999')),
-																	_1: {
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-																		_1: {
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$tableCell),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-																				_1: {
-																					ctor: '::',
-																					_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
-																					_1: {
-																						ctor: '::',
-																						_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
-																						_1: {
-																							ctor: '::',
-																							_0: _rtfeldman$elm_css$Css$hover(
-																								{
-																									ctor: '::',
-																									_0: _rtfeldman$elm_css$Css$color(
-																										_rtfeldman$elm_css$Css$hex('#D0021B')),
-																									_1: {ctor: '[]'}
-																								}),
-																							_1: {
-																								ctor: '::',
-																								_0: _rtfeldman$elm_css$Css$children(
-																									{
-																										ctor: '::',
-																										_0: A2(
-																											_rtfeldman$elm_css$Css$class,
-																											_inkuzmin$elm_multiselect$Multiselect_SelectCss$Clear,
-																											{
-																												ctor: '::',
-																												_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
-																												_1: {
-																													ctor: '::',
-																													_0: _rtfeldman$elm_css$Css$fontSize(
-																														_rtfeldman$elm_css$Css$px(18)),
-																													_1: {
-																														ctor: '::',
-																														_0: _rtfeldman$elm_css$Css$lineHeight(
-																															_rtfeldman$elm_css$Css$num(1)),
-																														_1: {ctor: '[]'}
-																													}
-																												}
-																											}),
-																										_1: {ctor: '[]'}
-																									}),
-																								_1: {ctor: '[]'}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_rtfeldman$elm_css$Css$class,
-																_inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowWrap,
-																{
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-																	_1: {
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$tableCell),
-																		_1: {
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
-																				_1: {
-																					ctor: '::',
-																					_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$middle),
-																					_1: {
-																						ctor: '::',
-																						_0: _rtfeldman$elm_css$Css$width(
-																							_rtfeldman$elm_css$Css$px(25)),
-																						_1: {
-																							ctor: '::',
-																							_0: _rtfeldman$elm_css$Css$paddingRight(
-																								_rtfeldman$elm_css$Css$px(5)),
-																							_1: {
-																								ctor: '::',
-																								_0: _rtfeldman$elm_css$Css$hover(
-																									{
-																										ctor: '::',
-																										_0: _rtfeldman$elm_css$Css$children(
-																											{
-																												ctor: '::',
-																												_0: A2(
-																													_rtfeldman$elm_css$Css$class,
-																													_inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow,
-																													{
-																														ctor: '::',
-																														_0: _rtfeldman$elm_css$Css$borderTopColor(
-																															_rtfeldman$elm_css$Css$hex('#666')),
-																														_1: {ctor: '[]'}
-																													}),
-																												_1: {
-																													ctor: '::',
-																													_0: A2(
-																														_rtfeldman$elm_css$Css$class,
-																														_inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside,
-																														{
-																															ctor: '::',
-																															_0: _rtfeldman$elm_css$Css$borderBottomColor(
-																																_rtfeldman$elm_css$Css$hex('#666')),
-																															_1: {ctor: '[]'}
-																														}),
-																													_1: {ctor: '[]'}
-																												}
-																											}),
-																										_1: {ctor: '[]'}
-																									}),
-																								_1: {
-																									ctor: '::',
-																									_0: _rtfeldman$elm_css$Css$children(
-																										{
-																											ctor: '::',
-																											_0: A2(
-																												_rtfeldman$elm_css$Css$class,
-																												_inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow,
-																												{
-																													ctor: '::',
-																													_0: A3(
-																														_rtfeldman$elm_css$Css$borderColor3,
-																														_rtfeldman$elm_css$Css$hex('#999'),
-																														_rtfeldman$elm_css$Css$transparent,
-																														_rtfeldman$elm_css$Css$transparent),
-																													_1: {
-																														ctor: '::',
-																														_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$solid),
-																														_1: {
-																															ctor: '::',
-																															_0: _rtfeldman$elm_css$Css$borderTopWidth(
-																																_rtfeldman$elm_css$Css$px(5)),
-																															_1: {
-																																ctor: '::',
-																																_0: _rtfeldman$elm_css$Css$borderLeftWidth(
-																																	_rtfeldman$elm_css$Css$px(5)),
-																																_1: {
-																																	ctor: '::',
-																																	_0: _rtfeldman$elm_css$Css$borderRightWidth(
-																																		_rtfeldman$elm_css$Css$px(5)),
-																																	_1: {
-																																		ctor: '::',
-																																		_0: _rtfeldman$elm_css$Css$borderBottomWidth(
-																																			_rtfeldman$elm_css$Css$px(2.5)),
-																																		_1: {
-																																			ctor: '::',
-																																			_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
-																																			_1: {
-																																				ctor: '::',
-																																				_0: _rtfeldman$elm_css$Css$height(_rtfeldman$elm_css$Css$zero),
-																																				_1: {
-																																					ctor: '::',
-																																					_0: _rtfeldman$elm_css$Css$width(_rtfeldman$elm_css$Css$zero),
-																																					_1: {
-																																						ctor: '::',
-																																						_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-																																						_1: {ctor: '[]'}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}),
-																											_1: {
-																												ctor: '::',
-																												_0: A2(
-																													_rtfeldman$elm_css$Css$class,
-																													_inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside,
-																													{
-																														ctor: '::',
-																														_0: A3(
-																															_rtfeldman$elm_css$Css$borderColor3,
-																															_rtfeldman$elm_css$Css$transparent,
-																															_rtfeldman$elm_css$Css$transparent,
-																															_rtfeldman$elm_css$Css$hex('#999')),
-																														_1: {
-																															ctor: '::',
-																															_0: _rtfeldman$elm_css$Css$borderStyle(_rtfeldman$elm_css$Css$solid),
-																															_1: {
-																																ctor: '::',
-																																_0: _rtfeldman$elm_css$Css$borderTopWidth(
-																																	_rtfeldman$elm_css$Css$px(2.5)),
-																																_1: {
-																																	ctor: '::',
-																																	_0: _rtfeldman$elm_css$Css$borderLeftWidth(
-																																		_rtfeldman$elm_css$Css$px(5)),
-																																	_1: {
-																																		ctor: '::',
-																																		_0: _rtfeldman$elm_css$Css$borderRightWidth(
-																																			_rtfeldman$elm_css$Css$px(5)),
-																																		_1: {
-																																			ctor: '::',
-																																			_0: _rtfeldman$elm_css$Css$borderBottomWidth(
-																																				_rtfeldman$elm_css$Css$px(5)),
-																																			_1: {
-																																				ctor: '::',
-																																				_0: _rtfeldman$elm_css$Css$display(_rtfeldman$elm_css$Css$inlineBlock),
-																																				_1: {
-																																					ctor: '::',
-																																					_0: _rtfeldman$elm_css$Css$height(_rtfeldman$elm_css$Css$zero),
-																																					_1: {
-																																						ctor: '::',
-																																						_0: _rtfeldman$elm_css$Css$width(_rtfeldman$elm_css$Css$zero),
-																																						_1: {
-																																							ctor: '::',
-																																							_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-																																							_1: {
-																																								ctor: '::',
-																																								_0: _rtfeldman$elm_css$Css$top(
-																																									_rtfeldman$elm_css$Css$px(-2.5)),
-																																								_1: {ctor: '[]'}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}),
-																												_1: {ctor: '[]'}
-																											}
-																										}),
-																									_1: {ctor: '[]'}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}),
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_rtfeldman$elm_css$Css$class,
-																	_inkuzmin$elm_multiselect$Multiselect_SelectCss$Menu,
-																	{
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$borderBottomRightRadius(
-																			_rtfeldman$elm_css$Css$px(4)),
-																		_1: {
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$borderBottomLeftRadius(
-																				_rtfeldman$elm_css$Css$px(4)),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$backgroundColor(
-																					_rtfeldman$elm_css$Css$hex('#fff')),
-																				_1: {
-																					ctor: '::',
-																					_0: A3(
-																						_rtfeldman$elm_css$Css$border3,
-																						_rtfeldman$elm_css$Css$px(1),
-																						_rtfeldman$elm_css$Css$solid,
-																						_rtfeldman$elm_css$Css$hex('#ccc')),
-																					_1: {
-																						ctor: '::',
-																						_0: _rtfeldman$elm_css$Css$borderTopColor(
-																							_rtfeldman$elm_css$Css$hex('#e6e6e6')),
-																						_1: {
-																							ctor: '::',
-																							_0: A4(
-																								_rtfeldman$elm_css$Css$boxShadow4,
-																								_rtfeldman$elm_css$Css$zero,
-																								_rtfeldman$elm_css$Css$px(1),
-																								_rtfeldman$elm_css$Css$zero,
-																								A4(_rtfeldman$elm_css$Css$rgba, 0, 0, 0, 6.0e-2)),
-																							_1: {
-																								ctor: '::',
-																								_0: _rtfeldman$elm_css$Css$marginTop(
-																									_rtfeldman$elm_css$Css$px(-1)),
-																								_1: {
-																									ctor: '::',
-																									_0: _rtfeldman$elm_css$Css$maxHeight(
-																										_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$Multiselect_SelectCss$menuHeight)),
-																									_1: {
-																										ctor: '::',
-																										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-																										_1: {
-																											ctor: '::',
-																											_0: _rtfeldman$elm_css$Css$width(
-																												_rtfeldman$elm_css$Css$pct(100)),
-																											_1: {
-																												ctor: '::',
-																												_0: _rtfeldman$elm_css$Css$zIndex(
-																													_rtfeldman$elm_css$Css$int(1)),
-																												_1: {
-																													ctor: '::',
-																													_0: _rtfeldman$elm_css$Css$overflowY(_rtfeldman$elm_css$Css$scroll),
-																													_1: {ctor: '[]'}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}),
-																_1: {
-																	ctor: '::',
-																	_0: A2(
-																		_rtfeldman$elm_css$Css$class,
-																		_inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem,
-																		{
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$color(
-																				_rtfeldman$elm_css$Css$hex('#666')),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-																				_1: {
-																					ctor: '::',
-																					_0: A2(
-																						_rtfeldman$elm_css$Css$padding2,
-																						_rtfeldman$elm_css$Css$px(8),
-																						_rtfeldman$elm_css$Css$px(10)),
-																					_1: {
-																						ctor: '::',
-																						_0: _rtfeldman$elm_css$Css$maxHeight(
-																							_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight)),
-																						_1: {ctor: '[]'}
-																					}
-																				}
-																			}
-																		}),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(
-																			_rtfeldman$elm_css$Css$class,
-																			_inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItemHovered,
-																			{
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$backgroundColor(
-																					A4(_rtfeldman$elm_css$Css$rgba, 0, 126, 255, 8.0e-2)),
-																				_1: {
-																					ctor: '::',
-																					_0: _rtfeldman$elm_css$Css$color(
-																						_rtfeldman$elm_css$Css$hex('#333')),
-																					_1: {ctor: '[]'}
-																				}
-																			}),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													}
+													_0: _rtfeldman$elm_css$Css$overflowY(_rtfeldman$elm_css$Css$scroll),
+													_1: {ctor: '[]'}
 												}
 											}
 										}
@@ -16068,43 +17211,68 @@ var _inkuzmin$elm_multiselect$Multiselect_SelectCss$css = function (_p0) {
 			}
 		}
 	});
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuId = {ctor: 'MenuId'};
-var _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputId = {ctor: 'InputId'};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight = 32;
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuItem = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$color(
+			_rtfeldman$elm_css$Css$hex('#666')),
+		_1: {
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_rtfeldman$elm_css$Css$padding2,
+					_rtfeldman$elm_css$Css$px(8),
+					_rtfeldman$elm_css$Css$px(10)),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$maxHeight(
+						_rtfeldman$elm_css$Css$px(_inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight)),
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	});
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$boxShadowCustom = function (p) {
+	return A2(_rtfeldman$elm_css$Css$property, 'box-shadow', p);
+};
+var _inkuzmin$elm_multiselect$Multiselect_SelectCss$focused = _rtfeldman$elm_css$Css$batch(
+	{
+		ctor: '::',
+		_0: _rtfeldman$elm_css$Css$borderColor(
+			_rtfeldman$elm_css$Css$hex('#007eff')),
+		_1: {
+			ctor: '::',
+			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$boxShadowCustom('inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(0, 126, 255, 0.1)'),
+			_1: {ctor: '[]'}
+		}
+	});
 
 var _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter = '‌‌';
-var _inkuzmin$elm_multiselect$Multiselect_Utils$snd = _elm_lang$core$Tuple$second;
 var _inkuzmin$elm_multiselect$Multiselect_Utils$fst = _elm_lang$core$Tuple$first;
 
 var _inkuzmin$elm_multiselect$Multiselect$onKeyPress = function (tagger) {
 	return A2(
-		_elm_lang$html$Html_Events$on,
+		_rtfeldman$elm_css$Html_Styled_Events$on,
 		'keydown',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
+		A2(_elm_lang$core$Json_Decode$map, tagger, _rtfeldman$elm_css$Html_Styled_Events$keyCode));
 };
 var _inkuzmin$elm_multiselect$Multiselect$onKeyUp = function (tagger) {
 	return A2(
-		_elm_lang$html$Html_Events$on,
+		_rtfeldman$elm_css$Html_Styled_Events$on,
 		'keyup',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
-};
-var _inkuzmin$elm_multiselect$Multiselect$send = function (msg) {
-	return A2(
-		_elm_lang$core$Task$perform,
-		_elm_lang$core$Basics$identity,
-		_elm_lang$core$Task$succeed(msg));
+		A2(_elm_lang$core$Json_Decode$map, tagger, _rtfeldman$elm_css$Html_Styled_Events$targetValue));
 };
 var _inkuzmin$elm_multiselect$Multiselect$onClickNoDefault = function (message) {
 	var config = {stopPropagation: true, preventDefault: true};
 	return A3(
-		_elm_lang$html$Html_Events$onWithOptions,
+		_rtfeldman$elm_css$Html_Styled_Events$onWithOptions,
 		'click',
 		config,
 		_elm_lang$core$Json_Decode$succeed(message));
 };
-var _inkuzmin$elm_multiselect$Multiselect$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('multiselect');
-var _inkuzmin$elm_multiselect$Multiselect$id = _inkuzmin$elm_multiselect$Multiselect$_p0.id;
-var _inkuzmin$elm_multiselect$Multiselect$class = _inkuzmin$elm_multiselect$Multiselect$_p0.$class;
-var _inkuzmin$elm_multiselect$Multiselect$classList = _inkuzmin$elm_multiselect$Multiselect$_p0.classList;
 var _inkuzmin$elm_multiselect$Multiselect_ops = _inkuzmin$elm_multiselect$Multiselect_ops || {};
 _inkuzmin$elm_multiselect$Multiselect_ops[':>'] = F2(
 	function (f, x) {
@@ -16112,7 +17280,7 @@ _inkuzmin$elm_multiselect$Multiselect_ops[':>'] = F2(
 	});
 var _inkuzmin$elm_multiselect$Multiselect$onKeyDown = function (tagger) {
 	return A2(
-		_elm_lang$html$Html_Events$on,
+		_rtfeldman$elm_css$Html_Styled_Events$on,
 		'keypress',
 		A2(
 			_elm_lang$core$Json_Decode$map,
@@ -16123,18 +17291,18 @@ var _inkuzmin$elm_multiselect$Multiselect$onKeyDown = function (tagger) {
 				A2(_inkuzmin$elm_multiselect$Multiselect_ops[':>'], _debois$elm_dom$DOM$previousSibling, _debois$elm_dom$DOM$offsetWidth))));
 };
 var _inkuzmin$elm_multiselect$Multiselect$fromResult = function (result) {
-	var _p1 = result;
-	if (_p1.ctor === 'Ok') {
-		return _elm_lang$core$Json_Decode$succeed(_p1._0);
+	var _p0 = result;
+	if (_p0.ctor === 'Ok') {
+		return _elm_lang$core$Json_Decode$succeed(_p0._0);
 	} else {
-		return _elm_lang$core$Json_Decode$fail(_p1._0);
+		return _elm_lang$core$Json_Decode$fail(_p0._0);
 	}
 };
 var _inkuzmin$elm_multiselect$Multiselect$delay = F2(
 	function (time, msg) {
 		return A2(
 			_elm_lang$core$Task$perform,
-			function (_p2) {
+			function (_p1) {
 				return msg;
 			},
 			_elm_lang$core$Process$sleep(time));
@@ -16144,18 +17312,18 @@ var _inkuzmin$elm_multiselect$Multiselect$nextItem = F2(
 		var findNextInList = function (l) {
 			findNextInList:
 			while (true) {
-				var _p3 = l;
-				if (_p3.ctor === '[]') {
+				var _p2 = l;
+				if (_p2.ctor === '[]') {
 					return _elm_lang$core$Maybe$Nothing;
 				} else {
-					if (_p3._1.ctor === '[]') {
-						return _elm_lang$core$Native_Utils.eq(_p3._0, item) ? _elm_lang$core$List$head(list) : _elm_lang$core$Maybe$Nothing;
+					if (_p2._1.ctor === '[]') {
+						return _elm_lang$core$Native_Utils.eq(_p2._0, item) ? _elm_lang$core$List$head(list) : _elm_lang$core$Maybe$Nothing;
 					} else {
-						var _p4 = _p3._1._0;
-						if (_elm_lang$core$Native_Utils.eq(_p3._0, item)) {
-							return _elm_lang$core$Maybe$Just(_p4);
+						var _p3 = _p2._1._0;
+						if (_elm_lang$core$Native_Utils.eq(_p2._0, item)) {
+							return _elm_lang$core$Maybe$Just(_p3);
 						} else {
-							var _v2 = {ctor: '::', _0: _p4, _1: _p3._1._1};
+							var _v2 = {ctor: '::', _0: _p3, _1: _p2._1._1};
 							l = _v2;
 							continue findNextInList;
 						}
@@ -16175,33 +17343,33 @@ var _inkuzmin$elm_multiselect$Multiselect$prevItem = F2(
 var _inkuzmin$elm_multiselect$Multiselect$nextSelectedItem = F2(
 	function (list, item) {
 		var takeLast = function (l) {
-			var _p5 = l;
-			if (_p5.ctor === '[]') {
+			var _p4 = l;
+			if (_p4.ctor === '[]') {
 				return _elm_lang$core$Maybe$Nothing;
 			} else {
-				if (_p5._1.ctor === '[]') {
+				if (_p4._1.ctor === '[]') {
 					return _elm_lang$core$Maybe$Nothing;
 				} else {
-					return _elm_lang$core$Maybe$Just(_p5._1._0);
+					return _elm_lang$core$Maybe$Just(_p4._1._0);
 				}
 			}
 		};
 		var findNextInList = function (l) {
 			findNextInList:
 			while (true) {
-				var _p6 = l;
-				if (_p6.ctor === '[]') {
+				var _p5 = l;
+				if (_p5.ctor === '[]') {
 					return _elm_lang$core$Maybe$Nothing;
 				} else {
-					if (_p6._1.ctor === '[]') {
-						return _elm_lang$core$Native_Utils.eq(_p6._0, item) ? takeLast(
+					if (_p5._1.ctor === '[]') {
+						return _elm_lang$core$Native_Utils.eq(_p5._0, item) ? takeLast(
 							_elm_lang$core$List$reverse(list)) : _elm_lang$core$Maybe$Nothing;
 					} else {
-						var _p7 = _p6._1._0;
-						if (_elm_lang$core$Native_Utils.eq(_p6._0, item)) {
-							return _elm_lang$core$Maybe$Just(_p7);
+						var _p6 = _p5._1._0;
+						if (_elm_lang$core$Native_Utils.eq(_p5._0, item)) {
+							return _elm_lang$core$Maybe$Just(_p6);
 						} else {
-							var _v5 = {ctor: '::', _0: _p7, _1: _p6._1._1};
+							var _v5 = {ctor: '::', _0: _p6, _1: _p5._1._1};
 							l = _v5;
 							continue findNextInList;
 						}
@@ -16213,9 +17381,9 @@ var _inkuzmin$elm_multiselect$Multiselect$nextSelectedItem = F2(
 	});
 var _inkuzmin$elm_multiselect$Multiselect$lastElem = A2(
 	_elm_lang$core$List$foldl,
-	function (_p8) {
+	function (_p7) {
 		return _elm_lang$core$Basics$always(
-			_elm_lang$core$Maybe$Just(_p8));
+			_elm_lang$core$Maybe$Just(_p7));
 	},
 	_elm_lang$core$Maybe$Nothing);
 var _inkuzmin$elm_multiselect$Multiselect$indexOf = F2(
@@ -16224,14 +17392,14 @@ var _inkuzmin$elm_multiselect$Multiselect$indexOf = F2(
 			function (l, index) {
 				helper:
 				while (true) {
-					var _p9 = l;
-					if (_p9.ctor === '[]') {
+					var _p8 = l;
+					if (_p8.ctor === '[]') {
 						return _elm_lang$core$Maybe$Nothing;
 					} else {
-						if (_elm_lang$core$Native_Utils.eq(_p9._0, el)) {
+						if (_elm_lang$core$Native_Utils.eq(_p8._0, el)) {
 							return _elm_lang$core$Maybe$Just(index);
 						} else {
-							var _v7 = _p9._1,
+							var _v7 = _p8._1,
 								_v8 = index + 1;
 							l = _v7;
 							index = _v8;
@@ -16243,14 +17411,14 @@ var _inkuzmin$elm_multiselect$Multiselect$indexOf = F2(
 		return A2(helper, list, 0);
 	});
 var _inkuzmin$elm_multiselect$Multiselect$fitViewPort = F2(
-	function (_p11, _p10) {
-		var _p12 = _p11;
-		var _p17 = _p12._0;
-		var _p16 = _p12._1;
-		var _p13 = _p10;
-		var _p15 = _p13._0;
-		var _p14 = _p13._1;
-		return (_elm_lang$core$Native_Utils.cmp(_p17, _p15) < 0) ? _p17 : ((_elm_lang$core$Native_Utils.cmp(_p16, _p14) > 0) ? (_p15 + (_p16 - _p14)) : _p15);
+	function (_p10, _p9) {
+		var _p11 = _p10;
+		var _p16 = _p11._0;
+		var _p15 = _p11._1;
+		var _p12 = _p9;
+		var _p14 = _p12._0;
+		var _p13 = _p12._1;
+		return (_elm_lang$core$Native_Utils.cmp(_p16, _p14) < 0) ? _p16 : ((_elm_lang$core$Native_Utils.cmp(_p15, _p13) > 0) ? (_p14 + (_p15 - _p13)) : _p14);
 	});
 var _inkuzmin$elm_multiselect$Multiselect$getBoundaries = function (i) {
 	return {ctor: '_Tuple2', _0: i * _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight, _1: (i * _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight) + _inkuzmin$elm_multiselect$Multiselect_SelectCss$itemHeight};
@@ -16277,56 +17445,6 @@ var _inkuzmin$elm_multiselect$Multiselect$populateValues = F3(
 var _inkuzmin$elm_multiselect$Multiselect$getSelectedValues = function (model) {
 	return model.selected;
 };
-var _inkuzmin$elm_multiselect$Multiselect$values = {
-	ctor: '::',
-	_0: {ctor: '_Tuple2', _0: 'one', _1: 'The first option'},
-	_1: {
-		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'two', _1: 'The second option'},
-		_1: {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'three', _1: 'The third option'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'four', _1: 'The 4th option'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'five', _1: 'The 5th option'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'six', _1: 'The 6th option'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'seven', _1: 'The 7th option'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'eight', _1: 'The 8th option'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'nine', _1: 'The 9th option'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'ten', _1: 'The 10th option'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'eleven', _1: 'The 11th option'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'twelve', _1: 'The 12th option'},
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _inkuzmin$elm_multiselect$Multiselect$Flags = {};
 var _inkuzmin$elm_multiselect$Multiselect$Model = function (a) {
 	return function (b) {
 		return function (c) {
@@ -16348,7 +17466,6 @@ var _inkuzmin$elm_multiselect$Multiselect$Model = function (a) {
 		};
 	};
 };
-var _inkuzmin$elm_multiselect$Multiselect$Disabled = {ctor: 'Disabled'};
 var _inkuzmin$elm_multiselect$Multiselect$Opened = {ctor: 'Opened'};
 var _inkuzmin$elm_multiselect$Multiselect$Focused = {ctor: 'Focused'};
 var _inkuzmin$elm_multiselect$Multiselect$Closed = {ctor: 'Closed'};
@@ -16358,13 +17475,6 @@ var _inkuzmin$elm_multiselect$Multiselect$initModel = F2(
 			{ctor: '[]'})(false)(_elm_lang$core$Maybe$Nothing)('')(23.0)(
 			_elm_lang$core$List$head(values))(tag);
 	});
-var _inkuzmin$elm_multiselect$Multiselect$init = function (flags) {
-	return {
-		ctor: '_Tuple2',
-		_0: A2(_inkuzmin$elm_multiselect$Multiselect$initModel, _inkuzmin$elm_multiselect$Multiselect$values, 'A'),
-		_1: _elm_lang$core$Platform_Cmd$none
-	};
-};
 var _inkuzmin$elm_multiselect$Multiselect$ScrollY = function (a) {
 	return {ctor: 'ScrollY', _0: a};
 };
@@ -16374,7 +17484,6 @@ var _inkuzmin$elm_multiselect$Multiselect$Shortcut = function (a) {
 var _inkuzmin$elm_multiselect$Multiselect$OnHover = function (a) {
 	return {ctor: 'OnHover', _0: a};
 };
-var _inkuzmin$elm_multiselect$Multiselect$ClearInput = {ctor: 'ClearInput'};
 var _inkuzmin$elm_multiselect$Multiselect$Adjust = function (a) {
 	return {ctor: 'Adjust', _0: a};
 };
@@ -16390,13 +17499,13 @@ var _inkuzmin$elm_multiselect$Multiselect$FocusResult = function (a) {
 var _inkuzmin$elm_multiselect$Multiselect$Clear = {ctor: 'Clear'};
 var _inkuzmin$elm_multiselect$Multiselect$clear = function (model) {
 	return (!_elm_lang$core$List$isEmpty(model.selected)) ? A2(
-		_elm_lang$html$Html$div,
+		_rtfeldman$elm_css$Html_Styled$div,
 		{
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$Multiselect$class(
+			_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$ClearWrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$clearWrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16408,25 +17517,25 @@ var _inkuzmin$elm_multiselect$Multiselect$clear = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
+				_rtfeldman$elm_css$Html_Styled$div,
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect$class(
+					_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 						{
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Clear,
+							_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$clear,
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('×'),
+					_0: _rtfeldman$elm_css$Html_Styled$text('×'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
 		}) : A2(
-		_elm_lang$html$Html$div,
+		_rtfeldman$elm_css$Html_Styled$div,
 		{ctor: '[]'},
 		{ctor: '[]'});
 };
@@ -16436,13 +17545,13 @@ var _inkuzmin$elm_multiselect$Multiselect$RemoveItem = function (a) {
 var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 	function (name, value) {
 		return A2(
-			_elm_lang$html$Html$div,
+			_rtfeldman$elm_css$Html_Styled$div,
 			{
 				ctor: '::',
-				_0: _inkuzmin$elm_multiselect$Multiselect$class(
+				_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Tag,
+						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$tag,
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -16450,18 +17559,18 @@ var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$span,
+					_rtfeldman$elm_css$Html_Styled$span,
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$Multiselect$class(
+						_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 							{
 								ctor: '::',
-								_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagIcon,
+								_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$tagIcon,
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
+							_0: _rtfeldman$elm_css$Html_Styled_Events$onClick(
 								_inkuzmin$elm_multiselect$Multiselect$RemoveItem(
 									{ctor: '_Tuple2', _0: name, _1: value})),
 							_1: {ctor: '[]'}
@@ -16469,26 +17578,26 @@ var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('×'),
+						_0: _rtfeldman$elm_css$Html_Styled$text('×'),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$span,
+						_rtfeldman$elm_css$Html_Styled$span,
 						{
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$Multiselect$class(
+							_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 								{
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagLabel,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$tagLabel,
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(value),
+							_0: _rtfeldman$elm_css$Html_Styled$text(value),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -16497,22 +17606,22 @@ var _inkuzmin$elm_multiselect$Multiselect$tag = F2(
 	});
 var _inkuzmin$elm_multiselect$Multiselect$tags = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
+		_rtfeldman$elm_css$Html_Styled$div,
 		{
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$Multiselect$class(
+			_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$TagWrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$tagWrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
 		},
 		A2(
 			_elm_lang$core$List$map,
-			function (_p18) {
-				var _p19 = _p18;
-				return A2(_inkuzmin$elm_multiselect$Multiselect$tag, _p19._0, _p19._1);
+			function (_p17) {
+				var _p18 = _p17;
+				return A2(_inkuzmin$elm_multiselect$Multiselect$tag, _p18._0, _p18._1);
 			},
 			model.selected));
 };
@@ -16520,104 +17629,104 @@ var _inkuzmin$elm_multiselect$Multiselect$OnSelect = function (a) {
 	return {ctor: 'OnSelect', _0: a};
 };
 var _inkuzmin$elm_multiselect$Multiselect$menu = function (model) {
-	var _p20 = model.status;
-	if (_p20.ctor === 'Opened') {
+	var _p19 = model.status;
+	if (_p19.ctor === 'Opened') {
 		var hovered = function () {
-			var _p21 = model.hovered;
-			if (_p21.ctor === 'Nothing') {
+			var _p20 = model.hovered;
+			if (_p20.ctor === 'Nothing') {
 				return '';
 			} else {
-				return _inkuzmin$elm_multiselect$Multiselect_Utils$fst(_p21._0);
+				return _inkuzmin$elm_multiselect$Multiselect_Utils$fst(_p20._0);
 			}
 		}();
 		return A2(
-			_elm_lang$html$Html$div,
+			_rtfeldman$elm_css$Html_Styled$div,
 			{
 				ctor: '::',
-				_0: _inkuzmin$elm_multiselect$Multiselect$class(
+				_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Menu,
+						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$menu,
 						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect$id(
+					_0: _rtfeldman$elm_css$Html_Styled_Attributes$id(
 						A2(_elm_lang$core$Basics_ops['++'], 'multiselectMenu', model.tag)),
 					_1: {ctor: '[]'}
 				}
 			},
 			A2(
 				_elm_lang$core$List$map,
-				function (_p22) {
-					var _p23 = _p22;
-					var _p25 = _p23._1;
-					var _p24 = _p23._0;
+				function (_p21) {
+					var _p22 = _p21;
+					var _p24 = _p22._1;
+					var _p23 = _p22._0;
 					return A2(
-						_elm_lang$html$Html$div,
+						_rtfeldman$elm_css$Html_Styled$div,
 						{
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$Multiselect$class(
-								_elm_lang$core$Native_Utils.eq(_p24, hovered) ? {
+							_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
+								_elm_lang$core$Native_Utils.eq(_p23, hovered) ? {
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItemHovered,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuItemHovered,
 									_1: {
 										ctor: '::',
-										_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem,
+										_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuItem,
 										_1: {ctor: '[]'}
 									}
 								} : {
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$MenuItem,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$menuItem,
 									_1: {ctor: '[]'}
 								}),
 							_1: {
 								ctor: '::',
 								_0: _inkuzmin$elm_multiselect$Multiselect$onClickNoDefault(
 									_inkuzmin$elm_multiselect$Multiselect$OnSelect(
-										{ctor: '_Tuple2', _0: _p24, _1: _p25})),
+										{ctor: '_Tuple2', _0: _p23, _1: _p24})),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onMouseOver(
+									_0: _rtfeldman$elm_css$Html_Styled_Events$onMouseOver(
 										_inkuzmin$elm_multiselect$Multiselect$OnHover(
-											{ctor: '_Tuple2', _0: _p24, _1: _p25})),
+											{ctor: '_Tuple2', _0: _p23, _1: _p24})),
 									_1: {ctor: '[]'}
 								}
 							}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(_p25),
+							_0: _rtfeldman$elm_css$Html_Styled$text(_p24),
 							_1: {ctor: '[]'}
 						});
 				},
 				model.filtered));
 	} else {
 		return A2(
-			_elm_lang$html$Html$div,
+			_rtfeldman$elm_css$Html_Styled$div,
 			{ctor: '[]'},
 			{ctor: '[]'});
 	}
 };
 var _inkuzmin$elm_multiselect$Multiselect$Toggle = {ctor: 'Toggle'};
 var _inkuzmin$elm_multiselect$Multiselect$arrow = function (model) {
-	var arrowClasses = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? {
+	var arrowCss = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowUpside,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrowUpside,
 		_1: {ctor: '[]'}
 	} : {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Arrow,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrow,
 		_1: {ctor: '[]'}
 	};
 	return A2(
-		_elm_lang$html$Html$div,
+		_rtfeldman$elm_css$Html_Styled$div,
 		{
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$Multiselect$class(
+			_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$ArrowWrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrowWrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16629,10 +17738,10 @@ var _inkuzmin$elm_multiselect$Multiselect$arrow = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
+				_rtfeldman$elm_css$Html_Styled$div,
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect$class(arrowClasses),
+					_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(arrowCss),
 					_1: {ctor: '[]'}
 				},
 				{ctor: '[]'}),
@@ -16657,24 +17766,24 @@ var _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons = function () {
 		_elm_lang$core$Basics$always(_inkuzmin$elm_multiselect$Multiselect$Start),
 		A2(
 			_elm_lang$core$Json_Decode$andThen,
-			function (_p26) {
+			function (_p25) {
 				return _inkuzmin$elm_multiselect$Multiselect$fromResult(
-					filterKey(_p26));
+					filterKey(_p25));
 			},
-			_elm_lang$html$Html_Events$keyCode));
+			_rtfeldman$elm_css$Html_Styled_Events$keyCode));
 	var options = {preventDefault: true, stopPropagation: false};
-	return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', options, decoder);
+	return A3(_rtfeldman$elm_css$Html_Styled_Events$onWithOptions, 'keydown', options, decoder);
 }();
 var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 	var value = _elm_lang$core$Native_Utils.eq(model.input, _inkuzmin$elm_multiselect$Multiselect_Utils$invisibleCharacter) ? A2(
-		_elm_lang$html$Html_Attributes$property,
+		_rtfeldman$elm_css$Html_Styled_Attributes$property,
 		'value',
 		_elm_lang$core$Json_Encode$string(model.input)) : A2(
-		_elm_lang$html$Html_Attributes$property,
+		_rtfeldman$elm_css$Html_Styled_Attributes$property,
 		'type',
 		_elm_lang$core$Json_Encode$string('text'));
 	var w = _elm_lang$core$Basics$toString(model.inputWidth + 23.0);
-	var inputStyle = _elm_lang$html$Html_Attributes$style(
+	var inputStyle = _rtfeldman$elm_css$Html_Styled_Attributes$style(
 		{
 			ctor: '::',
 			_0: {
@@ -16685,16 +17794,16 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 			_1: {ctor: '[]'}
 		});
 	return A2(
-		_elm_lang$html$Html$div,
+		_rtfeldman$elm_css$Html_Styled$div,
 		{
 			ctor: '::',
 			_0: _inkuzmin$elm_multiselect$Multiselect$preventDefaultButtons,
 			_1: {
 				ctor: '::',
-				_0: _inkuzmin$elm_multiselect$Multiselect$class(
+				_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputWrap,
+						_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$inputWrap,
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -16703,36 +17812,36 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
+				_rtfeldman$elm_css$Html_Styled$div,
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect$class(
+					_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 						{
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$InputMirrow,
+							_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$inputMirrow,
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(model.input),
+					_0: _rtfeldman$elm_css$Html_Styled$text(model.input),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$input,
+					_rtfeldman$elm_css$Html_Styled$input,
 					{
 						ctor: '::',
-						_0: _inkuzmin$elm_multiselect$Multiselect$id(
+						_0: _rtfeldman$elm_css$Html_Styled_Attributes$id(
 							A2(_elm_lang$core$Basics_ops['++'], 'multiselectInput', model.tag)),
 						_1: {
 							ctor: '::',
-							_0: _inkuzmin$elm_multiselect$Multiselect$class(
+							_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 								{
 									ctor: '::',
-									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Input,
+									_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$input,
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -16763,51 +17872,51 @@ var _inkuzmin$elm_multiselect$Multiselect$input = function (model) {
 			}
 		});
 };
-var _inkuzmin$elm_multiselect$Multiselect$view = function (model) {
-	var inputClasses = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Focused) ? {
+var _inkuzmin$elm_multiselect$Multiselect$styledView = function (model) {
+	var inputCss = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Focused) ? {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$container,
 		_1: {
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Focused,
+			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$focused,
 			_1: {ctor: '[]'}
 		}
 	} : (_elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$container,
 		_1: {
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Opened,
+			_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$opened,
 			_1: {ctor: '[]'}
 		}
 	} : {
 		ctor: '::',
-		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Container,
+		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$container,
 		_1: {ctor: '[]'}
 	});
 	return A2(
-		_elm_lang$html$Html$div,
+		_rtfeldman$elm_css$Html_Styled$div,
 		{
 			ctor: '::',
-			_0: _inkuzmin$elm_multiselect$Multiselect$class(
+			_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$Wrap,
+					_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$wrap,
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_inkuzmin$elm_multiselect$Multiselect$ClickOnComponent),
+				_0: _rtfeldman$elm_css$Html_Styled_Events$onClick(_inkuzmin$elm_multiselect$Multiselect$ClickOnComponent),
 				_1: {ctor: '[]'}
 			}
 		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
+				_rtfeldman$elm_css$Html_Styled$div,
 				{
 					ctor: '::',
-					_0: _inkuzmin$elm_multiselect$Multiselect$class(inputClasses),
+					_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(inputCss),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -16833,6 +17942,10 @@ var _inkuzmin$elm_multiselect$Multiselect$view = function (model) {
 				_1: {ctor: '[]'}
 			}
 		});
+};
+var _inkuzmin$elm_multiselect$Multiselect$view = function (_p26) {
+	return _rtfeldman$elm_css$Html_Styled$toUnstyled(
+		_inkuzmin$elm_multiselect$Multiselect$styledView(_p26));
 };
 var _inkuzmin$elm_multiselect$Multiselect$Cleared = {ctor: 'Cleared'};
 var _inkuzmin$elm_multiselect$Multiselect$Unselected = function (a) {
@@ -16990,15 +18103,6 @@ var _inkuzmin$elm_multiselect$Multiselect$update = F2(
 						_2: _elm_lang$core$Maybe$Nothing
 					};
 				}
-			case 'ClearInput':
-				return {
-					ctor: '_Tuple3',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{input: ''}),
-					_1: _elm_lang$core$Platform_Cmd$none,
-					_2: _elm_lang$core$Maybe$Nothing
-				};
 			case 'Adjust':
 				return {
 					ctor: '_Tuple3',

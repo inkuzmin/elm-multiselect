@@ -1,13 +1,11 @@
-module Multiselect.Utils exposing (..)
+module Multiselect.Utils exposing (invisibleCharacter, fst)
 
 
+fst : ( a1, a2 ) -> a1
 fst =
     Tuple.first
 
 
-snd =
-    Tuple.second
-
-
+invisibleCharacter : String
 invisibleCharacter =
     "\x200C\x200C"

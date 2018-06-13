@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
 import Html.Attributes
 
 
@@ -10,6 +9,7 @@ import Html.Attributes
 import Multiselect
 
 
+main : Program Flags Model Msg
 main =
     Html.programWithFlags
         { init = init
@@ -97,14 +97,14 @@ update msg model =
 
         HOI sub ->
             let
-                ( subModel, subCmd ) =
+                ( subModel, subCmd, _ ) =
                     Multiselect.update sub model.multiselectA
             in
                 { model | multiselectA = subModel } ! [ Cmd.map HOI subCmd ]
 
         Nyan sub ->
             let
-                ( subModel, subCmd ) =
+                ( subModel, subCmd, _ ) =
                     Multiselect.update sub model.multiselectB
             in
                 { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
