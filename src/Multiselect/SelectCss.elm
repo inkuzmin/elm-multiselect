@@ -44,7 +44,7 @@ import Css
         , color
         , none
         )
-import Css.Foreign exposing (children, everything)
+import Css.Foreign exposing (children, everything, class)
 
 
 boxShadowCustom : String -> Style
@@ -221,9 +221,10 @@ arrowWrap =
         , Css.paddingRight (px 5)
         , hover
             [ children
-                [ everything
-                    [ Css.borderTopColor (hex "#666")
-                    , Css.borderBottomColor (hex "#666")
+                [ Css.Foreign.selector "*[rel=arrow]"
+                    [ Css.borderTopColor (hex "#666") ]
+                , Css.Foreign.selector "*[rel=arrowUpside]"
+                    [ Css.borderBottomColor (hex "#666")
                     ]
                 ]
             ]

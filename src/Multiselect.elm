@@ -792,12 +792,23 @@ arrow model =
                 [ SelectCss.arrowUpside ]
             else
                 [ SelectCss.arrow ]
+
+        arrowRel =
+            if model.status == Opened then
+                "arrowUpside"
+            else
+                "arrow"
     in
         div
             [ css [ SelectCss.arrowWrap ]
             , onClickNoDefault Toggle
             ]
-            [ div [ css arrowCss ] [] ]
+            [ div
+                [ css arrowCss
+                , Html.Styled.Attributes.rel arrowRel
+                ]
+                []
+            ]
 
 
 clear : Model -> Html.Styled.Html Msg

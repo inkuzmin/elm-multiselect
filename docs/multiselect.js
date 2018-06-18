@@ -15944,19 +15944,28 @@ var _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrowWrap = _rtfeldman$elm_c
 											_0: _rtfeldman$elm_css$Css_Foreign$children(
 												{
 													ctor: '::',
-													_0: _rtfeldman$elm_css$Css_Foreign$everything(
+													_0: A2(
+														_rtfeldman$elm_css$Css_Foreign$selector,
+														'*[rel=arrow]',
 														{
 															ctor: '::',
 															_0: _rtfeldman$elm_css$Css$borderTopColor(
 																_rtfeldman$elm_css$Css$hex('#666')),
-															_1: {
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_rtfeldman$elm_css$Css_Foreign$selector,
+															'*[rel=arrowUpside]',
+															{
 																ctor: '::',
 																_0: _rtfeldman$elm_css$Css$borderBottomColor(
 																	_rtfeldman$elm_css$Css$hex('#666')),
 																_1: {ctor: '[]'}
-															}
-														}),
-													_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
 												}),
 											_1: {ctor: '[]'}
 										}),
@@ -16884,6 +16893,7 @@ var _inkuzmin$elm_multiselect$Multiselect$menu = function (model) {
 };
 var _inkuzmin$elm_multiselect$Multiselect$Toggle = {ctor: 'Toggle'};
 var _inkuzmin$elm_multiselect$Multiselect$arrow = function (model) {
+	var arrowRel = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? 'arrowUpside' : 'arrow';
 	var arrowCss = _elm_lang$core$Native_Utils.eq(model.status, _inkuzmin$elm_multiselect$Multiselect$Opened) ? {
 		ctor: '::',
 		_0: _inkuzmin$elm_multiselect$Multiselect_SelectCss$arrowUpside,
@@ -16916,7 +16926,11 @@ var _inkuzmin$elm_multiselect$Multiselect$arrow = function (model) {
 				{
 					ctor: '::',
 					_0: _rtfeldman$elm_css$Html_Styled_Attributes$css(arrowCss),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Html_Styled_Attributes$rel(arrowRel),
+						_1: {ctor: '[]'}
+					}
 				},
 				{ctor: '[]'}),
 			_1: {ctor: '[]'}
