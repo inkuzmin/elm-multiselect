@@ -1,16 +1,15 @@
-module Multiselect.Keycodes
-    exposing
-        ( return
-        , downArrow
-        , upArrow
-        , backspace
-        , tab
-        , escape
-        , end
-        , pageDown
-        , home
-        , pageUp
-        )
+module Multiselect.Keycodes exposing
+    ( backspace
+    , downArrow
+    , end
+    , escape
+    , home
+    , pageDown
+    , pageUp
+    , return
+    , tab
+    , upArrow
+    )
 
 
 type alias KeyCode =

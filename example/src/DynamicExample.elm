@@ -1,18 +1,22 @@
 module Main exposing (..)
 
+import Browser
 import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
-import Multiselect
-import Mouse
 import Html.Attributes
+import Html.Events exposing (onClick)
+import Http as Http
 import Json.Decode as Decode
-import Http
+import Multiselect
 
 
 main =
-    Html.programWithFlags
+    Browser.document
         { init = init
-        , view = view
+        , view =
+            \m ->
+                { title = "Elm 0.19 starter"
+                , body = [ view m ]
+                }
         , update = update
         , subscriptions = subscriptions
         }
@@ -36,15 +40,15 @@ type alias Model =
     }
 
 
-model : Model
-model =
+initModel : Model
+initModel =
     { multiselectC = Multiselect.initModel valuesC "C"
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( model, prepopulateValues )
+    ( initModel, prepopulateValues )
 
 
 
@@ -65,10 +69,10 @@ update msg model =
 
         Yay sub ->
             let
-                ( subModel, subCmd ) =
+                ( subModel, subCmd, maybeOutMsg ) =
                     Multiselect.update sub model.multiselectC
             in
-                { model | multiselectC = subModel } ! [ Cmd.map Yay subCmd ]
+            ( { model | multiselectC = subModel }, Cmd.map Yay subCmd )
 
         Prepopulate (Ok vs) ->
             let
@@ -78,7 +82,7 @@ update msg model =
                 values =
                     List.map (\v -> ( v, v )) vs
             in
-                { model | multiselectC = Multiselect.populateValues multiselectModel values [] } ! []
+            ( { model | multiselectC = Multiselect.populateValues multiselectModel values []}, Cmd.none )
 
         Prepopulate (Err _) ->
             Debug.log "error" ( model, Cmd.none )
@@ -125,7 +129,7 @@ prepopulateValues =
         request =
             Http.get url decodeUrl
     in
-        Http.send Prepopulate request
+    Http.send Prepopulate request
 
 
 

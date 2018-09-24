@@ -1,19 +1,22 @@
 module Main exposing (..)
 
-import Html exposing (Html, button, div, text)
-import Html.Attributes
-
-
 -- Import Multiselect
 
+import Browser
+import Html exposing (Html, button, div, text)
+import Html.Attributes
 import Multiselect
 
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+    Browser.document
         { init = init
-        , view = view
+        , view =
+            \m ->
+                { title = "Elm 0.19 starter"
+                , body = [ view m ]
+                }
         , update = update
         , subscriptions = subscriptions
         }
@@ -66,8 +69,8 @@ type alias Model =
     }
 
 
-model : Model
-model =
+initModel : Model
+initModel =
     { multiselectA = Multiselect.initModel valuesA "A"
     , multiselectB = Multiselect.initModel valuesB "B"
     }
@@ -75,7 +78,7 @@ model =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( model, Cmd.none )
+    ( initModel, Cmd.none )
 
 
 
@@ -100,14 +103,14 @@ update msg model =
                 ( subModel, subCmd, _ ) =
                     Multiselect.update sub model.multiselectA
             in
-                { model | multiselectA = subModel } ! [ Cmd.map HOI subCmd ]
+            ( { model | multiselectA = subModel }, Cmd.map HOI subCmd )
 
         Nyan sub ->
             let
                 ( subModel, subCmd, _ ) =
                     Multiselect.update sub model.multiselectB
             in
-                { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
+            ( { model | multiselectB = subModel }, Cmd.map Nyan subCmd )
 
 
 
@@ -119,7 +122,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ Html.map HOI <| Multiselect.view model.multiselectA
-        , div [ Html.Attributes.style [ ( "height", "300px" ) ] ] [ text "" ]
+        , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
         , Html.map Nyan <| Multiselect.view model.multiselectB
         ]
 
