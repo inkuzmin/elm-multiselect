@@ -1,4 +1,4 @@
-module Multiselect.Utils exposing (invisibleCharacter, fst)
+module Multiselect.Utils exposing (fst, invisibleCharacter)
 
 
 fst : ( a1, a2 ) -> a1
@@ -8,4 +8,4 @@ fst =
 
 invisibleCharacter : String
 invisibleCharacter =
-    "\x200C\x200C"
+    "\u{200C}\u{200C}"

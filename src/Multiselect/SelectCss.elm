@@ -1,50 +1,50 @@
 module Multiselect.SelectCss
     exposing
-        ( menuItem
-        , menuItemHovered
-        , menu
+        ( arrow
+        , arrowUpside
+        , arrowWrap
         , clear
         , clearWrap
-        , arrow
-        , arrowWrap
-        , arrowUpside
-        , tagLabel
-        , tagIcon
-        , tag
-        , tagWrap
+        , container
+        , focused
         , input
         , inputMirrow
-        , wrap
         , inputWrap
-        , container
-        , opened
-        , focused
         , itemHeight
+        , menu
         , menuHeight
+        , menuItem
+        , menuItemHovered
+        , opened
+        , tag
+        , tagIcon
+        , tagLabel
+        , tagWrap
+        , wrap
         )
 
 import Css
     exposing
         ( Style
-        , property
-        , px
-        , hex
-        , int
-        , pct
-        , width
-        , height
-        , hover
-        , num
-        , cursor
-        , padding3
-        , rgba
-        , solid
-        , em
         , border2
         , color
+        , cursor
+        , em
+        , height
+        , hex
+        , hover
+        , int
         , none
+        , num
+        , padding3
+        , pct
+        , property
+        , px
+        , rgba
+        , solid
+        , width
         )
-import Css.Foreign exposing (children, everything, class)
+import Css.Foreign exposing (children, class, everything)
 
 
 boxShadowCustom : String -> Style
@@ -219,15 +219,17 @@ arrowWrap =
         , Css.verticalAlign Css.middle
         , Css.width (px 25)
         , Css.paddingRight (px 5)
-        , hover
-            [ children
-                [ Css.Foreign.selector "*[rel=arrow]"
-                    [ Css.borderTopColor (hex "#666") ]
-                , Css.Foreign.selector "*[rel=arrowUpside]"
-                    [ Css.borderBottomColor (hex "#666")
-                    ]
-                ]
-            ]
+
+        -- FIXME missing after upgrade to 0.19
+        --        , hover
+        --            [ children
+        --                [ Css.Foreign.selector "*[rel=arrow]"
+        --                    [ Css.borderTopColor (hex "#666") ]
+        --                , Css.Foreign.selector "*[rel=arrowUpside]"
+        --                    [ Css.borderBottomColor (hex "#666")
+        --                    ]
+        --                ]
+        --            ]
         ]
 
 

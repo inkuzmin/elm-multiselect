@@ -1,18 +1,23 @@
 module Main exposing (..)
 
+import Browser as Browser
 import Html exposing (Html, button, div, text)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Http
+import Http as Http
 import Json.Decode as Decode
 import Multiselect
 
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+    Browser.document
         { init = init
-        , view = view
+        , view =
+            \m ->
+                { title = "Elm 0.19 starter"
+                , body = [ view m ]
+                }
         , update = update
         , subscriptions = subscriptions
         }
@@ -68,8 +73,8 @@ type alias Model =
     }
 
 
-model : Model
-model =
+initModel : Model
+initModel =
     { multiselectA = Multiselect.initModel valuesA "A"
     , multiselectB = Multiselect.initModel valuesB "B"
     , multiselectC = Multiselect.initModel valuesC "C"
@@ -79,7 +84,7 @@ model =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( model, prepopulateValues )
+    ( initModel, prepopulateValues )
 
 
 
@@ -106,14 +111,14 @@ update msg model =
                 ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectA
             in
-                { model | multiselectA = subModel } ! [ Cmd.map HOI subCmd ]
+            ( { model | multiselectA = subModel }, Cmd.map HOI subCmd )
 
         Nyan sub ->
             let
                 ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectB
             in
-                { model | multiselectB = subModel } ! [ Cmd.map Nyan subCmd ]
+            ( { model | multiselectB = subModel }, Cmd.map Nyan subCmd )
 
         Yay sub ->
             let
@@ -131,7 +136,7 @@ update msg model =
                         Nothing ->
                             ( newModel, Cmd.none )
             in
-                newerModel ! [ Cmd.map Yay subCmd, outCommands ]
+            ( newerModel, Cmd.batch [ Cmd.map Yay subCmd, outCommands ] )
 
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
@@ -144,7 +149,7 @@ update msg model =
                 values =
                     List.map (\v -> ( v, v )) vs
             in
-                { model | multiselectC = Multiselect.populateValues multiselectModel values [] } ! []
+            ( { model | multiselectC = Multiselect.populateValues multiselectModel values [] }, Cmd.none )
 
         Prepopulate (Err _) ->
             Debug.log "error" ( model, Cmd.none )
@@ -160,7 +165,7 @@ updateOutMsg msg model =
                     , Debug.log "value" v
                     )
             in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         Multiselect.Unselected ( k, v ) ->
             let
@@ -169,14 +174,14 @@ updateOutMsg msg model =
                     , Debug.log "value" v
                     )
             in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         Multiselect.Cleared ->
             let
                 _ =
                     Debug.log "Received Cleared msg from Multiselect" ""
             in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
 
 
@@ -190,11 +195,11 @@ view model =
         , Html.map HOI <| Multiselect.view model.multiselectA
         , showSelected model.selectedA
         , Html.button [ Html.Attributes.class "btn", onClick SelectA ] [ text "Select!" ]
-        , div [ Html.Attributes.style [ ( "height", "300px" ) ] ] [ text "" ]
+        , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
         , Html.h3 [] [ text "Submit on select" ]
         , Html.map Nyan <| Multiselect.view model.multiselectB
         , showSelected (Multiselect.getSelectedValues model.multiselectB)
-        , div [ Html.Attributes.style [ ( "height", "300px" ) ] ] [ text "" ]
+        , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
         , Html.h3 [] [ text "Contributors (dynamic fetching of values)" ]
         , Html.map Yay <| Multiselect.view model.multiselectC
         , showSelected (Multiselect.getSelectedValues model.multiselectC)
@@ -232,7 +237,7 @@ prepopulateValues =
         request =
             Http.get url decodeUrl
     in
-        Http.send Prepopulate request
+    Http.send Prepopulate request
 
 
 decodeUrl : Decode.Decoder (List String)
