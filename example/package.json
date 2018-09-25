@@ -4,7 +4,6 @@
   "description": "A multiselect control built with and for Elm",
   "main": "brunch-config.js",
   "scripts": {
-    "postinstall": "elm package install -y",
     "start": "brunch watch --server",
     "prod": "brunch build --production",
     "test": "brunch build --production"
@@ -20,7 +19,7 @@
   "devDependencies": {
     "auto-reload-brunch": "^2.7.1",
     "brunch": "^2.8.2",
-    "elm-brunch": "^0.7.0",
+    "elm-brunch": "^0.12.0",
     "hmr-brunch": "^0.1.1"
   }
 }
