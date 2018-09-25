@@ -9,7 +9,13 @@ Live demo: https://inkuzmin.github.io/elm-multiselect/
 ## How to use
 
 ### Project level
+elm <=0.18
 Add `"inkuzmin/elm-multiselect": "1.0.0 <= v < 2.0.0"` to dependencies section of elm-package.json
+
+elm >=0.19
+```bash
+elm install inkuzmin/elm-multiselect
+```
 
 ### Code level
 See the `example` folder, `src/MinimalExample.elm` provides a minimal example.
