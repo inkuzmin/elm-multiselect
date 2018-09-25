@@ -190,20 +190,45 @@ updateOutMsg msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ Html.h3 [] [ text "Submit on button click" ]
-        , Html.map HOI <| Multiselect.view model.multiselectA
-        , showSelected model.selectedA
-        , Html.button [ Html.Attributes.class "btn", onClick SelectA ] [ text "Select!" ]
-        , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
-        , Html.h3 [] [ text "Submit on select" ]
-        , Html.map Nyan <| Multiselect.view model.multiselectB
-        , showSelected (Multiselect.getSelectedValues model.multiselectB)
-        , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
-        , Html.h3 [] [ text "Contributors (dynamic fetching of values)" ]
-        , Html.map Yay <| Multiselect.view model.multiselectC
-        , showSelected (Multiselect.getSelectedValues model.multiselectC)
+    div [] [
+        div [ Html.Attributes.class "wrapper" ] [
+            Html.header [] [
+                div [] [
+                    Html.h1 [] [ text "elm-multiselect"]
+                    , Html.p [] [ text "A multiselect control built with and for Elm" ]
+                ]
+            ]
+            , div [ Html.Attributes.class "subheader" ] [
+                Html.a [ Html.Attributes.class "github-button", Html.Attributes.href "https://github.com/inkuzmin/elm-multiselect"
+                , Html.Attributes.attribute "data-size" "large" , Html.Attributes.attribute "data-show-count" "true"
+                , Html.Attributes.attribute "aria-label" "Star inkuzmin/elm-multiselect on GitHub" ] [ text "Star" ]
+            ]
+            , div [ Html.Attributes.id "main" ]
+                [ Html.h3 [] [ text "Submit on button click" ]
+                , Html.map HOI <| Multiselect.view model.multiselectA
+                , showSelected model.selectedA
+                , Html.button [ Html.Attributes.class "btn", onClick SelectA ] [ text "Select!" ]
+                , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
+                , Html.h3 [] [ text "Submit on select" ]
+                , Html.map Nyan <| Multiselect.view model.multiselectB
+                , showSelected (Multiselect.getSelectedValues model.multiselectB)
+                , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
+                , Html.h3 [] [ text "Contributors (dynamic fetching of values)" ]
+                , Html.map Yay <| Multiselect.view model.multiselectC
+                , showSelected (Multiselect.getSelectedValues model.multiselectC)
+                ]
+            , div [ Html.Attributes.class "push" ] []
         ]
+        , Html.footer [] [
+            div [ Html.Attributes.class "acknowledgements" ] [
+                Html.a [ Html.Attributes.class "image unitartu", Html.Attributes.href "https://www.ut.ee/en" ] [ Html.img [ Html.Attributes.alt "Emblem of the University of Tartu", Html.Attributes.src "https://inkuzmin.github.io/logos/assets/unitartu.svg" , Html.Attributes.width 100 ] [] ]
+                , Html.a [ Html.Attributes.class "image biit", Html.Attributes.href "https://biit.cs.ut.ee/" ] [ Html.img [ Html.Attributes.alt "BIIT research group", Html.Attributes.src "https://inkuzmin.github.io/logos/assets/biit.svg" , Html.Attributes.width 100 ] [] ]
+            ]
+            , div [ Html.Attributes.class "copy" ] [
+                Html.p [] [ text "© 2018 ", Html.a [ Html.Attributes.href "https://github.com/inkuzmin" ] [ text "Ivan Kuzmin" ] ]
+            ]
+        ]
+    ]
 
 
 showSelected : List ( String, String ) -> Html Msg
