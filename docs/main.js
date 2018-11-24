@@ -4614,6 +4614,7 @@ var author$project$Main$valuesB = _List_fromArray(
 		_Utils_Tuple2('7', 'BBB')
 	]);
 var author$project$Main$valuesC = _List_Nil;
+var author$project$Main$valuesD = _List_Nil;
 var author$project$Multiselect$Closed = {$: 'Closed'};
 var author$project$Multiselect$Model = function (status) {
 	return function (values) {
@@ -4659,6 +4660,7 @@ var author$project$Main$initModel = {
 	multiselectA: A2(author$project$Multiselect$initModel, author$project$Main$valuesA, 'A'),
 	multiselectB: A2(author$project$Multiselect$initModel, author$project$Main$valuesB, 'B'),
 	multiselectC: A2(author$project$Multiselect$initModel, author$project$Main$valuesC, 'C'),
+	multiselectD: A2(author$project$Multiselect$initModel, author$project$Main$valuesD, 'D'),
 	selectedA: _List_Nil
 };
 var author$project$Main$Prepopulate = function (a) {
@@ -6331,35 +6333,14 @@ var author$project$Main$subscriptions = function (model) {
 				author$project$Multiselect$subscriptions(model.multiselectC))
 			]));
 };
-var elm$core$Debug$log = _Debug_log;
-var elm$core$Platform$Cmd$batch = _Platform_batch;
-var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Main$updateOutMsg = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'Selected':
-				var _n1 = msg.a;
-				var k = _n1.a;
-				var v = _n1.b;
-				var _n2 = _Utils_Tuple2(
-					A2(elm$core$Debug$log, 'Received Selected msg from Multiselect, key', k),
-					A2(elm$core$Debug$log, 'value', v));
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-			case 'Unselected':
-				var _n3 = msg.a;
-				var k = _n3.a;
-				var v = _n3.b;
-				var _n4 = _Utils_Tuple2(
-					A2(elm$core$Debug$log, 'Received Unselected msg from Multiselect, key', k),
-					A2(elm$core$Debug$log, 'value', v));
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-			default:
-				var _n5 = A2(elm$core$Debug$log, 'Received Cleared msg from Multiselect', '');
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		}
-	});
+var author$project$Main$Tags = function (a) {
+	return {$: 'Tags', a: a};
+};
 var author$project$Multiselect$getSelectedValues = function (model) {
 	return model.selected;
+};
+var author$project$Multiselect$getValues = function (model) {
+	return model.values;
 };
 var elm$core$Basics$not = _Basics_not;
 var elm$core$List$filter = F2(
@@ -6426,10 +6407,78 @@ var author$project$Multiselect$populateValues = F3(
 			model,
 			{filtered: filtered, selected: selected, values: values});
 	});
+var author$project$Main$addTag = F2(
+	function (multiselectModel, tag) {
+		var values = author$project$Multiselect$getValues(multiselectModel);
+		var selected = author$project$Multiselect$getSelectedValues(multiselectModel);
+		var alreadyExists = A2(elm$core$List$member, tag, values);
+		return alreadyExists ? multiselectModel : A3(
+			author$project$Multiselect$populateValues,
+			multiselectModel,
+			_Utils_ap(
+				values,
+				_List_fromArray(
+					[tag])),
+			_Utils_ap(
+				selected,
+				_List_fromArray(
+					[tag])));
+	});
+var elm$core$Debug$log = _Debug_log;
+var elm$core$Platform$Cmd$batch = _Platform_batch;
+var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
+var author$project$Main$handleTag = F2(
+	function (msg, model) {
+		if (msg.$ === 'NotFound') {
+			var v = msg.a;
+			var tag = _Utils_Tuple2(v, v);
+			var multiselectModel = model.multiselectD;
+			var populated = A2(author$project$Main$addTag, multiselectModel, tag);
+			var _n1 = A2(elm$core$Debug$log, 'Received Not Found msg from Multiselect, value', v);
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{multiselectD: populated}),
+				elm$core$Platform$Cmd$none);
+		} else {
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		}
+	});
+var author$project$Main$updateOutMsg = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Selected':
+				var _n1 = msg.a;
+				var k = _n1.a;
+				var v = _n1.b;
+				var _n2 = _Utils_Tuple2(
+					A2(elm$core$Debug$log, 'Received Selected msg from Multiselect, key', k),
+					A2(elm$core$Debug$log, 'value', v));
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			case 'Unselected':
+				var _n3 = msg.a;
+				var k = _n3.a;
+				var v = _n3.b;
+				var _n4 = _Utils_Tuple2(
+					A2(elm$core$Debug$log, 'Received Unselected msg from Multiselect, key', k),
+					A2(elm$core$Debug$log, 'value', v));
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			case 'Cleared':
+				var _n5 = A2(elm$core$Debug$log, 'Received Cleared msg from Multiselect', '');
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			default:
+				var v = msg.a;
+				var _n6 = A2(elm$core$Debug$log, 'Received Not Found msg from Multiselect, value', v);
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		}
+	});
 var author$project$Multiselect$Cleared = {$: 'Cleared'};
 var author$project$Multiselect$DisableProtection = {$: 'DisableProtection'};
 var author$project$Multiselect$FocusResult = function (a) {
 	return {$: 'FocusResult', a: a};
+};
+var author$project$Multiselect$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
 };
 var author$project$Multiselect$ScrollResult = function (a) {
 	return {$: 'ScrollResult', a: a};
@@ -7029,7 +7078,13 @@ var author$project$Multiselect$update = F2(
 								if (_Utils_eq(key, author$project$Multiselect$Keycodes$return)) {
 									var _n10 = model.hovered;
 									if (_n10.$ === 'Nothing') {
-										return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+										var isInvisible = _Utils_eq(model.input, author$project$Multiselect$Utils$invisibleCharacter);
+										var isEmpty = elm$core$String$isEmpty(model.input);
+										return (isInvisible || isEmpty) ? _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing) : _Utils_Tuple3(
+											model,
+											elm$core$Platform$Cmd$none,
+											elm$core$Maybe$Just(
+												author$project$Multiselect$NotFound(model.input)));
 									} else {
 										var item = _n10.a;
 										var selected = _Utils_ap(
@@ -7175,6 +7230,33 @@ var author$project$Main$update = F2(
 						_List_fromArray(
 							[
 								A2(elm$core$Platform$Cmd$map, author$project$Main$Yay, subCmd),
+								outCommands
+							])));
+			case 'Tags':
+				var sub = msg.a;
+				var _n6 = A2(author$project$Multiselect$update, sub, model.multiselectD);
+				var subModel = _n6.a;
+				var subCmd = _n6.b;
+				var outMsg = _n6.c;
+				var newModel = _Utils_update(
+					model,
+					{multiselectD: subModel});
+				var _n7 = function () {
+					if (outMsg.$ === 'Just') {
+						var m = outMsg.a;
+						return A2(author$project$Main$handleTag, m, newModel);
+					} else {
+						return _Utils_Tuple2(newModel, elm$core$Platform$Cmd$none);
+					}
+				}();
+				var newerModel = _n7.a;
+				var outCommands = _n7.b;
+				return _Utils_Tuple2(
+					newerModel,
+					elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								A2(elm$core$Platform$Cmd$map, author$project$Main$Tags, subCmd),
 								outCommands
 							])));
 			case 'SelectA':
@@ -11040,7 +11122,30 @@ var author$project$Main$view = function (model) {
 								author$project$Main$Yay,
 								author$project$Multiselect$view(model.multiselectC)),
 								author$project$Main$showSelected(
-								author$project$Multiselect$getSelectedValues(model.multiselectC))
+								author$project$Multiselect$getSelectedValues(model.multiselectC)),
+								A2(
+								elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2(elm$html$Html$Attributes$style, 'height', '300px')
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('')
+									])),
+								A2(
+								elm$html$Html$h3,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Tagging Example')
+									])),
+								A2(
+								elm$html$Html$map,
+								author$project$Main$Tags,
+								author$project$Multiselect$view(model.multiselectD)),
+								author$project$Main$showSelected(
+								author$project$Multiselect$getSelectedValues(model.multiselectD))
 							])),
 						A2(
 						elm$html$Html$div,

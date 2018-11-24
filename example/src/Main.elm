@@ -60,6 +60,9 @@ valuesC : List ( String, String )
 valuesC =
     []
 
+valuesD : List ( String, String )
+valuesD =
+    []
 
 type alias Flags =
     {}
@@ -69,6 +72,7 @@ type alias Model =
     { multiselectA : Multiselect.Model
     , multiselectB : Multiselect.Model
     , multiselectC : Multiselect.Model
+    , multiselectD : Multiselect.Model
     , selectedA : List ( String, String )
     }
 
@@ -78,6 +82,7 @@ initModel =
     { multiselectA = Multiselect.initModel valuesA "A"
     , multiselectB = Multiselect.initModel valuesB "B"
     , multiselectC = Multiselect.initModel valuesC "C"
+    , multiselectD = Multiselect.initModel valuesD "D"
     , selectedA = []
     }
 
@@ -96,6 +101,7 @@ type Msg
     | HOI Multiselect.Msg
     | Nyan Multiselect.Msg
     | Yay Multiselect.Msg
+    | Tags Multiselect.Msg
     | SelectA
     | Prepopulate (Result Http.Error (List String))
 
@@ -137,6 +143,23 @@ update msg model =
                             ( newModel, Cmd.none )
             in
             ( newerModel, Cmd.batch [ Cmd.map Yay subCmd, outCommands ] )
+        Tags sub ->
+            let
+                ( subModel, subCmd, outMsg ) =
+                    Multiselect.update sub model.multiselectD
+
+                newModel =
+                    { model | multiselectD = subModel }
+
+                ( newerModel, outCommands ) =
+                    case outMsg of
+                        Just m ->
+                            handleTag m newModel
+
+                        Nothing ->
+                            ( newModel, Cmd.none )
+            in
+            ( newerModel, Cmd.batch [ Cmd.map Tags subCmd, outCommands ] )
 
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
@@ -154,6 +177,40 @@ update msg model =
         Prepopulate (Err _) ->
             Debug.log "error" ( model, Cmd.none )
 
+
+addTag : Multiselect.Model -> (String, String) -> Multiselect.Model
+addTag multiselectModel tag =
+    let
+        values = 
+            Multiselect.getValues multiselectModel
+        selected =
+            Multiselect.getSelectedValues multiselectModel
+        alreadyExists =
+            List.member tag values
+    in
+        if alreadyExists then
+            multiselectModel
+        else
+            Multiselect.populateValues multiselectModel (values ++ [ tag ]) (selected ++ [ tag ])
+    
+
+handleTag : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
+handleTag msg model =
+    case msg of
+        Multiselect.NotFound v ->
+            let
+                _ =
+                    Debug.log "Received Not Found msg from Multiselect, value" v
+                tag =
+                    (v, v)
+                multiselectModel =
+                    model.multiselectD
+                populated =
+                    addTag multiselectModel tag
+            in
+            ( { model | multiselectD = populated }, Cmd.none)
+        _ ->
+            ( model, Cmd.none )
 
 updateOutMsg : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
 updateOutMsg msg model =
@@ -182,7 +239,12 @@ updateOutMsg msg model =
                     Debug.log "Received Cleared msg from Multiselect" ""
             in
             ( model, Cmd.none )
-
+        Multiselect.NotFound v ->
+            let
+                _ =
+                    Debug.log "Received Not Found msg from Multiselect, value" v
+            in
+            ( model, Cmd.none )
 
 
 -- VIEW
@@ -216,6 +278,10 @@ view model =
                 , Html.h3 [] [ text "Contributors (dynamic fetching of values)" ]
                 , Html.map Yay <| Multiselect.view model.multiselectC
                 , showSelected (Multiselect.getSelectedValues model.multiselectC)
+                , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
+                , Html.h3 [] [ text "Tagging Example" ]
+                , Html.map Tags <| Multiselect.view model.multiselectD
+                , showSelected (Multiselect.getSelectedValues model.multiselectD)
                 ]
             , div [ Html.Attributes.class "push" ] []
         ]

@@ -3,6 +3,7 @@ module Multiselect
         ( Model
         , Msg
         , OutMsg(..)
+        , getValues
         , getSelectedValues
         , initModel
         , populateValues
@@ -125,6 +126,12 @@ initModel values tag1 =
         tag1
 
 
+{-| Get the full list of values : List (String, String)
+-}
+getValues : Model -> List ( String, String )
+getValues model =
+    model.values
+
 {-| Get selected values : List (String, String)
 -}
 getSelectedValues : Model -> List ( String, String )
@@ -181,6 +188,7 @@ type OutMsg
     = Selected ( String, String )
     | Unselected ( String, String )
     | Cleared
+    | NotFound String
 
 
 {-| Update the control state
@@ -457,7 +465,16 @@ update msg model =
             else if key == Keycodes.return then
                 case model.hovered of
                     Nothing ->
-                        ( model, Cmd.none, Nothing )
+                        let
+                            isInvisible = 
+                                model.input == invisibleCharacter
+                            isEmpty =
+                                String.isEmpty model.input
+                        in
+                            if isInvisible || isEmpty then
+                                ( model, Cmd.none, Nothing )
+                            else
+                                ( model, Cmd.none, Just (NotFound model.input) )
 
                     Just item ->
                         let
