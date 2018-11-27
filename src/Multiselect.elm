@@ -16,7 +16,7 @@ Please, check example/src/MinimalExample.elm for the minimal example on how to u
 
 # Helpers
 
-@docs initModel, getSelectedValues, populateValues
+@docs initModel, getSelectedValues, populateValues, clearInputText, getValues
 
 
 # Model
