@@ -1,16 +1,13 @@
-module Multiselect
-    exposing
-        ( Model
-        , Msg
-        , OutMsg(..)
-        , getValues
-        , getSelectedValues
-        , initModel
-        , populateValues
-        , subscriptions
-        , update
-        , view
-        )
+module Multiselect exposing
+    ( initModel, getSelectedValues, populateValues
+    , Model
+    , Msg
+    , OutMsg(..)
+    , view
+    , update
+    , subscriptions
+    , clearInputText, getValues
+    )
 
 {-| An implementation of multiselect control built with and for Elm.
 
@@ -132,6 +129,7 @@ getValues : Model -> List ( String, String )
 getValues model =
     model.values
 
+
 {-| Get selected values : List (String, String)
 -}
 getSelectedValues : Model -> List ( String, String )
@@ -147,10 +145,20 @@ populateValues model values selected =
         filtered =
             if List.isEmpty selected then
                 values
+
             else
                 filter selected values
     in
     { model | values = values, filtered = filtered, selected = selected }
+
+
+{-| Clear the input text: (Model, Cmd Msg)
+-}
+clearInputText : Model -> ( Model, Cmd Msg )
+clearInputText model =
+    ( { model | input = invisibleCharacter }
+    , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+    )
 
 
 filter : List ( String, String ) -> List ( String, String ) -> List ( String, String )
@@ -215,6 +223,7 @@ update msg model =
                     ]
                 , Nothing
                 )
+
             else
                 ( { model | status = Opened }
                 , Cmd.batch
@@ -226,6 +235,7 @@ update msg model =
         Click ->
             if model.protected then
                 ( { model | protected = False }, Cmd.none, Nothing )
+
             else
                 ( { model | status = Closed }, Cmd.none, Nothing )
 
@@ -235,6 +245,7 @@ update msg model =
         ClickOnComponent ->
             if model.protected then
                 ( model, Cmd.none, Nothing )
+
             else
                 ( { model | status = Opened, protected = True }
                 , Cmd.batch
@@ -252,6 +263,7 @@ update msg model =
                 Ok () ->
                     if model.input == invisibleCharacter then
                         ( { model | input = "" }, Cmd.none, Nothing )
+
                     else
                         ( { model | error = Nothing }, Cmd.none, Nothing )
 
@@ -263,6 +275,7 @@ update msg model =
                 Ok () ->
                     if model.input == invisibleCharacter then
                         ( { model | input = "" }, Cmd.none, Nothing )
+
                     else
                         ( { model | error = Nothing }, Cmd.none, Nothing )
 
@@ -279,6 +292,7 @@ update msg model =
             in
             if model.protected then
                 ( { model | protected = False }, Cmd.none, Nothing )
+
             else
                 case model.hovered of
                     Nothing ->
@@ -289,6 +303,7 @@ update msg model =
                             , status =
                                 if List.isEmpty filtered then
                                     Closed
+
                                 else
                                     Opened
                           }
@@ -305,12 +320,14 @@ update msg model =
                                 , status =
                                     if List.isEmpty filtered then
                                         Closed
+
                                     else
                                         Opened
                               }
                             , Cmd.none
                             , Nothing
                             )
+
                         else
                             ( { model
                                 | filtered = filtered
@@ -318,6 +335,7 @@ update msg model =
                                 , status =
                                     if List.isEmpty filtered then
                                         Closed
+
                                     else
                                         Opened
                               }
@@ -341,6 +359,7 @@ update msg model =
                 , status =
                     if List.isEmpty filtered then
                         Closed
+
                     else
                         Opened
               }
@@ -430,6 +449,7 @@ update msg model =
                         , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                         , Nothing
                         )
+
             else if key == Keycodes.downArrow then
                 case model.hovered of
                     Nothing ->
@@ -444,6 +464,7 @@ update msg model =
                         , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                         , Nothing
                         )
+
             else if key == Keycodes.pageUp || key == Keycodes.home then
                 let
                     first =
@@ -453,6 +474,7 @@ update msg model =
                 , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                 , Nothing
                 )
+
             else if key == Keycodes.pageDown || key == Keycodes.end then
                 let
                     last =
@@ -462,19 +484,22 @@ update msg model =
                 , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                 , Nothing
                 )
+
             else if key == Keycodes.return then
                 case model.hovered of
                     Nothing ->
                         let
-                            isInvisible = 
+                            isInvisible =
                                 model.input == invisibleCharacter
+
                             isEmpty =
                                 String.isEmpty model.input
                         in
-                            if isInvisible || isEmpty then
-                                ( model, Cmd.none, Nothing )
-                            else
-                                ( model, Cmd.none, Just (NotFound model.input) )
+                        if isInvisible || isEmpty then
+                            ( model, Cmd.none, Nothing )
+
+                        else
+                            ( model, Cmd.none, Just (NotFound model.input) )
 
                     Just item ->
                         let
@@ -492,6 +517,7 @@ update msg model =
                             , status =
                                 if List.isEmpty filtered then
                                     Closed
+
                                 else
                                     Opened
                           }
@@ -500,10 +526,13 @@ update msg model =
                             ]
                         , Just (Selected item)
                         )
+
             else if key == Keycodes.escape then
                 ( { model | status = Closed, protected = True }, Cmd.none, Nothing )
+
             else if key == Keycodes.tab then
                 ( { model | status = Closed }, Cmd.none, Nothing )
+
             else if key == Keycodes.backspace then
                 if model.input == "" then
                     case lastElem model.selected of
@@ -523,8 +552,10 @@ update msg model =
                             , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                             , Just (Unselected item)
                             )
+
                 else
                     ( model, Cmd.none, Nothing )
+
             else
                 ( model, Cmd.none, Nothing )
 
@@ -543,8 +574,10 @@ fitViewPort : ( Float, Float ) -> ( Float, Float ) -> Float
 fitViewPort ( top, bottom ) ( vpTop, vpBottom ) =
     if top < vpTop then
         top
+
     else if bottom > vpBottom then
         vpTop + (bottom - vpBottom)
+
     else
         vpTop
 
@@ -560,6 +593,7 @@ indexOf el list =
                 x :: xs ->
                     if x == el then
                         Just index
+
                     else
                         helper xs (index + 1)
     in
@@ -593,12 +627,14 @@ nextSelectedItem list item =
                 x :: [] ->
                     if x == item then
                         takeLast (List.reverse list)
+
                     else
                         Nothing
 
                 x :: y :: rest ->
                     if x == item then
                         Just y
+
                     else
                         findNextInList (y :: rest)
     in
@@ -616,12 +652,14 @@ nextItem list item =
                 x :: [] ->
                     if x == item then
                         List.head list
+
                     else
                         Nothing
 
                 x :: y :: rest ->
                     if x == item then
                         Just y
+
                     else
                         findNextInList (y :: rest)
     in
@@ -681,8 +719,10 @@ styledView model =
         inputCss =
             if model.status == Focused then
                 [ SelectCss.container, SelectCss.focused ]
+
             else if model.status == Opened then
                 [ SelectCss.container, SelectCss.opened ]
+
             else
                 [ SelectCss.container ]
     in
@@ -714,6 +754,7 @@ input model =
         value =
             if model.input == invisibleCharacter then
                 Html.Styled.Attributes.property "value" (Encode.string model.input)
+
             else
                 Html.Styled.Attributes.property "type" (Encode.string "text")
     in
@@ -744,6 +785,7 @@ preventDefaultButtons =
         filterKey code =
             if code == Keycodes.upArrow || code == Keycodes.downArrow then
                 Ok code
+
             else
                 Err "ignored input"
 
@@ -805,12 +847,14 @@ arrow model =
         arrowCss =
             if model.status == Opened then
                 [ SelectCss.arrowUpside ]
+
             else
                 [ SelectCss.arrow ]
 
         arrowRel =
             if model.status == Opened then
                 "arrowUpside"
+
             else
                 "arrow"
     in
@@ -834,6 +878,7 @@ clear model =
             , onClickNoDefault Clear
             ]
             [ div [ css [ SelectCss.clear ] ] [ text "×" ] ]
+
     else
         div [] []
 
@@ -858,6 +903,7 @@ menu model =
                             [ css
                                 (if name == hovered then
                                     [ SelectCss.menuItemHovered, SelectCss.menuItem ]
+
                                  else
                                     [ SelectCss.menuItem ]
                                 )
@@ -886,6 +932,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     if model.status == Opened then
         BrowserEvents.onClick (Json.Decode.succeed Click)
+
     else
         Sub.none
 

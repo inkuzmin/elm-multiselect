@@ -6336,6 +6336,21 @@ var author$project$Main$subscriptions = function (model) {
 var author$project$Main$Tags = function (a) {
 	return {$: 'Tags', a: a};
 };
+var author$project$Multiselect$FocusResult = function (a) {
+	return {$: 'FocusResult', a: a};
+};
+var author$project$Multiselect$Utils$invisibleCharacter = '\u200c\u200c';
+var elm$browser$Browser$Dom$focus = _Browser_call('focus');
+var author$project$Multiselect$clearInputText = function (model) {
+	return _Utils_Tuple2(
+		_Utils_update(
+			model,
+			{input: author$project$Multiselect$Utils$invisibleCharacter}),
+		A2(
+			elm$core$Task$attempt,
+			author$project$Multiselect$FocusResult,
+			elm$browser$Browser$Dom$focus('multiselectInput' + model.tag)));
+};
 var author$project$Multiselect$getSelectedValues = function (model) {
 	return model.selected;
 };
@@ -6407,39 +6422,50 @@ var author$project$Multiselect$populateValues = F3(
 			model,
 			{filtered: filtered, selected: selected, values: values});
 	});
+var elm$core$Platform$Cmd$map = _Platform_map;
+var elm$core$Platform$Cmd$batch = _Platform_batch;
+var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$addTag = F2(
 	function (multiselectModel, tag) {
 		var values = author$project$Multiselect$getValues(multiselectModel);
 		var selected = author$project$Multiselect$getSelectedValues(multiselectModel);
 		var alreadyExists = A2(elm$core$List$member, tag, values);
-		return alreadyExists ? multiselectModel : A3(
-			author$project$Multiselect$populateValues,
-			multiselectModel,
-			_Utils_ap(
-				values,
-				_List_fromArray(
-					[tag])),
-			_Utils_ap(
-				selected,
-				_List_fromArray(
-					[tag])));
+		return alreadyExists ? _Utils_Tuple2(multiselectModel, elm$core$Platform$Cmd$none) : function (_n0) {
+			var m = _n0.a;
+			var c = _n0.b;
+			return _Utils_Tuple2(
+				m,
+				A2(elm$core$Platform$Cmd$map, author$project$Main$Tags, c));
+		}(
+			author$project$Multiselect$clearInputText(
+				A3(
+					author$project$Multiselect$populateValues,
+					multiselectModel,
+					_Utils_ap(
+						values,
+						_List_fromArray(
+							[tag])),
+					_Utils_ap(
+						selected,
+						_List_fromArray(
+							[tag])))));
 	});
 var elm$core$Debug$log = _Debug_log;
-var elm$core$Platform$Cmd$batch = _Platform_batch;
-var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$handleTag = F2(
 	function (msg, model) {
 		if (msg.$ === 'NotFound') {
 			var v = msg.a;
 			var tag = _Utils_Tuple2(v, v);
 			var multiselectModel = model.multiselectD;
-			var populated = A2(author$project$Main$addTag, multiselectModel, tag);
-			var _n1 = A2(elm$core$Debug$log, 'Received Not Found msg from Multiselect, value', v);
+			var _n1 = A2(author$project$Main$addTag, multiselectModel, tag);
+			var populated = _n1.a;
+			var cmd = _n1.b;
+			var _n2 = A2(elm$core$Debug$log, 'Received Not Found msg from Multiselect, value', v);
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{multiselectD: populated}),
-				elm$core$Platform$Cmd$none);
+				cmd);
 		} else {
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
@@ -6474,9 +6500,6 @@ var author$project$Main$updateOutMsg = F2(
 	});
 var author$project$Multiselect$Cleared = {$: 'Cleared'};
 var author$project$Multiselect$DisableProtection = {$: 'DisableProtection'};
-var author$project$Multiselect$FocusResult = function (a) {
-	return {$: 'FocusResult', a: a};
-};
 var author$project$Multiselect$NotFound = function (a) {
 	return {$: 'NotFound', a: a};
 };
@@ -6664,8 +6687,6 @@ var author$project$Multiselect$Keycodes$pageUp = 33;
 var author$project$Multiselect$Keycodes$return = 13;
 var author$project$Multiselect$Keycodes$tab = 9;
 var author$project$Multiselect$Keycodes$upArrow = 38;
-var author$project$Multiselect$Utils$invisibleCharacter = '\u200c\u200c';
-var elm$browser$Browser$Dom$focus = _Browser_call('focus');
 var elm$core$Basics$neq = _Utils_notEqual;
 var elm$core$String$toLower = _String_toLower;
 var author$project$Multiselect$update = F2(
@@ -7177,7 +7198,6 @@ var author$project$Multiselect$update = F2(
 				}
 		}
 	});
-var elm$core$Platform$Cmd$map = _Platform_map;
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
