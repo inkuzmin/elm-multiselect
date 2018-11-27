@@ -1,15 +1,13 @@
-module Multiselect
-    exposing
-        ( Model
-        , Msg
-        , OutMsg(..)
-        , getSelectedValues
-        , initModel
-        , populateValues
-        , subscriptions
-        , update
-        , view
-        )
+module Multiselect exposing
+    ( initModel, getSelectedValues, populateValues
+    , Model
+    , Msg
+    , OutMsg(..)
+    , view
+    , update
+    , subscriptions
+    , clearInputText, getValues
+    )
 
 {-| An implementation of multiselect control built with and for Elm.
 
@@ -126,6 +124,13 @@ initModel values tag1 =
         }
 
 
+{-| Get the full list of values : List (String, String)
+-}
+getValues : Model -> List ( String, String )
+getValues model =
+    model.values
+
+
 {-| Get selected values : List (String, String)
 -}
 getSelectedValues : Model -> List ( String, String )
@@ -141,10 +146,20 @@ populateValues (Model model) values selected =
         filtered =
             if List.isEmpty selected then
                 values
+
             else
                 filter selected values
     in
     Model { model | values = values, filtered = filtered, selected = selected }
+
+
+{-| Clear the input text: (Model, Cmd Msg)
+-}
+clearInputText : Model -> ( Model, Cmd Msg )
+clearInputText model =
+    ( { model | input = invisibleCharacter }
+    , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+    )
 
 
 filter : List ( String, String ) -> List ( String, String ) -> List ( String, String )
@@ -182,6 +197,7 @@ type OutMsg
     = Selected ( String, String )
     | Unselected ( String, String )
     | Cleared
+    | NotFound String
 
 
 {-| Update the control state
@@ -208,6 +224,7 @@ update msg (Model model) =
                     ]
                 , Nothing
                 )
+
             else
                 ( Model { model | status = Opened }
                 , Cmd.batch
@@ -282,6 +299,7 @@ update msg (Model model) =
                             , status =
                                 if List.isEmpty filtered then
                                     Closed
+
                                 else
                                     Opened
                           }
@@ -298,12 +316,14 @@ update msg (Model model) =
                                 , status =
                                     if List.isEmpty filtered then
                                         Closed
+
                                     else
                                         Opened
                               }
                             , Cmd.none
                             , Nothing
                             )
+
                         else
                             ( Model { model
                                 | filtered = filtered
@@ -311,6 +331,7 @@ update msg (Model model) =
                                 , status =
                                     if List.isEmpty filtered then
                                         Closed
+
                                     else
                                         Opened
                               }
@@ -334,6 +355,7 @@ update msg (Model model) =
                 , status =
                     if List.isEmpty filtered then
                         Closed
+
                     else
                         Opened
               }
@@ -423,6 +445,7 @@ update msg (Model model) =
                         , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                         , Nothing
                         )
+
             else if key == Keycodes.downArrow then
                 case model.hovered of
                     Nothing ->
@@ -437,6 +460,7 @@ update msg (Model model) =
                         , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                         , Nothing
                         )
+
             else if key == Keycodes.pageUp || key == Keycodes.home then
                 let
                     first =
@@ -446,6 +470,7 @@ update msg (Model model) =
                 , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                 , Nothing
                 )
+
             else if key == Keycodes.pageDown || key == Keycodes.end then
                 let
                     last =
@@ -455,10 +480,22 @@ update msg (Model model) =
                 , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                 , Nothing
                 )
+
             else if key == Keycodes.return then
                 case model.hovered of
                     Nothing ->
-                        ( Model model, Cmd.none, Nothing )
+                        let
+                            isInvisible =
+                                model.input == invisibleCharacter
+
+                            isEmpty =
+                                String.isEmpty model.input
+                        in
+                        if isInvisible || isEmpty then
+                            ( Model model, Cmd.none, Nothing )
+
+                        else
+                            ( Model model, Cmd.none, Just (NotFound model.input) )
 
                     Just item ->
                         let
@@ -476,6 +513,7 @@ update msg (Model model) =
                             , status =
                                 if List.isEmpty filtered then
                                     Closed
+
                                 else
                                     Opened
                           }
@@ -484,8 +522,10 @@ update msg (Model model) =
                             ]
                         , Just (Selected item)
                         )
+
             else if key == Keycodes.escape then
                 ( Model { model | status = Closed, protected = True }, Cmd.none, Nothing )
+
             else if key == Keycodes.tab then
                 ( Model { model | status = Closed }, Cmd.none, Nothing )
             else if key == Keycodes.backspace then
@@ -507,8 +547,10 @@ update msg (Model model) =
                             , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                             , Just (Unselected item)
                             )
+
                 else
                     ( Model model, Cmd.none, Nothing )
+
             else
                 ( Model model, Cmd.none, Nothing )
 
@@ -527,8 +569,10 @@ fitViewPort : ( Float, Float ) -> ( Float, Float ) -> Float
 fitViewPort ( top, bottom ) ( vpTop, vpBottom ) =
     if top < vpTop then
         top
+
     else if bottom > vpBottom then
         vpTop + (bottom - vpBottom)
+
     else
         vpTop
 
@@ -544,6 +588,7 @@ indexOf el list =
                 x :: xs ->
                     if x == el then
                         Just index
+
                     else
                         helper xs (index + 1)
     in
@@ -577,12 +622,14 @@ nextSelectedItem list item =
                 x :: [] ->
                     if x == item then
                         takeLast (List.reverse list)
+
                     else
                         Nothing
 
                 x :: y :: rest ->
                     if x == item then
                         Just y
+
                     else
                         findNextInList (y :: rest)
     in
@@ -600,12 +647,14 @@ nextItem list item =
                 x :: [] ->
                     if x == item then
                         List.head list
+
                     else
                         Nothing
 
                 x :: y :: rest ->
                     if x == item then
                         Just y
+
                     else
                         findNextInList (y :: rest)
     in
@@ -665,8 +714,10 @@ styledView (Model model) =
         inputCss =
             if model.status == Focused then
                 [ SelectCss.container, SelectCss.focused ]
+
             else if model.status == Opened then
                 [ SelectCss.container, SelectCss.opened ]
+
             else
                 [ SelectCss.container ]
     in
@@ -698,6 +749,7 @@ input (Model model) =
         value =
             if model.input == invisibleCharacter then
                 Html.Styled.Attributes.property "value" (Encode.string model.input)
+
             else
                 Html.Styled.Attributes.property "type" (Encode.string "text")
     in
@@ -728,6 +780,7 @@ preventDefaultButtons =
         filterKey code =
             if code == Keycodes.upArrow || code == Keycodes.downArrow then
                 Ok code
+
             else
                 Err "ignored input"
 
@@ -789,12 +842,14 @@ arrow (Model model) =
         arrowCss =
             if model.status == Opened then
                 [ SelectCss.arrowUpside ]
+
             else
                 [ SelectCss.arrow ]
 
         arrowRel =
             if model.status == Opened then
                 "arrowUpside"
+
             else
                 "arrow"
     in
@@ -818,6 +873,7 @@ clear (Model model) =
             , onClickNoDefault Clear
             ]
             [ div [ css [ SelectCss.clear ] ] [ text "×" ] ]
+
     else
         div [] []
 
@@ -842,6 +898,7 @@ menu (Model model) =
                             [ css
                                 (if name == hovered then
                                     [ SelectCss.menuItemHovered, SelectCss.menuItem ]
+
                                  else
                                     [ SelectCss.menuItem ]
                                 )
@@ -870,6 +927,7 @@ subscriptions : Model -> Sub Msg
 subscriptions (Model model) =
     if model.status == Opened then
         BrowserEvents.onClick (Json.Decode.succeed Click)
+
     else
         Sub.none
 

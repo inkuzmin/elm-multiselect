@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (Flags, Model, Msg(..), addTag, decodeUrl, handleTag, init, initModel, main, prepopulateValues, showSelected, subscriptions, update, updateOutMsg, valuesA, valuesB, valuesC, valuesD, view)
 
 import Browser as Browser
 import Html exposing (Html, button, div, text)
@@ -61,6 +61,11 @@ valuesC =
     []
 
 
+valuesD : List ( String, String )
+valuesD =
+    []
+
+
 type alias Flags =
     {}
 
@@ -69,6 +74,7 @@ type alias Model =
     { multiselectA : Multiselect.Model
     , multiselectB : Multiselect.Model
     , multiselectC : Multiselect.Model
+    , multiselectD : Multiselect.Model
     , selectedA : List ( String, String )
     }
 
@@ -78,6 +84,7 @@ initModel =
     { multiselectA = Multiselect.initModel valuesA "A"
     , multiselectB = Multiselect.initModel valuesB "B"
     , multiselectC = Multiselect.initModel valuesC "C"
+    , multiselectD = Multiselect.initModel valuesD "D"
     , selectedA = []
     }
 
@@ -96,6 +103,7 @@ type Msg
     | HOI Multiselect.Msg
     | Nyan Multiselect.Msg
     | Yay Multiselect.Msg
+    | Tags Multiselect.Msg
     | SelectA
     | Prepopulate (Result Http.Error (List String))
 
@@ -138,6 +146,24 @@ update msg model =
             in
             ( newerModel, Cmd.batch [ Cmd.map Yay subCmd, outCommands ] )
 
+        Tags sub ->
+            let
+                ( subModel, subCmd, outMsg ) =
+                    Multiselect.update sub model.multiselectD
+
+                newModel =
+                    { model | multiselectD = subModel }
+
+                ( newerModel, outCommands ) =
+                    case outMsg of
+                        Just m ->
+                            handleTag m newModel
+
+                        Nothing ->
+                            ( newModel, Cmd.none )
+            in
+            ( newerModel, Cmd.batch [ Cmd.map Tags subCmd, outCommands ] )
+
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
 
@@ -153,6 +179,50 @@ update msg model =
 
         Prepopulate (Err _) ->
             Debug.log "error" ( model, Cmd.none )
+
+
+addTag : Multiselect.Model -> ( String, String ) -> ( Multiselect.Model, Cmd Msg )
+addTag multiselectModel tag =
+    let
+        values =
+            Multiselect.getValues multiselectModel
+
+        selected =
+            Multiselect.getSelectedValues multiselectModel
+
+        alreadyExists =
+            List.member tag values
+    in
+    if alreadyExists then
+        ( multiselectModel, Cmd.none )
+
+    else
+        Multiselect.populateValues multiselectModel (values ++ [ tag ]) (selected ++ [ tag ])
+            |> Multiselect.clearInputText
+            |> (\( m, c ) -> ( m, Cmd.map Tags c ))
+
+
+handleTag : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
+handleTag msg model =
+    case msg of
+        Multiselect.NotFound v ->
+            let
+                _ =
+                    Debug.log "Received Not Found msg from Multiselect, value" v
+
+                tag =
+                    ( v, v )
+
+                multiselectModel =
+                    model.multiselectD
+
+                ( populated, cmd ) =
+                    addTag multiselectModel tag
+            in
+            ( { model | multiselectD = populated }, cmd )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 updateOutMsg : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
@@ -183,6 +253,13 @@ updateOutMsg msg model =
             in
             ( model, Cmd.none )
 
+        Multiselect.NotFound v ->
+            let
+                _ =
+                    Debug.log "Received Not Found msg from Multiselect, value" v
+            in
+            ( model, Cmd.none )
+
 
 
 -- VIEW
@@ -190,19 +267,24 @@ updateOutMsg msg model =
 
 view : Model -> Html Msg
 view model =
-    div [] [
-        div [ Html.Attributes.class "wrapper" ] [
-            Html.header [] [
-                div [] [
-                    Html.h1 [] [ text "elm-multiselect"]
+    div []
+        [ div [ Html.Attributes.class "wrapper" ]
+            [ Html.header []
+                [ div []
+                    [ Html.h1 [] [ text "elm-multiselect" ]
                     , Html.p [] [ text "A multiselect control built with and for Elm" ]
+                    ]
                 ]
-            ]
-            , div [ Html.Attributes.class "subheader" ] [
-                Html.a [ Html.Attributes.class "github-button", Html.Attributes.href "https://github.com/inkuzmin/elm-multiselect"
-                , Html.Attributes.attribute "data-size" "large" , Html.Attributes.attribute "data-show-count" "true"
-                , Html.Attributes.attribute "aria-label" "Star inkuzmin/elm-multiselect on GitHub" ] [ text "Star" ]
-            ]
+            , div [ Html.Attributes.class "subheader" ]
+                [ Html.a
+                    [ Html.Attributes.class "github-button"
+                    , Html.Attributes.href "https://github.com/inkuzmin/elm-multiselect"
+                    , Html.Attributes.attribute "data-size" "large"
+                    , Html.Attributes.attribute "data-show-count" "true"
+                    , Html.Attributes.attribute "aria-label" "Star inkuzmin/elm-multiselect on GitHub"
+                    ]
+                    [ text "Star" ]
+                ]
             , div [ Html.Attributes.id "main" ]
                 [ Html.h3 [] [ text "Submit on button click" ]
                 , Html.map HOI <| Multiselect.view model.multiselectA
@@ -216,19 +298,23 @@ view model =
                 , Html.h3 [] [ text "Contributors (dynamic fetching of values)" ]
                 , Html.map Yay <| Multiselect.view model.multiselectC
                 , showSelected (Multiselect.getSelectedValues model.multiselectC)
+                , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
+                , Html.h3 [] [ text "Tagging Example" ]
+                , Html.map Tags <| Multiselect.view model.multiselectD
+                , showSelected (Multiselect.getSelectedValues model.multiselectD)
                 ]
             , div [ Html.Attributes.class "push" ] []
-        ]
-        , Html.footer [] [
-            div [ Html.Attributes.class "acknowledgements" ] [
-                Html.a [ Html.Attributes.class "image unitartu", Html.Attributes.href "https://www.ut.ee/en" ] [ Html.img [ Html.Attributes.alt "Emblem of the University of Tartu", Html.Attributes.src "https://inkuzmin.github.io/logos/assets/unitartu.svg" , Html.Attributes.width 100 ] [] ]
-                , Html.a [ Html.Attributes.class "image biit", Html.Attributes.href "https://biit.cs.ut.ee/" ] [ Html.img [ Html.Attributes.alt "BIIT research group", Html.Attributes.src "https://inkuzmin.github.io/logos/assets/biit.svg" , Html.Attributes.width 100 ] [] ]
             ]
-            , div [ Html.Attributes.class "copy" ] [
-                Html.p [] [ text "© 2018 ", Html.a [ Html.Attributes.href "https://github.com/inkuzmin" ] [ text "Ivan Kuzmin" ] ]
+        , Html.footer []
+            [ div [ Html.Attributes.class "acknowledgements" ]
+                [ Html.a [ Html.Attributes.class "image unitartu", Html.Attributes.href "https://www.ut.ee/en" ] [ Html.img [ Html.Attributes.alt "Emblem of the University of Tartu", Html.Attributes.src "https://inkuzmin.github.io/logos/assets/unitartu.svg", Html.Attributes.width 100 ] [] ]
+                , Html.a [ Html.Attributes.class "image biit", Html.Attributes.href "https://biit.cs.ut.ee/" ] [ Html.img [ Html.Attributes.alt "BIIT research group", Html.Attributes.src "https://inkuzmin.github.io/logos/assets/biit.svg", Html.Attributes.width 100 ] [] ]
+                ]
+            , div [ Html.Attributes.class "copy" ]
+                [ Html.p [] [ text "© 2018 ", Html.a [ Html.Attributes.href "https://github.com/inkuzmin" ] [ text "Ivan Kuzmin" ] ]
+                ]
             ]
         ]
-    ]
 
 
 showSelected : List ( String, String ) -> Html Msg
