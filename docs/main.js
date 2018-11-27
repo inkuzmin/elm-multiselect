@@ -4616,28 +4616,13 @@ var author$project$Main$valuesB = _List_fromArray(
 var author$project$Main$valuesC = _List_Nil;
 var author$project$Main$valuesD = _List_Nil;
 var author$project$Multiselect$Closed = {$: 'Closed'};
-var author$project$Multiselect$Model = function (status) {
-	return function (values) {
-		return function (filtered) {
-			return function (selected) {
-				return function (_protected) {
-					return function (error) {
-						return function (input) {
-							return function (inputWidth) {
-								return function (hovered) {
-									return function (tag) {
-										return {error: error, filtered: filtered, hovered: hovered, input: input, inputWidth: inputWidth, _protected: _protected, selected: selected, status: status, tag: tag, values: values};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
+var author$project$Multiselect$Model = function (a) {
+	return {$: 'Model', a: a};
 };
 var elm$core$Basics$False = {$: 'False'};
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
 var elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
@@ -4653,8 +4638,19 @@ var elm$core$List$head = function (list) {
 };
 var author$project$Multiselect$initModel = F2(
 	function (values, tag1) {
-		return author$project$Multiselect$Model(author$project$Multiselect$Closed)(values)(values)(_List_Nil)(false)(elm$core$Maybe$Nothing)('')(23.0)(
-			elm$core$List$head(values))(tag1);
+		return author$project$Multiselect$Model(
+			{
+				error: elm$core$Maybe$Nothing,
+				filtered: values,
+				hovered: elm$core$List$head(values),
+				input: '',
+				inputWidth: 23.0,
+				_protected: false,
+				selected: _List_Nil,
+				status: author$project$Multiselect$Closed,
+				tag: tag1,
+				values: values
+			});
 	});
 var author$project$Main$initModel = {
 	multiselectA: A2(author$project$Multiselect$initModel, author$project$Main$valuesA, 'A'),
@@ -5634,9 +5630,6 @@ var elm$http$Http$expectJson = function (decoder) {
 			}
 		});
 };
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var elm$http$Http$Internal$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6310,7 +6303,8 @@ var elm$browser$Browser$Events$on = F3(
 var elm$browser$Browser$Events$onClick = A2(elm$browser$Browser$Events$on, elm$browser$Browser$Events$Document, 'click');
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Multiselect$subscriptions = function (model) {
+var author$project$Multiselect$subscriptions = function (_n0) {
+	var model = _n0.a;
 	return _Utils_eq(model.status, author$project$Multiselect$Opened) ? elm$browser$Browser$Events$onClick(
 		elm$json$Json$Decode$succeed(author$project$Multiselect$Click)) : elm$core$Platform$Sub$none;
 };
@@ -6341,20 +6335,24 @@ var author$project$Multiselect$FocusResult = function (a) {
 };
 var author$project$Multiselect$Utils$invisibleCharacter = '\u200c\u200c';
 var elm$browser$Browser$Dom$focus = _Browser_call('focus');
-var author$project$Multiselect$clearInputText = function (model) {
+var author$project$Multiselect$clearInputText = function (_n0) {
+	var model = _n0.a;
 	return _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{input: author$project$Multiselect$Utils$invisibleCharacter}),
+		author$project$Multiselect$Model(
+			_Utils_update(
+				model,
+				{input: author$project$Multiselect$Utils$invisibleCharacter})),
 		A2(
 			elm$core$Task$attempt,
 			author$project$Multiselect$FocusResult,
 			elm$browser$Browser$Dom$focus('multiselectInput' + model.tag)));
 };
-var author$project$Multiselect$getSelectedValues = function (model) {
+var author$project$Multiselect$getSelectedValues = function (_n0) {
+	var model = _n0.a;
 	return model.selected;
 };
-var author$project$Multiselect$getValues = function (model) {
+var author$project$Multiselect$getValues = function (_n0) {
+	var model = _n0.a;
 	return model.values;
 };
 var elm$core$Basics$not = _Basics_not;
@@ -6416,11 +6414,13 @@ var elm$core$List$isEmpty = function (xs) {
 	}
 };
 var author$project$Multiselect$populateValues = F3(
-	function (model, values, selected) {
+	function (_n0, values, selected) {
+		var model = _n0.a;
 		var filtered = elm$core$List$isEmpty(selected) ? values : A2(author$project$Multiselect$filter, selected, values);
-		return _Utils_update(
-			model,
-			{filtered: filtered, selected: selected, values: values});
+		return author$project$Multiselect$Model(
+			_Utils_update(
+				model,
+				{filtered: filtered, selected: selected, values: values}));
 	});
 var elm$core$Platform$Cmd$map = _Platform_map;
 var elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6690,15 +6690,20 @@ var author$project$Multiselect$Keycodes$upArrow = 38;
 var elm$core$Basics$neq = _Utils_notEqual;
 var elm$core$String$toLower = _String_toLower;
 var author$project$Multiselect$update = F2(
-	function (msg, model) {
+	function (msg, _n0) {
+		var model = _n0.a;
 		switch (msg.$) {
 			case 'Start':
-				return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+				return _Utils_Tuple3(
+					author$project$Multiselect$Model(model),
+					elm$core$Platform$Cmd$none,
+					elm$core$Maybe$Nothing);
 			case 'Toggle':
 				return _Utils_eq(model.status, author$project$Multiselect$Opened) ? _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{status: author$project$Multiselect$Closed}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{status: author$project$Multiselect$Closed})),
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -6708,9 +6713,10 @@ var author$project$Multiselect$update = F2(
 								elm$browser$Browser$Dom$focus('multiselectInput' + model.tag))
 							])),
 					elm$core$Maybe$Nothing) : _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{status: author$project$Multiselect$Opened}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{status: author$project$Multiselect$Opened})),
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -6722,28 +6728,35 @@ var author$project$Multiselect$update = F2(
 					elm$core$Maybe$Nothing);
 			case 'Click':
 				return model._protected ? _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{_protected: false}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{_protected: false})),
 					elm$core$Platform$Cmd$none,
 					elm$core$Maybe$Nothing) : _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{status: author$project$Multiselect$Closed}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{status: author$project$Multiselect$Closed})),
 					elm$core$Platform$Cmd$none,
 					elm$core$Maybe$Nothing);
 			case 'DisableProtection':
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{_protected: false}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{_protected: false})),
 					elm$core$Platform$Cmd$none,
 					elm$core$Maybe$Nothing);
 			case 'ClickOnComponent':
-				return model._protected ? _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing) : _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{_protected: true, status: author$project$Multiselect$Opened}),
+				return model._protected ? _Utils_Tuple3(
+					author$project$Multiselect$Model(model),
+					elm$core$Platform$Cmd$none,
+					elm$core$Maybe$Nothing) : _Utils_Tuple3(
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{_protected: true, status: author$project$Multiselect$Opened})),
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -6759,23 +6772,26 @@ var author$project$Multiselect$update = F2(
 				if (result.$ === 'Err') {
 					var id = result.a.a;
 					return _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{
-								error: elm$core$Maybe$Just('Could not find dom id: ' + id)
-							}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{
+									error: elm$core$Maybe$Just('Could not find dom id: ' + id)
+								})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing);
 				} else {
 					return _Utils_eq(model.input, author$project$Multiselect$Utils$invisibleCharacter) ? _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{input: ''}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{input: ''})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing) : _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{error: elm$core$Maybe$Nothing}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{error: elm$core$Maybe$Nothing})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing);
 				}
@@ -6784,32 +6800,36 @@ var author$project$Multiselect$update = F2(
 				if (result.$ === 'Err') {
 					var id = result.a.a;
 					return _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{
-								error: elm$core$Maybe$Just('Could not find dom id: ' + id)
-							}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{
+									error: elm$core$Maybe$Just('Could not find dom id: ' + id)
+								})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing);
 				} else {
 					return _Utils_eq(model.input, author$project$Multiselect$Utils$invisibleCharacter) ? _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{input: ''}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{input: ''})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing) : _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{error: elm$core$Maybe$Nothing}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{error: elm$core$Maybe$Nothing})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing);
 				}
 			case 'Adjust':
 				var value = msg.a;
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{inputWidth: value}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{inputWidth: value})),
 					elm$core$Platform$Cmd$none,
 					elm$core$Maybe$Nothing);
 			case 'Filter':
@@ -6819,8 +6839,8 @@ var author$project$Multiselect$update = F2(
 					model.selected,
 					A2(
 						elm$core$List$filter,
-						function (_n4) {
-							var val = _n4.b;
+						function (_n5) {
+							var val = _n5.b;
 							return A2(
 								elm$core$String$contains,
 								elm$core$String$toLower(value),
@@ -6829,27 +6849,29 @@ var author$project$Multiselect$update = F2(
 						model.values));
 				if (model._protected) {
 					return _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{_protected: false}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{_protected: false})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing);
 				} else {
-					var _n3 = model.hovered;
-					if (_n3.$ === 'Nothing') {
+					var _n4 = model.hovered;
+					if (_n4.$ === 'Nothing') {
 						return _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{
-									filtered: filtered,
-									hovered: elm$core$List$head(filtered),
-									input: value,
-									status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
-								}),
+							author$project$Multiselect$Model(
+								_Utils_update(
+									model,
+									{
+										filtered: filtered,
+										hovered: elm$core$List$head(filtered),
+										input: value,
+										status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
+									})),
 							elm$core$Platform$Cmd$none,
 							elm$core$Maybe$Nothing);
 					} else {
-						var item = _n3.a;
+						var item = _n4.a;
 						return (!elm$core$List$length(
 							A2(
 								elm$core$List$filter,
@@ -6857,23 +6879,25 @@ var author$project$Multiselect$update = F2(
 									return _Utils_eq(i, item);
 								},
 								filtered))) ? _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{
-									filtered: filtered,
-									hovered: elm$core$List$head(filtered),
-									input: value,
-									status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
-								}),
+							author$project$Multiselect$Model(
+								_Utils_update(
+									model,
+									{
+										filtered: filtered,
+										hovered: elm$core$List$head(filtered),
+										input: value,
+										status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
+									})),
 							elm$core$Platform$Cmd$none,
 							elm$core$Maybe$Nothing) : _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{
-									filtered: filtered,
-									input: value,
-									status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
-								}),
+							author$project$Multiselect$Model(
+								_Utils_update(
+									model,
+									{
+										filtered: filtered,
+										input: value,
+										status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
+									})),
 							elm$core$Platform$Cmd$none,
 							elm$core$Maybe$Nothing);
 					}
@@ -6886,15 +6910,16 @@ var author$project$Multiselect$update = F2(
 						[item]));
 				var filtered = A2(author$project$Multiselect$filter, selected, model.values);
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							filtered: filtered,
-							hovered: A2(author$project$Multiselect$nextSelectedItem, model.filtered, item),
-							input: author$project$Multiselect$Utils$invisibleCharacter,
-							selected: selected,
-							status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
-						}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{
+								filtered: filtered,
+								hovered: A2(author$project$Multiselect$nextSelectedItem, model.filtered, item),
+								input: author$project$Multiselect$Utils$invisibleCharacter,
+								selected: selected,
+								status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
+							})),
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -6914,13 +6939,14 @@ var author$project$Multiselect$update = F2(
 					},
 					model.selected);
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							filtered: A2(author$project$Multiselect$filter, selected, model.values),
-							hovered: elm$core$Maybe$Just(item),
-							selected: selected
-						}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{
+								filtered: A2(author$project$Multiselect$filter, selected, model.values),
+								hovered: elm$core$Maybe$Just(item),
+								selected: selected
+							})),
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -6934,14 +6960,15 @@ var author$project$Multiselect$update = F2(
 			case 'Clear':
 				var selected = _List_Nil;
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							filtered: A2(author$project$Multiselect$filter, selected, model.values),
-							input: author$project$Multiselect$Utils$invisibleCharacter,
-							selected: selected,
-							status: author$project$Multiselect$Closed
-						}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{
+								filtered: A2(author$project$Multiselect$filter, selected, model.values),
+								input: author$project$Multiselect$Utils$invisibleCharacter,
+								selected: selected,
+								status: author$project$Multiselect$Closed
+							})),
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -6954,11 +6981,12 @@ var author$project$Multiselect$update = F2(
 			case 'OnHover':
 				var item = msg.a;
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							hovered: elm$core$Maybe$Just(item)
-						}),
+					author$project$Multiselect$Model(
+						_Utils_update(
+							model,
+							{
+								hovered: elm$core$Maybe$Just(item)
+							})),
 					elm$core$Platform$Cmd$none,
 					elm$core$Maybe$Nothing);
 			case 'ScrollY':
@@ -6966,32 +6994,40 @@ var author$project$Multiselect$update = F2(
 				if (result.$ === 'Err') {
 					var id = result.a.a;
 					return _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{
-								error: elm$core$Maybe$Just('Could not find dom id: ' + id)
-							}),
+						author$project$Multiselect$Model(
+							_Utils_update(
+								model,
+								{
+									error: elm$core$Maybe$Just('Could not find dom id: ' + id)
+								})),
 						elm$core$Platform$Cmd$none,
 						elm$core$Maybe$Nothing);
 				} else {
 					var y = result.a;
-					var _n6 = model.hovered;
-					if (_n6.$ === 'Nothing') {
-						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+					var _n7 = model.hovered;
+					if (_n7.$ === 'Nothing') {
+						return _Utils_Tuple3(
+							author$project$Multiselect$Model(model),
+							elm$core$Platform$Cmd$none,
+							elm$core$Maybe$Nothing);
 					} else {
-						var item = _n6.a;
-						var _n7 = A2(author$project$Multiselect$indexOf, item, model.filtered);
-						if (_n7.$ === 'Nothing') {
-							return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+						var item = _n7.a;
+						var _n8 = A2(author$project$Multiselect$indexOf, item, model.filtered);
+						if (_n8.$ === 'Nothing') {
+							return _Utils_Tuple3(
+								author$project$Multiselect$Model(model),
+								elm$core$Platform$Cmd$none,
+								elm$core$Maybe$Nothing);
 						} else {
-							var idx = _n7.a;
+							var idx = _n8.a;
 							var vpBoundaries = author$project$Multiselect$getViewPortBoundaries(y);
 							var boundaries = author$project$Multiselect$getBoundaries(idx);
 							var scroll = A2(author$project$Multiselect$fitViewPort, boundaries, vpBoundaries);
 							return _Utils_Tuple3(
-								_Utils_update(
-									model,
-									{error: elm$core$Maybe$Nothing}),
+								author$project$Multiselect$Model(
+									_Utils_update(
+										model,
+										{error: elm$core$Maybe$Nothing})),
 								elm$core$Platform$Cmd$batch(
 									_List_fromArray(
 										[
@@ -7007,23 +7043,25 @@ var author$project$Multiselect$update = F2(
 			default:
 				var key = msg.a;
 				if (_Utils_eq(key, author$project$Multiselect$Keycodes$upArrow)) {
-					var _n8 = model.hovered;
-					if (_n8.$ === 'Nothing') {
+					var _n9 = model.hovered;
+					if (_n9.$ === 'Nothing') {
 						return _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{
-									hovered: elm$core$List$head(model.filtered)
-								}),
+							author$project$Multiselect$Model(
+								_Utils_update(
+									model,
+									{
+										hovered: elm$core$List$head(model.filtered)
+									})),
 							elm$core$Platform$Cmd$none,
 							elm$core$Maybe$Nothing);
 					} else {
-						var item = _n8.a;
+						var item = _n9.a;
 						var prev = A2(author$project$Multiselect$prevItem, model.filtered, item);
 						return _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{hovered: prev}),
+							author$project$Multiselect$Model(
+								_Utils_update(
+									model,
+									{hovered: prev})),
 							elm$core$Platform$Cmd$batch(
 								_List_fromArray(
 									[
@@ -7036,23 +7074,25 @@ var author$project$Multiselect$update = F2(
 					}
 				} else {
 					if (_Utils_eq(key, author$project$Multiselect$Keycodes$downArrow)) {
-						var _n9 = model.hovered;
-						if (_n9.$ === 'Nothing') {
+						var _n10 = model.hovered;
+						if (_n10.$ === 'Nothing') {
 							return _Utils_Tuple3(
-								_Utils_update(
-									model,
-									{
-										hovered: elm$core$List$head(model.filtered)
-									}),
+								author$project$Multiselect$Model(
+									_Utils_update(
+										model,
+										{
+											hovered: elm$core$List$head(model.filtered)
+										})),
 								elm$core$Platform$Cmd$none,
 								elm$core$Maybe$Nothing);
 						} else {
-							var item = _n9.a;
+							var item = _n10.a;
 							var next = A2(author$project$Multiselect$nextItem, model.filtered, item);
 							return _Utils_Tuple3(
-								_Utils_update(
-									model,
-									{hovered: next}),
+								author$project$Multiselect$Model(
+									_Utils_update(
+										model,
+										{hovered: next})),
 								elm$core$Platform$Cmd$batch(
 									_List_fromArray(
 										[
@@ -7067,9 +7107,10 @@ var author$project$Multiselect$update = F2(
 						if (_Utils_eq(key, author$project$Multiselect$Keycodes$pageUp) || _Utils_eq(key, author$project$Multiselect$Keycodes$home)) {
 							var first = elm$core$List$head(model.filtered);
 							return _Utils_Tuple3(
-								_Utils_update(
-									model,
-									{hovered: first}),
+								author$project$Multiselect$Model(
+									_Utils_update(
+										model,
+										{hovered: first})),
 								elm$core$Platform$Cmd$batch(
 									_List_fromArray(
 										[
@@ -7083,9 +7124,10 @@ var author$project$Multiselect$update = F2(
 							if (_Utils_eq(key, author$project$Multiselect$Keycodes$pageDown) || _Utils_eq(key, author$project$Multiselect$Keycodes$end)) {
 								var last = author$project$Multiselect$lastElem(model.filtered);
 								return _Utils_Tuple3(
-									_Utils_update(
-										model,
-										{hovered: last}),
+									author$project$Multiselect$Model(
+										_Utils_update(
+											model,
+											{hovered: last})),
 									elm$core$Platform$Cmd$batch(
 										_List_fromArray(
 											[
@@ -7097,32 +7139,36 @@ var author$project$Multiselect$update = F2(
 									elm$core$Maybe$Nothing);
 							} else {
 								if (_Utils_eq(key, author$project$Multiselect$Keycodes$return)) {
-									var _n10 = model.hovered;
-									if (_n10.$ === 'Nothing') {
+									var _n11 = model.hovered;
+									if (_n11.$ === 'Nothing') {
 										var isInvisible = _Utils_eq(model.input, author$project$Multiselect$Utils$invisibleCharacter);
 										var isEmpty = elm$core$String$isEmpty(model.input);
-										return (isInvisible || isEmpty) ? _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing) : _Utils_Tuple3(
-											model,
+										return (isInvisible || isEmpty) ? _Utils_Tuple3(
+											author$project$Multiselect$Model(model),
+											elm$core$Platform$Cmd$none,
+											elm$core$Maybe$Nothing) : _Utils_Tuple3(
+											author$project$Multiselect$Model(model),
 											elm$core$Platform$Cmd$none,
 											elm$core$Maybe$Just(
 												author$project$Multiselect$NotFound(model.input)));
 									} else {
-										var item = _n10.a;
+										var item = _n11.a;
 										var selected = _Utils_ap(
 											model.selected,
 											_List_fromArray(
 												[item]));
 										var filtered = A2(author$project$Multiselect$filter, selected, model.values);
 										return _Utils_Tuple3(
-											_Utils_update(
-												model,
-												{
-													filtered: filtered,
-													hovered: A2(author$project$Multiselect$nextSelectedItem, model.filtered, item),
-													input: author$project$Multiselect$Utils$invisibleCharacter,
-													selected: selected,
-													status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
-												}),
+											author$project$Multiselect$Model(
+												_Utils_update(
+													model,
+													{
+														filtered: filtered,
+														hovered: A2(author$project$Multiselect$nextSelectedItem, model.filtered, item),
+														input: author$project$Multiselect$Utils$invisibleCharacter,
+														selected: selected,
+														status: elm$core$List$isEmpty(filtered) ? author$project$Multiselect$Closed : author$project$Multiselect$Opened
+													})),
 											elm$core$Platform$Cmd$batch(
 												_List_fromArray(
 													[
@@ -7137,27 +7183,32 @@ var author$project$Multiselect$update = F2(
 								} else {
 									if (_Utils_eq(key, author$project$Multiselect$Keycodes$escape)) {
 										return _Utils_Tuple3(
-											_Utils_update(
-												model,
-												{_protected: true, status: author$project$Multiselect$Closed}),
+											author$project$Multiselect$Model(
+												_Utils_update(
+													model,
+													{_protected: true, status: author$project$Multiselect$Closed})),
 											elm$core$Platform$Cmd$none,
 											elm$core$Maybe$Nothing);
 									} else {
 										if (_Utils_eq(key, author$project$Multiselect$Keycodes$tab)) {
 											return _Utils_Tuple3(
-												_Utils_update(
-													model,
-													{status: author$project$Multiselect$Closed}),
+												author$project$Multiselect$Model(
+													_Utils_update(
+														model,
+														{status: author$project$Multiselect$Closed})),
 												elm$core$Platform$Cmd$none,
 												elm$core$Maybe$Nothing);
 										} else {
 											if (_Utils_eq(key, author$project$Multiselect$Keycodes$backspace)) {
 												if (model.input === '') {
-													var _n11 = author$project$Multiselect$lastElem(model.selected);
-													if (_n11.$ === 'Nothing') {
-														return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+													var _n12 = author$project$Multiselect$lastElem(model.selected);
+													if (_n12.$ === 'Nothing') {
+														return _Utils_Tuple3(
+															author$project$Multiselect$Model(model),
+															elm$core$Platform$Cmd$none,
+															elm$core$Maybe$Nothing);
 													} else {
-														var item = _n11.a;
+														var item = _n12.a;
 														var selected = A2(
 															elm$core$List$filter,
 															function (value) {
@@ -7165,13 +7216,14 @@ var author$project$Multiselect$update = F2(
 															},
 															model.selected);
 														return _Utils_Tuple3(
-															_Utils_update(
-																model,
-																{
-																	filtered: A2(author$project$Multiselect$filter, selected, model.values),
-																	hovered: elm$core$Maybe$Just(item),
-																	selected: selected
-																}),
+															author$project$Multiselect$Model(
+																_Utils_update(
+																	model,
+																	{
+																		filtered: A2(author$project$Multiselect$filter, selected, model.values),
+																		hovered: elm$core$Maybe$Just(item),
+																		selected: selected
+																	})),
 															elm$core$Platform$Cmd$batch(
 																_List_fromArray(
 																	[
@@ -7184,10 +7236,16 @@ var author$project$Multiselect$update = F2(
 																author$project$Multiselect$Unselected(item)));
 													}
 												} else {
-													return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+													return _Utils_Tuple3(
+														author$project$Multiselect$Model(model),
+														elm$core$Platform$Cmd$none,
+														elm$core$Maybe$Nothing);
 												}
 											} else {
-												return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, elm$core$Maybe$Nothing);
+												return _Utils_Tuple3(
+													author$project$Multiselect$Model(model),
+													elm$core$Platform$Cmd$none,
+													elm$core$Maybe$Nothing);
 											}
 										}
 									}
@@ -9689,7 +9747,8 @@ var rtfeldman$elm_css$VirtualDom$Styled$attribute = F2(
 			'');
 	});
 var rtfeldman$elm_css$Html$Styled$Attributes$rel = rtfeldman$elm_css$VirtualDom$Styled$attribute('rel');
-var author$project$Multiselect$arrow = function (model) {
+var author$project$Multiselect$arrow = function (_n0) {
+	var model = _n0.a;
 	var arrowRel = _Utils_eq(model.status, author$project$Multiselect$Opened) ? 'arrowUpside' : 'arrow';
 	var arrowCss = _Utils_eq(model.status, author$project$Multiselect$Opened) ? _List_fromArray(
 		[author$project$Multiselect$SelectCss$arrowUpside]) : _List_fromArray(
@@ -9781,7 +9840,8 @@ var rtfeldman$elm_css$VirtualDom$Styled$text = function (str) {
 		elm$virtual_dom$VirtualDom$text(str));
 };
 var rtfeldman$elm_css$Html$Styled$text = rtfeldman$elm_css$VirtualDom$Styled$text;
-var author$project$Multiselect$clear = function (model) {
+var author$project$Multiselect$clear = function (_n0) {
+	var model = _n0.a;
 	return (!elm$core$List$isEmpty(model.selected)) ? A2(
 		rtfeldman$elm_css$Html$Styled$div,
 		_List_fromArray(
@@ -9998,7 +10058,8 @@ var rtfeldman$elm_css$VirtualDom$Styled$style = F2(
 			'');
 	});
 var rtfeldman$elm_css$Html$Styled$Attributes$style = rtfeldman$elm_css$VirtualDom$Styled$style;
-var author$project$Multiselect$input = function (model) {
+var author$project$Multiselect$input = function (_n0) {
+	var model = _n0.a;
 	var w = elm$core$String$fromFloat(model.inputWidth + 23.0);
 	var value = _Utils_eq(model.input, author$project$Multiselect$Utils$invisibleCharacter) ? A2(
 		rtfeldman$elm_css$Html$Styled$Attributes$property,
@@ -10192,15 +10253,16 @@ var rtfeldman$elm_css$Html$Styled$Events$onMouseOver = function (msg) {
 		'mouseover',
 		elm$json$Json$Decode$succeed(msg));
 };
-var author$project$Multiselect$menu = function (model) {
-	var _n0 = model.status;
-	if (_n0.$ === 'Opened') {
+var author$project$Multiselect$menu = function (_n0) {
+	var model = _n0.a;
+	var _n1 = model.status;
+	if (_n1.$ === 'Opened') {
 		var hovered = function () {
-			var _n2 = model.hovered;
-			if (_n2.$ === 'Nothing') {
+			var _n3 = model.hovered;
+			if (_n3.$ === 'Nothing') {
 				return '';
 			} else {
-				var item = _n2.a;
+				var item = _n3.a;
 				return author$project$Multiselect$Utils$fst(item);
 			}
 		}();
@@ -10215,9 +10277,9 @@ var author$project$Multiselect$menu = function (model) {
 				]),
 			A2(
 				elm$core$List$map,
-				function (_n1) {
-					var name = _n1.a;
-					var value = _n1.b;
+				function (_n2) {
+					var name = _n2.a;
+					var value = _n2.b;
 					return A2(
 						rtfeldman$elm_css$Html$Styled$div,
 						_List_fromArray(
@@ -10368,7 +10430,8 @@ var author$project$Multiselect$SelectCss$tagWrap = rtfeldman$elm_css$Css$batch(
 		[
 			rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inline)
 		]));
-var author$project$Multiselect$tags = function (model) {
+var author$project$Multiselect$tags = function (_n0) {
+	var model = _n0.a;
 	return A2(
 		rtfeldman$elm_css$Html$Styled$div,
 		_List_fromArray(
@@ -10379,9 +10442,9 @@ var author$project$Multiselect$tags = function (model) {
 			]),
 		A2(
 			elm$core$List$map,
-			function (_n0) {
-				var name = _n0.a;
-				var value = _n0.b;
+			function (_n1) {
+				var name = _n1.a;
+				var value = _n1.b;
 				return A2(author$project$Multiselect$tag, name, value);
 			},
 			model.selected));
@@ -10435,7 +10498,8 @@ var author$project$Multiselect$SelectCss$wrap = rtfeldman$elm_css$Css$batch(
 			rtfeldman$elm_css$Css$width(
 			rtfeldman$elm_css$Css$pct(100))
 		]));
-var author$project$Multiselect$styledView = function (model) {
+var author$project$Multiselect$styledView = function (_n0) {
+	var model = _n0.a;
 	var inputCss = _Utils_eq(model.status, author$project$Multiselect$Focused) ? _List_fromArray(
 		[author$project$Multiselect$SelectCss$container, author$project$Multiselect$SelectCss$focused]) : (_Utils_eq(model.status, author$project$Multiselect$Opened) ? _List_fromArray(
 		[author$project$Multiselect$SelectCss$container, author$project$Multiselect$SelectCss$opened]) : _List_fromArray(
@@ -10459,12 +10523,17 @@ var author$project$Multiselect$styledView = function (model) {
 					]),
 				_List_fromArray(
 					[
-						author$project$Multiselect$tags(model),
-						author$project$Multiselect$input(model),
-						author$project$Multiselect$clear(model),
-						author$project$Multiselect$arrow(model)
+						author$project$Multiselect$tags(
+						author$project$Multiselect$Model(model)),
+						author$project$Multiselect$input(
+						author$project$Multiselect$Model(model)),
+						author$project$Multiselect$clear(
+						author$project$Multiselect$Model(model)),
+						author$project$Multiselect$arrow(
+						author$project$Multiselect$Model(model))
 					])),
-				author$project$Multiselect$menu(model)
+				author$project$Multiselect$menu(
+				author$project$Multiselect$Model(model))
 			]));
 };
 var elm$virtual_dom$VirtualDom$node = function (tag) {

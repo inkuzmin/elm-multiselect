@@ -127,7 +127,7 @@ initModel values tag1 =
 {-| Get the full list of values : List (String, String)
 -}
 getValues : Model -> List ( String, String )
-getValues model =
+getValues (Model model) =
     model.values
 
 
@@ -156,8 +156,8 @@ populateValues (Model model) values selected =
 {-| Clear the input text: (Model, Cmd Msg)
 -}
 clearInputText : Model -> ( Model, Cmd Msg )
-clearInputText model =
-    ( { model | input = invisibleCharacter }
+clearInputText (Model model) =
+    ( Model { model | input = invisibleCharacter }
     , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
     )
 
