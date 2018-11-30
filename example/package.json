@@ -18,7 +18,7 @@
   "dependencies": {},
   "devDependencies": {
     "auto-reload-brunch": "^2.7.1",
-    "brunch": "^2.8.2",
+    "brunch": "^2.10.17",
     "elm-brunch": "^0.12.0",
     "hmr-brunch": "^0.1.1"
   }
