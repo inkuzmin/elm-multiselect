@@ -283,6 +283,8 @@ menu =
         , Css.width (pct 100)
         , Css.zIndex (int 1)
         , Css.overflowY Css.scroll
+        , Css.padding Css.zero
+        , Css.listStyleType Css.none
         ]
 
 

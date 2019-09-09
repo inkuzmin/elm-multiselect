@@ -907,10 +907,10 @@ menu (Model model) =
                         Just item ->
                             fst item
             in
-            div [ attribute "role" "list", css [ SelectCss.menu ], Html.Styled.Attributes.id ("multiselectMenu" ++ model.tag) ]
+            ul [ attribute "role" "list", css [ SelectCss.menu ], Html.Styled.Attributes.id ("multiselectMenu" ++ model.tag) ]
                 (List.map
                     (\( name, value ) ->
-                        div
+                        li
                             [ css
                                 (if name == hovered then
                                     [ SelectCss.menuItemHovered, SelectCss.menuItem ]

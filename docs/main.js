@@ -10149,6 +10149,7 @@ var rtfeldman$elm_css$Css$prop4 = F5(
 					[argA.value, argB.value, argC.value, argD.value])));
 	});
 var rtfeldman$elm_css$Css$boxShadow4 = rtfeldman$elm_css$Css$prop4('box-shadow');
+var rtfeldman$elm_css$Css$listStyleType = rtfeldman$elm_css$Css$prop1('list-style-type');
 var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$maxHeight = rtfeldman$elm_css$Css$prop1('max-height');
 var rtfeldman$elm_css$Css$overflowY = rtfeldman$elm_css$Css$prop1('overflow-y');
@@ -10213,8 +10214,11 @@ var author$project$Multiselect$SelectCss$menu = rtfeldman$elm_css$Css$batch(
 			rtfeldman$elm_css$Css$pct(100)),
 			rtfeldman$elm_css$Css$zIndex(
 			rtfeldman$elm_css$Css$int(1)),
-			rtfeldman$elm_css$Css$overflowY(rtfeldman$elm_css$Css$scroll)
+			rtfeldman$elm_css$Css$overflowY(rtfeldman$elm_css$Css$scroll),
+			rtfeldman$elm_css$Css$padding(rtfeldman$elm_css$Css$zero),
+			rtfeldman$elm_css$Css$listStyleType(rtfeldman$elm_css$Css$none)
 		]));
+var rtfeldman$elm_css$Css$listStyle = rtfeldman$elm_css$Css$prop1('list-style');
 var rtfeldman$elm_css$Css$prop2 = F3(
 	function (key, argA, argB) {
 		return A2(
@@ -10238,7 +10242,8 @@ var author$project$Multiselect$SelectCss$menuItem = rtfeldman$elm_css$Css$batch(
 			rtfeldman$elm_css$Css$px(8),
 			rtfeldman$elm_css$Css$px(10)),
 			rtfeldman$elm_css$Css$maxHeight(
-			rtfeldman$elm_css$Css$px(author$project$Multiselect$SelectCss$itemHeight))
+			rtfeldman$elm_css$Css$px(author$project$Multiselect$SelectCss$itemHeight)),
+			rtfeldman$elm_css$Css$listStyle(rtfeldman$elm_css$Css$none)
 		]));
 var author$project$Multiselect$SelectCss$menuItemHovered = rtfeldman$elm_css$Css$batch(
 	_List_fromArray(
@@ -10249,6 +10254,9 @@ var author$project$Multiselect$SelectCss$menuItemHovered = rtfeldman$elm_css$Css
 			rtfeldman$elm_css$Css$hex('#333'))
 		]));
 var author$project$Multiselect$Utils$fst = elm$core$Tuple$first;
+var rtfeldman$elm_css$Html$Styled$li = rtfeldman$elm_css$Html$Styled$node('li');
+var rtfeldman$elm_css$Html$Styled$ul = rtfeldman$elm_css$Html$Styled$node('ul');
+var rtfeldman$elm_css$Html$Styled$Attributes$attribute = rtfeldman$elm_css$VirtualDom$Styled$attribute;
 var rtfeldman$elm_css$Html$Styled$Events$onMouseOver = function (msg) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$Events$on,
@@ -10269,9 +10277,10 @@ var author$project$Multiselect$menu = function (_n0) {
 			}
 		}();
 		return A2(
-			rtfeldman$elm_css$Html$Styled$div,
+			rtfeldman$elm_css$Html$Styled$ul,
 			_List_fromArray(
 				[
+					A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'role', 'list'),
 					rtfeldman$elm_css$Html$Styled$Attributes$css(
 					_List_fromArray(
 						[author$project$Multiselect$SelectCss$menu])),
@@ -10283,7 +10292,7 @@ var author$project$Multiselect$menu = function (_n0) {
 					var name = _n2.a;
 					var value = _n2.b;
 					return A2(
-						rtfeldman$elm_css$Html$Styled$div,
+						rtfeldman$elm_css$Html$Styled$li,
 						_List_fromArray(
 							[
 								rtfeldman$elm_css$Html$Styled$Attributes$css(
@@ -10295,7 +10304,8 @@ var author$project$Multiselect$menu = function (_n0) {
 									_Utils_Tuple2(name, value))),
 								rtfeldman$elm_css$Html$Styled$Events$onMouseOver(
 								author$project$Multiselect$OnHover(
-									_Utils_Tuple2(name, value)))
+									_Utils_Tuple2(name, value))),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'role', 'listitem')
 							]),
 						_List_fromArray(
 							[
@@ -10304,7 +10314,7 @@ var author$project$Multiselect$menu = function (_n0) {
 				},
 				model.filtered));
 	} else {
-		return A2(rtfeldman$elm_css$Html$Styled$div, _List_Nil, _List_Nil);
+		return A2(rtfeldman$elm_css$Html$Styled$ul, _List_Nil, _List_Nil);
 	}
 };
 var author$project$Multiselect$RemoveItem = function (a) {
