@@ -1,27 +1,26 @@
-module Multiselect.SelectCss
-    exposing
-        ( arrow
-        , arrowUpside
-        , arrowWrap
-        , clear
-        , clearWrap
-        , container
-        , focused
-        , input
-        , inputMirrow
-        , inputWrap
-        , itemHeight
-        , menu
-        , menuHeight
-        , menuItem
-        , menuItemHovered
-        , opened
-        , tag
-        , tagIcon
-        , tagLabel
-        , tagWrap
-        , wrap
-        )
+module Multiselect.SelectCss exposing
+    ( arrow
+    , arrowUpside
+    , arrowWrap
+    , clear
+    , clearWrap
+    , container
+    , focused
+    , input
+    , inputMirrow
+    , inputWrap
+    , itemHeight
+    , menu
+    , menuHeight
+    , menuItem
+    , menuItemHovered
+    , opened
+    , tag
+    , tagIcon
+    , tagLabel
+    , tagWrap
+    , wrap
+    )
 
 import Css
     exposing
@@ -44,6 +43,7 @@ import Css
         , solid
         , width
         )
+
 
 
 --import Css.Foreign exposing (children, class, everything)
@@ -293,6 +293,7 @@ menuItem =
         , Css.cursor Css.pointer
         , Css.padding2 (px 8) (px 10)
         , Css.maxHeight (px itemHeight)
+        , Css.listStyle Css.none
         ]
 
 
