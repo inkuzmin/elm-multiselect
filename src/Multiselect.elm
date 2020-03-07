@@ -481,7 +481,7 @@ update msg (Model model) =
                 , Nothing
                 )
 
-            else if key == Keycodes.return then
+            else if key == Keycodes.return && model.status == Opened then
                 case model.hovered of
                     Nothing ->
                         let
