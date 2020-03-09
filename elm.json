@@ -3,7 +3,7 @@
     "name": "inkuzmin/elm-multiselect",
     "summary": "multiselect control",
     "license": "BSD-3-Clause",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "exposed-modules": [
         "Multiselect"
     ],
