@@ -147,11 +147,7 @@ var __makeRelativeRequire = function(require, mappings, pref) {
     return require(name);
   }
 };
-require.register("src/Multiselect.elm", function(exports, require, module) {
-
-});
-
-;require.register("src/Multiselect/Keycodes.elm", function(exports, require, module) {
+require.register("src/Multiselect/Keycodes.elm", function(exports, require, module) {
 
 });
 
@@ -164,10 +160,6 @@ require.register("src/Multiselect.elm", function(exports, require, module) {
 });
 
 ;require.register("src/DynamicExample.elm", function(exports, require, module) {
-
-});
-
-;require.register("src/Main.elm", function(exports, require, module) {
 
 });
 
