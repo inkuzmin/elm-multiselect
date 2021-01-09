@@ -147,7 +147,7 @@ populateValues (Model model) values selected =
                 values
 
             else
-                filter selected values
+                valuesWithoutSelected { selected = selected, values = values }
     in
     Model { model | values = values, filtered = filtered, selected = selected }
 
@@ -161,8 +161,8 @@ clearInputText (Model model) =
     )
 
 
-filter : List ( String, String ) -> List ( String, String ) -> List ( String, String )
-filter selected values =
+valuesWithoutSelected : { selected : List ( String, String ), values : List ( String, String ) } -> List ( String, String )
+valuesWithoutSelected { selected, values } =
     List.filter (\value -> not (List.member value selected)) values
 
 
@@ -291,10 +291,12 @@ update msg (Model model) =
             else
                 let
                     filtered =
-                        filter model.selected
-                            (List.filter (\( _, val ) -> String.contains (String.toLower value) (String.toLower val))
-                                model.values
-                            )
+                        valuesWithoutSelected
+                            { selected = model.selected
+                            , values =
+                                List.filter (\( _, val ) -> String.contains (String.toLower value) (String.toLower val))
+                                    model.values
+                            }
                 in
                 case model.hovered of
                     Nothing ->
@@ -354,7 +356,7 @@ update msg (Model model) =
                     model.selected ++ [ item ]
 
                 filtered =
-                    filter selected model.values
+                    valuesWithoutSelected { selected = selected, values = model.values }
             in
             ( Model
                 { model
@@ -383,7 +385,7 @@ update msg (Model model) =
             ( Model
                 { model
                     | selected = selected
-                    , filtered = filter selected model.values
+                    , filtered = valuesWithoutSelected { selected = selected, values = model.values }
                     , hovered = Just item
                 }
             , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
@@ -398,7 +400,7 @@ update msg (Model model) =
             ( Model
                 { model
                     | selected = selected
-                    , filtered = filter selected model.values
+                    , filtered = valuesWithoutSelected { selected = selected, values = model.values }
                     , input = Nothing
                     , status = Closed
                 }
@@ -522,7 +524,7 @@ update msg (Model model) =
                                 model.selected ++ [ item ]
 
                             filtered =
-                                filter selected model.values
+                                valuesWithoutSelected { selected = selected, values = model.values }
                         in
                         ( Model
                             { model
@@ -564,7 +566,7 @@ update msg (Model model) =
                                 ( Model
                                     { model
                                         | selected = selected
-                                        , filtered = filter selected model.values
+                                        , filtered = valuesWithoutSelected { selected = selected, values = model.values }
                                         , hovered = Just item
                                     }
                                 , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
