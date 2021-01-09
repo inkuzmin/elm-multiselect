@@ -262,11 +262,12 @@ update msg (Model model) =
                     ( Model { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, Nothing )
 
                 Ok () ->
-                    if model.input == Nothing then
-                        ( Model { model | input = Just "" }, Cmd.none, Nothing )
+                    case model.input of
+                        Nothing ->
+                            ( Model { model | input = Just "" }, Cmd.none, Nothing )
 
-                    else
-                        ( Model { model | error = Nothing }, Cmd.none, Nothing )
+                        Just _ ->
+                            ( Model { model | error = Nothing }, Cmd.none, Nothing )
 
         FocusResult result ->
             case result of
@@ -274,11 +275,12 @@ update msg (Model model) =
                     ( Model { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, Nothing )
 
                 Ok () ->
-                    if model.input == Nothing then
-                        ( Model { model | input = Just "" }, Cmd.none, Nothing )
+                    case model.input of
+                        Nothing ->
+                            ( Model { model | input = Just "" }, Cmd.none, Nothing )
 
-                    else
-                        ( Model { model | error = Nothing }, Cmd.none, Nothing )
+                        Just _ ->
+                            ( Model { model | error = Nothing }, Cmd.none, Nothing )
 
         Adjust value ->
             ( Model { model | inputWidth = value }, Cmd.none, Nothing )
@@ -505,18 +507,15 @@ update msg (Model model) =
             then
                 case model.hovered of
                     Nothing ->
-                        let
-                            isInvisible =
-                                model.input == Nothing
+                        case model.input of
+                            Nothing ->
+                                ( Model model, Cmd.none, Nothing )
 
-                            isEmpty =
-                                model.input == Just ""
-                        in
-                        if isInvisible || isEmpty then
-                            ( Model model, Cmd.none, Nothing )
+                            Just "" ->
+                                ( Model model, Cmd.none, Nothing )
 
-                        else
-                            ( Model model, Cmd.none, Just (NotFound (Maybe.withDefault "" model.input)) )
+                            Just input_ ->
+                                ( Model model, Cmd.none, Just (NotFound input_) )
 
                     Just item ->
                         let
@@ -552,28 +551,29 @@ update msg (Model model) =
                 ( Model { model | status = Closed }, Cmd.none, Nothing )
 
             else if key == Keycodes.backspace then
-                if model.input == Just "" then
-                    case lastElem model.selected of
-                        Nothing ->
-                            ( Model model, Cmd.none, Nothing )
+                case model.input of
+                    Just "" ->
+                        case lastElem model.selected of
+                            Nothing ->
+                                ( Model model, Cmd.none, Nothing )
 
-                        Just item ->
-                            let
-                                selected =
-                                    List.filter (\value -> value /= item) model.selected
-                            in
-                            ( Model
-                                { model
-                                    | selected = selected
-                                    , filtered = filter selected model.values
-                                    , hovered = Just item
-                                }
-                            , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
-                            , Just (Unselected item)
-                            )
+                            Just item ->
+                                let
+                                    selected =
+                                        List.filter (\value -> value /= item) model.selected
+                                in
+                                ( Model
+                                    { model
+                                        | selected = selected
+                                        , filtered = filter selected model.values
+                                        , hovered = Just item
+                                    }
+                                , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
+                                , Just (Unselected item)
+                                )
 
-                else
-                    ( Model model, Cmd.none, Nothing )
+                    _ ->
+                        ( Model model, Cmd.none, Nothing )
 
             else
                 ( Model model, Cmd.none, Nothing )
@@ -771,11 +771,12 @@ input (Model model) =
             Html.Styled.Attributes.style "width" (w ++ "px")
 
         value =
-            if model.input == Nothing then
-                Html.Styled.Attributes.property "value" (Encode.string "")
+            case model.input of
+                Nothing ->
+                    Html.Styled.Attributes.property "value" (Encode.string "")
 
-            else
-                Html.Styled.Attributes.property "type" (Encode.string "text")
+                Just _ ->
+                    Html.Styled.Attributes.property "type" (Encode.string "text")
     in
     div
         [ preventDefaultButtons
