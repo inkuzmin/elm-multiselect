@@ -66,7 +66,7 @@ import Json.Decode exposing (Decoder)
 import Json.Encode as Encode
 import Multiselect.Keycodes as Keycodes
 import Multiselect.SelectCss as SelectCss
-import Multiselect.Utils exposing (fst, invisibleCharacter)
+import Multiselect.Utils exposing (fst)
 import Process
 import String
 import Task as Task exposing (Task)
@@ -94,7 +94,7 @@ type Model
         , selected : List ( String, String )
         , protected : Bool
         , error : Maybe String
-        , input : String
+        , input : Maybe String
         , inputWidth : Float
         , hovered : Maybe ( String, String )
         , tag : String
@@ -117,7 +117,7 @@ initModel values tag1 =
         , selected = []
         , protected = False
         , error = Nothing
-        , input = ""
+        , input = Just ""
         , inputWidth = 23.0
         , hovered = List.head values
         , tag = tag1
@@ -157,7 +157,7 @@ populateValues (Model model) values selected =
 -}
 clearInputText : Model -> ( Model, Cmd Msg )
 clearInputText (Model model) =
-    ( Model { model | input = invisibleCharacter }
+    ( Model { model | input = Nothing }
     , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
     )
 
@@ -262,8 +262,8 @@ update msg (Model model) =
                     ( Model { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, Nothing )
 
                 Ok () ->
-                    if model.input == invisibleCharacter then
-                        ( Model { model | input = "" }, Cmd.none, Nothing )
+                    if model.input == Nothing then
+                        ( Model { model | input = Just "" }, Cmd.none, Nothing )
 
                     else
                         ( Model { model | error = Nothing }, Cmd.none, Nothing )
@@ -274,8 +274,8 @@ update msg (Model model) =
                     ( Model { model | error = Just ("Could not find dom id: " ++ id) }, Cmd.none, Nothing )
 
                 Ok () ->
-                    if model.input == invisibleCharacter then
-                        ( Model { model | input = "" }, Cmd.none, Nothing )
+                    if model.input == Nothing then
+                        ( Model { model | input = Just "" }, Cmd.none, Nothing )
 
                     else
                         ( Model { model | error = Nothing }, Cmd.none, Nothing )
@@ -300,7 +300,7 @@ update msg (Model model) =
                         ( Model
                             { model
                                 | filtered = filtered
-                                , input = value
+                                , input = Just value
                                 , hovered = List.head filtered
                                 , status =
                                     if List.isEmpty filtered then
@@ -318,7 +318,7 @@ update msg (Model model) =
                             ( Model
                                 { model
                                     | filtered = filtered
-                                    , input = value
+                                    , input = Just value
                                     , hovered = List.head filtered
                                     , status =
                                         if List.isEmpty filtered then
@@ -335,7 +335,7 @@ update msg (Model model) =
                             ( Model
                                 { model
                                     | filtered = filtered
-                                    , input = value
+                                    , input = Just value
                                     , status =
                                         if List.isEmpty filtered then
                                             Closed
@@ -360,7 +360,7 @@ update msg (Model model) =
                     | selected = selected
                     , filtered = filtered
                     , hovered = nextSelectedItem model.filtered item
-                    , input = invisibleCharacter
+                    , input = Nothing
                     , status =
                         if List.isEmpty filtered then
                             Closed
@@ -398,7 +398,7 @@ update msg (Model model) =
                 { model
                     | selected = selected
                     , filtered = filter selected model.values
-                    , input = invisibleCharacter
+                    , input = Nothing
                     , status = Closed
                 }
             , Cmd.batch
@@ -507,16 +507,16 @@ update msg (Model model) =
                     Nothing ->
                         let
                             isInvisible =
-                                model.input == invisibleCharacter
+                                model.input == Nothing
 
                             isEmpty =
-                                String.isEmpty model.input
+                                model.input == Just ""
                         in
                         if isInvisible || isEmpty then
                             ( Model model, Cmd.none, Nothing )
 
                         else
-                            ( Model model, Cmd.none, Just (NotFound model.input) )
+                            ( Model model, Cmd.none, Just (NotFound (Maybe.withDefault "" model.input)) )
 
                     Just item ->
                         let
@@ -531,7 +531,7 @@ update msg (Model model) =
                                 | selected = selected
                                 , filtered = filtered
                                 , hovered = nextSelectedItem model.filtered item
-                                , input = invisibleCharacter
+                                , input = Nothing
                                 , status =
                                     if List.isEmpty filtered then
                                         Closed
@@ -552,7 +552,7 @@ update msg (Model model) =
                 ( Model { model | status = Closed }, Cmd.none, Nothing )
 
             else if key == Keycodes.backspace then
-                if model.input == "" then
+                if model.input == Just "" then
                     case lastElem model.selected of
                         Nothing ->
                             ( Model model, Cmd.none, Nothing )
@@ -771,8 +771,8 @@ input (Model model) =
             Html.Styled.Attributes.style "width" (w ++ "px")
 
         value =
-            if model.input == invisibleCharacter then
-                Html.Styled.Attributes.property "value" (Encode.string model.input)
+            if model.input == Nothing then
+                Html.Styled.Attributes.property "value" (Encode.string "")
 
             else
                 Html.Styled.Attributes.property "type" (Encode.string "text")
@@ -781,7 +781,7 @@ input (Model model) =
         [ preventDefaultButtons
         , css [ SelectCss.inputWrap ]
         ]
-        [ div [ css [ SelectCss.inputMirrow ] ] [ text model.input ]
+        [ div [ css [ SelectCss.inputMirrow ] ] [ text (Maybe.withDefault "" model.input) ]
         , Html.Styled.input
             [ Html.Styled.Attributes.id ("multiselectInput" ++ model.tag)
             , css [ SelectCss.input ]
