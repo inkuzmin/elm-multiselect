@@ -66,7 +66,6 @@ import Json.Decode exposing (Decoder)
 import Json.Encode as Encode
 import Multiselect.Keycodes as Keycodes
 import Multiselect.SelectCss as SelectCss
-import Multiselect.Utils exposing (fst)
 import Process
 import String
 import Task as Task exposing (Task)
@@ -913,8 +912,8 @@ menu (Model model) =
                         Nothing ->
                             ""
 
-                        Just item ->
-                            fst item
+                        Just ( id, _ ) ->
+                            id
             in
             div [ css [ SelectCss.menu ], Html.Styled.Attributes.id ("multiselectMenu" ++ model.tag) ]
                 (List.map
