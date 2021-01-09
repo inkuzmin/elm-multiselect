@@ -1,12 +1,11 @@
 module Multiselect exposing
-    ( initModel, getSelectedValues, populateValues
+    ( initModel, getSelectedValues, populateValues, clearInputText, getValues
     , Model
     , Msg
     , OutMsg(..)
     , view
     , update
     , subscriptions
-    , clearInputText, getValues
     )
 
 {-| An implementation of multiselect control built with and for Elm.
@@ -87,18 +86,19 @@ type Status
         }
 
 -}
-type Model = Model
-    { status : Status
-    , values : List ( String, String )
-    , filtered : List ( String, String )
-    , selected : List ( String, String )
-    , protected : Bool
-    , error : Maybe String
-    , input : String
-    , inputWidth : Float
-    , hovered : Maybe ( String, String )
-    , tag : String
-    }
+type Model
+    = Model
+        { status : Status
+        , values : List ( String, String )
+        , filtered : List ( String, String )
+        , selected : List ( String, String )
+        , protected : Bool
+        , error : Maybe String
+        , input : String
+        , inputWidth : Float
+        , hovered : Maybe ( String, String )
+        , tag : String
+        }
 
 
 {-| Init model based on the values : List (String, String) and id : String provided by the user.
@@ -119,7 +119,7 @@ initModel values tag1 =
         , error = Nothing
         , input = ""
         , inputWidth = 23.0
-        , hovered = (List.head values)
+        , hovered = List.head values
         , tag = tag1
         }
 
@@ -214,7 +214,7 @@ update : Msg -> Model -> ( Model, Cmd Msg, Maybe OutMsg )
 update msg (Model model) =
     case msg of
         Start ->
-            (Model model, Cmd.none, Nothing )
+            ( Model model, Cmd.none, Nothing )
 
         Toggle ->
             if model.status == Opened then
@@ -236,6 +236,7 @@ update msg (Model model) =
         Click ->
             if model.protected then
                 ( Model { model | protected = False }, Cmd.none, Nothing )
+
             else
                 ( Model { model | status = Closed }, Cmd.none, Nothing )
 
@@ -245,6 +246,7 @@ update msg (Model model) =
         ClickOnComponent ->
             if model.protected then
                 ( Model model, Cmd.none, Nothing )
+
             else
                 ( Model { model | status = Opened, protected = True }
                 , Cmd.batch
@@ -262,6 +264,7 @@ update msg (Model model) =
                 Ok () ->
                     if model.input == invisibleCharacter then
                         ( Model { model | input = "" }, Cmd.none, Nothing )
+
                     else
                         ( Model { model | error = Nothing }, Cmd.none, Nothing )
 
@@ -273,6 +276,7 @@ update msg (Model model) =
                 Ok () ->
                     if model.input == invisibleCharacter then
                         ( Model { model | input = "" }, Cmd.none, Nothing )
+
                     else
                         ( Model { model | error = Nothing }, Cmd.none, Nothing )
 
@@ -289,27 +293,12 @@ update msg (Model model) =
             in
             if model.protected then
                 ( Model { model | protected = False }, Cmd.none, Nothing )
+
             else
                 case model.hovered of
                     Nothing ->
-                        ( Model { model
-                            | filtered = filtered
-                            , input = value
-                            , hovered = List.head filtered
-                            , status =
-                                if List.isEmpty filtered then
-                                    Closed
-
-                                else
-                                    Opened
-                          }
-                        , Cmd.none
-                        , Nothing
-                        )
-
-                    Just item ->
-                        if List.length (List.filter (\i -> i == item) filtered) == 0 then
-                            ( Model { model
+                        ( Model
+                            { model
                                 | filtered = filtered
                                 , input = value
                                 , hovered = List.head filtered
@@ -319,22 +308,41 @@ update msg (Model model) =
 
                                     else
                                         Opened
-                              }
+                            }
+                        , Cmd.none
+                        , Nothing
+                        )
+
+                    Just item ->
+                        if List.length (List.filter (\i -> i == item) filtered) == 0 then
+                            ( Model
+                                { model
+                                    | filtered = filtered
+                                    , input = value
+                                    , hovered = List.head filtered
+                                    , status =
+                                        if List.isEmpty filtered then
+                                            Closed
+
+                                        else
+                                            Opened
+                                }
                             , Cmd.none
                             , Nothing
                             )
 
                         else
-                            ( Model { model
-                                | filtered = filtered
-                                , input = value
-                                , status =
-                                    if List.isEmpty filtered then
-                                        Closed
+                            ( Model
+                                { model
+                                    | filtered = filtered
+                                    , input = value
+                                    , status =
+                                        if List.isEmpty filtered then
+                                            Closed
 
-                                    else
-                                        Opened
-                              }
+                                        else
+                                            Opened
+                                }
                             , Cmd.none
                             , Nothing
                             )
@@ -347,18 +355,19 @@ update msg (Model model) =
                 filtered =
                     filter selected model.values
             in
-            ( Model { model
-                | selected = selected
-                , filtered = filtered
-                , hovered = nextSelectedItem model.filtered item
-                , input = invisibleCharacter
-                , status =
-                    if List.isEmpty filtered then
-                        Closed
+            ( Model
+                { model
+                    | selected = selected
+                    , filtered = filtered
+                    , hovered = nextSelectedItem model.filtered item
+                    , input = invisibleCharacter
+                    , status =
+                        if List.isEmpty filtered then
+                            Closed
 
-                    else
-                        Opened
-              }
+                        else
+                            Opened
+                }
             , Cmd.batch
                 [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
                 ]
@@ -370,11 +379,12 @@ update msg (Model model) =
                 selected =
                     List.filter (\value -> value /= item) model.selected
             in
-            ( Model { model
-                | selected = selected
-                , filtered = filter selected model.values
-                , hovered = Just item
-              }
+            ( Model
+                { model
+                    | selected = selected
+                    , filtered = filter selected model.values
+                    , hovered = Just item
+                }
             , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
             , Just (Unselected item)
             )
@@ -384,12 +394,13 @@ update msg (Model model) =
                 selected =
                     []
             in
-            ( Model { model
-                | selected = selected
-                , filtered = filter selected model.values
-                , input = invisibleCharacter
-                , status = Closed
-              }
+            ( Model
+                { model
+                    | selected = selected
+                    , filtered = filter selected model.values
+                    , input = invisibleCharacter
+                    , status = Closed
+                }
             , Cmd.batch
                 [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
                 ]
@@ -505,18 +516,19 @@ update msg (Model model) =
                             filtered =
                                 filter selected model.values
                         in
-                        ( Model { model
-                            | selected = selected
-                            , filtered = filtered
-                            , hovered = nextSelectedItem model.filtered item
-                            , input = invisibleCharacter
-                            , status =
-                                if List.isEmpty filtered then
-                                    Closed
+                        ( Model
+                            { model
+                                | selected = selected
+                                , filtered = filtered
+                                , hovered = nextSelectedItem model.filtered item
+                                , input = invisibleCharacter
+                                , status =
+                                    if List.isEmpty filtered then
+                                        Closed
 
-                                else
-                                    Opened
-                          }
+                                    else
+                                        Opened
+                            }
                         , Cmd.batch
                             [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
                             ]
@@ -528,6 +540,7 @@ update msg (Model model) =
 
             else if key == Keycodes.tab then
                 ( Model { model | status = Closed }, Cmd.none, Nothing )
+
             else if key == Keycodes.backspace then
                 if model.input == "" then
                     case lastElem model.selected of
@@ -539,11 +552,12 @@ update msg (Model model) =
                                 selected =
                                     List.filter (\value -> value /= item) model.selected
                             in
-                            ( Model { model
-                                | selected = selected
-                                , filtered = filter selected model.values
-                                , hovered = Just item
-                              }
+                            ( Model
+                                { model
+                                    | selected = selected
+                                    , filtered = filter selected model.values
+                                    , hovered = Just item
+                                }
                             , Cmd.batch [ domScrollY ("multiselectMenu" ++ model.tag) |> Task.attempt ScrollY ]
                             , Just (Unselected item)
                             )
