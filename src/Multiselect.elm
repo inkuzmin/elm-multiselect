@@ -285,17 +285,17 @@ update msg (Model model) =
             ( Model { model | inputWidth = value }, Cmd.none, Nothing )
 
         Filter value ->
-            let
-                filtered =
-                    filter model.selected
-                        (List.filter (\( _, val ) -> String.contains (String.toLower value) (String.toLower val))
-                            model.values
-                        )
-            in
             if model.protected then
                 ( Model { model | protected = False }, Cmd.none, Nothing )
 
             else
+                let
+                    filtered =
+                        filter model.selected
+                            (List.filter (\( _, val ) -> String.contains (String.toLower value) (String.toLower val))
+                                model.values
+                            )
+                in
                 case model.hovered of
                     Nothing ->
                         ( Model
