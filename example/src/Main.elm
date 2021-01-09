@@ -74,17 +74,19 @@ type alias Model =
     { multiselectA : Multiselect.Model
     , multiselectB : Multiselect.Model
     , multiselectC : Multiselect.Model
-    , multiselectD : Multiselect.Model
+    , multiselectTagged : Multiselect.Model
+    , multiselectTaggedShowPrefix : Multiselect.Model
     , selectedA : List ( String, String )
     }
 
 
 initModel : Model
 initModel =
-    { multiselectA = Multiselect.initModel valuesA "A"
-    , multiselectB = Multiselect.initModel valuesB "B"
-    , multiselectC = Multiselect.initModel valuesC "C"
-    , multiselectD = Multiselect.initModel valuesD "D"
+    { multiselectA = Multiselect.initModel valuesA "A" Multiselect.Hide
+    , multiselectB = Multiselect.initModel valuesB "B" Multiselect.Hide
+    , multiselectC = Multiselect.initModel valuesC "C" Multiselect.Hide
+    , multiselectTagged = Multiselect.initModel valuesD "Tagged" Multiselect.Hide
+    , multiselectTaggedShowPrefix = Multiselect.initModel valuesD "TaggedShowPrefix" Multiselect.Show
     , selectedA = []
     }
 
@@ -104,6 +106,7 @@ type Msg
     | Nyan Multiselect.Msg
     | Yay Multiselect.Msg
     | Tags Multiselect.Msg
+    | TagsWithPrefix Multiselect.Msg
     | SelectA
     | Prepopulate (Result Http.Error (List String))
 
@@ -147,22 +150,38 @@ update msg model =
             ( newerModel, Cmd.batch [ Cmd.map Yay subCmd, outCommands ] )
 
         Tags sub ->
-            let
+           let
                 ( subModel, subCmd, outMsg ) =
-                    Multiselect.update sub model.multiselectD
+                    Multiselect.update sub model.multiselectTagged
 
-                newModel =
-                    { model | multiselectD = subModel }
-
-                ( newerModel, outCommands ) =
+                ( newSubModel, outCmd) =
                     case outMsg of
                         Just m ->
-                            handleTag m newModel
+                            handleTag m subModel
 
                         Nothing ->
-                            ( newModel, Cmd.none )
+                            ( subModel, subCmd )
             in
-            ( newerModel, Cmd.batch [ Cmd.map Tags subCmd, outCommands ] )
+            ( {model | multiselectTagged = newSubModel}
+            , Cmd.batch (List.map (Cmd.map Tags) [ subCmd, outCmd] ))
+
+        TagsWithPrefix sub ->
+            let
+                ( subModel, subCmd, outMsg) =
+                    Multiselect.update sub model.multiselectTaggedShowPrefix
+
+
+                ( newSubModel, outCmd) =
+                    case outMsg of
+                        Just m ->
+                            handleTag m subModel
+
+                        Nothing ->
+                            ( subModel, subCmd )
+            in
+            ( {model | multiselectTaggedShowPrefix = newSubModel}
+            ,  Cmd.batch (List.map (Cmd.map TagsWithPrefix) [ subCmd, outCmd ] ))
+
 
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
@@ -181,7 +200,7 @@ update msg model =
             Debug.log "error" ( model, Cmd.none )
 
 
-addTag : Multiselect.Model -> ( String, String ) -> ( Multiselect.Model, Cmd Msg )
+addTag : Multiselect.Model -> ( String, String ) -> ( Multiselect.Model, Cmd Multiselect.Msg )
 addTag multiselectModel tag =
     let
         values =
@@ -199,11 +218,10 @@ addTag multiselectModel tag =
     else
         Multiselect.populateValues multiselectModel (values ++ [ tag ]) (selected ++ [ tag ])
             |> Multiselect.clearInputText
-            |> (\( m, c ) -> ( m, Cmd.map Tags c ))
 
 
-handleTag : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
-handleTag msg model =
+handleTag : Multiselect.OutMsg -> Multiselect.Model -> ( Multiselect.Model, Cmd Multiselect.Msg )
+handleTag msg multiselectModel =
     case msg of
         Multiselect.NotFound v ->
             let
@@ -213,16 +231,13 @@ handleTag msg model =
                 tag =
                     ( v, v )
 
-                multiselectModel =
-                    model.multiselectD
-
                 ( populated, cmd ) =
                     addTag multiselectModel tag
             in
-            ( { model | multiselectD = populated }, cmd )
+            (populated , cmd )
 
         _ ->
-            ( model, Cmd.none )
+            ( multiselectModel, Cmd.none )
 
 
 updateOutMsg : Multiselect.OutMsg -> Model -> ( Model, Cmd Msg )
@@ -299,9 +314,13 @@ view model =
                 , Html.map Yay <| Multiselect.view model.multiselectC
                 , showSelected (Multiselect.getSelectedValues model.multiselectC)
                 , div [ Html.Attributes.style "height" "300px" ] [ text "" ]
-                , Html.h3 [] [ text "Tagging Example" ]
-                , Html.map Tags <| Multiselect.view model.multiselectD
-                , showSelected (Multiselect.getSelectedValues model.multiselectD)
+                , Html.h3 [] [ text "Tagging Example (inputInMenu = Hide)" ]
+                , Html.map Tags <| Multiselect.view model.multiselectTagged
+                , showSelected (Multiselect.getSelectedValues model.multiselectTagged)
+                , div [ Html.Attributes.style "height" "180px" ] [ text "" ]
+                , Html.h3 [] [ text "Tagging Example (inputInMenu = Show)" ]
+                , Html.map TagsWithPrefix <| Multiselect.view model.multiselectTaggedShowPrefix
+                , showSelected (Multiselect.getSelectedValues model.multiselectTaggedShowPrefix)
                 ]
             , div [ Html.Attributes.class "push" ] []
             ]

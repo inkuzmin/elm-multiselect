@@ -6,6 +6,7 @@ module Multiselect exposing
     , view
     , update
     , subscriptions
+    , InputInMenu(..)
     )
 
 {-| An implementation of multiselect control built with and for Elm.
@@ -78,6 +79,14 @@ type Status
     | Opened
 
 
+{-| Whether or to show the input field as the first result of the menu or not
+useful for tagging
+-}
+type InputInMenu
+    = Show
+    | Hide
+
+
 {-| Opaque type that holds the model
 
     type alias Model =
@@ -97,6 +106,7 @@ type Model
         , inputWidth : Float
         , hovered : Maybe ( String, String )
         , tag : String
+        , inputInMenu : InputInMenu
         }
 
 
@@ -107,8 +117,8 @@ type Model
         }
 
 -}
-initModel : List ( String, String ) -> String -> Model
-initModel values tag1 =
+initModel : List ( String, String ) -> String -> InputInMenu -> Model
+initModel values tag1 inputInMenu =
     Model
         { status = Closed
         , values = values
@@ -120,6 +130,7 @@ initModel values tag1 =
         , inputWidth = 23.0
         , hovered = List.head values
         , tag = tag1
+        , inputInMenu = inputInMenu
         }
 
 
@@ -290,12 +301,24 @@ update msg (Model model) =
 
             else
                 let
+                    lowerValue =
+                        String.toLower value
+
+                    valuesMatchingSearch =
+                        model.values
+                            |> List.filter (\( _, val ) -> String.contains lowerValue (String.toLower val))
+
+                    maybePrefixedWithValue =
+                        if model.inputInMenu == Hide || value == "" || List.any (\( _, val ) -> String.toLower val == value) valuesMatchingSearch then
+                            valuesMatchingSearch
+
+                        else
+                            ( value, value ) :: valuesMatchingSearch
+
                     filtered =
                         valuesWithoutSelected
                             { selected = model.selected
-                            , values =
-                                List.filter (\( _, val ) -> String.contains (String.toLower value) (String.toLower val))
-                                    model.values
+                            , values = maybePrefixedWithValue
                             }
                 in
                 case model.hovered of
@@ -518,32 +541,43 @@ update msg (Model model) =
                             Just input_ ->
                                 ( Model model, Cmd.none, Just (NotFound input_) )
 
-                    Just item ->
+                    Just ( id, val ) ->
                         let
-                            selected =
-                                model.selected ++ [ item ]
-
-                            filtered =
-                                valuesWithoutSelected { selected = selected, values = model.values }
+                            lowerVal =
+                                String.toLower val
                         in
-                        ( Model
-                            { model
-                                | selected = selected
-                                , filtered = filtered
-                                , hovered = nextSelectedItem model.filtered item
-                                , input = Nothing
-                                , status =
-                                    if List.isEmpty filtered then
-                                        Closed
+                        if model.inputInMenu == Show && Just val == model.input && List.all (\( _, value ) -> String.toLower value /= lowerVal) model.values then
+                            ( Model model, Cmd.none, Just (NotFound val) )
 
-                                    else
-                                        Opened
-                            }
-                        , Cmd.batch
-                            [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                            ]
-                        , Just (Selected item)
-                        )
+                        else
+                            let
+                                item =
+                                    ( id, val )
+
+                                selected =
+                                    model.selected ++ [ item ]
+
+                                filtered =
+                                    valuesWithoutSelected { selected = selected, values = model.values }
+                            in
+                            ( Model
+                                { model
+                                    | selected = selected
+                                    , filtered = filtered
+                                    , hovered = nextSelectedItem model.filtered item
+                                    , input = Nothing
+                                    , status =
+                                        if List.isEmpty filtered then
+                                            Closed
+
+                                        else
+                                            Opened
+                                }
+                            , Cmd.batch
+                                [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                                ]
+                            , Just (Selected item)
+                            )
 
             else if key == Keycodes.escape then
                 ( Model { model | status = Closed, protected = True }, Cmd.none, Nothing )
