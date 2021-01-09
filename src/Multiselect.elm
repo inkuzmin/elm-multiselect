@@ -771,13 +771,15 @@ input (Model model) =
         inputStyle =
             Html.Styled.Attributes.style "width" (w ++ "px")
 
-        value =
+        forceClear =
             case model.input of
                 Nothing ->
-                    Html.Styled.Attributes.property "value" (Encode.string "")
+                    -- clear input value
+                    Html.Styled.Attributes.value ""
 
                 Just _ ->
-                    Html.Styled.Attributes.property "type" (Encode.string "text")
+                    -- no op attribute
+                    Html.Styled.Attributes.classList []
     in
     div
         [ preventDefaultButtons
@@ -791,7 +793,8 @@ input (Model model) =
             , onKeyPress Shortcut
             , onKeyUp Filter
             , inputStyle
-            , value
+            , Html.Styled.Attributes.property "type" (Encode.string "text")
+            , forceClear
             ]
             []
         ]
