@@ -492,7 +492,17 @@ update msg (Model model) =
                 , Nothing
                 )
 
-            else if key == Keycodes.return && model.status == Opened then
+            else if
+                key
+                    == Keycodes.return
+                    && (-- we don't know which item the user is selecting with a closed list, so ignore return
+                        model.status
+                            == Opened
+                            -- except: when the filtered is empty, in which case we assume user wants to add filtered
+                            || List.isEmpty model.filtered
+                        --
+                       )
+            then
                 case model.hovered of
                     Nothing ->
                         let
