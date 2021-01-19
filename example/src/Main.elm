@@ -200,6 +200,15 @@ update msg model =
             Debug.log "error" ( model, Cmd.none )
 
 
+{-| addTag
+
+    does nothing if tag already exists in multiselect model
+    if it doesn't exist,
+    - appends the tag to the end of the database of tags
+    - appends the tag to the end of the currently selected tag
+    - clears textbox input (as it's replaced with the selected tag)
+
+-}
 addTag : Multiselect.Model -> ( String, String ) -> ( Multiselect.Model, Cmd Multiselect.Msg )
 addTag multiselectModel tag =
     let
@@ -220,6 +229,13 @@ addTag multiselectModel tag =
             |> Multiselect.clearInputText
 
 
+{-| Handles Multiselect.update's `OutMsg`
+
+    for the cases of Selected, Unselected, and Cleared, return the original Model and no msg
+    for (NotFound v) case, passes on to addTag, which will add the tag to the database and selected
+    if not found
+
+-}
 handleTag : Multiselect.OutMsg -> Multiselect.Model -> ( Multiselect.Model, Cmd Multiselect.Msg )
 handleTag msg multiselectModel =
     case msg of
