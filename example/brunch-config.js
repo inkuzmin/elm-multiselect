@@ -11,7 +11,7 @@ module.exports = {
     },
     plugins: {
       elmBrunch: {
-        mainModules: ["../src/Multiselect.elm", "src/Main.elm"],
+        mainModules: ["src/Main.elm"],
         outputFolder: "../docs/"
       }
     }
