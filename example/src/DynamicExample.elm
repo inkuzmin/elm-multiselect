@@ -42,7 +42,11 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { multiselectC = Multiselect.initModel valuesC "C" Multiselect.Hide
+    let
+        config =
+            Multiselect.defaultConfig
+    in
+    { multiselectC = Multiselect.initModel { config | values = valuesC, tag = "C" }
     }
 
 

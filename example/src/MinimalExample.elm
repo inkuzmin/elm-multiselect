@@ -71,8 +71,12 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { multiselectA = Multiselect.initModel valuesA "A" Multiselect.Hide
-    , multiselectB = Multiselect.initModel valuesB "B" Multiselect.Hide
+    let
+        config =
+            Multiselect.defaultConfig
+    in
+    { multiselectA = Multiselect.initModel { config | values = valuesA, tag = "A" }
+    , multiselectB = Multiselect.initModel { config | values = valuesB, tag = "B", isMultiSelect = False }
     }
 
 
