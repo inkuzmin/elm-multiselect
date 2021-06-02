@@ -54,7 +54,6 @@ import Browser.Dom as Dom
 import Browser.Events as BrowserEvents
 import DOM
 import Html exposing (Html)
-import Html.Events as Events
 import Html.Styled
     exposing
         ( div
@@ -69,8 +68,7 @@ import Multiselect.Keycodes as Keycodes
 import Multiselect.SelectCss as SelectCss
 import Process
 import String
-import Task as Task exposing (Task)
-import Time
+import Task exposing (Task)
 
 
 type Status
