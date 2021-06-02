@@ -1,4 +1,4 @@
-module Main exposing (..)
+module DynamicExample exposing (..)
 
 import Browser
 import Html exposing (Html, button, div, text)
@@ -42,7 +42,7 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { multiselectC = Multiselect.initModel valuesC "C"
+    { multiselectC = Multiselect.initModel valuesC "C" Multiselect.Hide
     }
 
 
@@ -82,7 +82,7 @@ update msg model =
                 values =
                     List.map (\v -> ( v, v )) vs
             in
-            ( { model | multiselectC = Multiselect.populateValues multiselectModel values []}, Cmd.none )
+            ( { model | multiselectC = Multiselect.populateValues multiselectModel values [] }, Cmd.none )
 
         Prepopulate (Err _) ->
             Debug.log "error" ( model, Cmd.none )

@@ -1,4 +1,4 @@
-module Main exposing (..)
+module MinimalExample exposing (..)
 
 -- Import Multiselect
 
@@ -71,8 +71,8 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { multiselectA = Multiselect.initModel valuesA "A"
-    , multiselectB = Multiselect.initModel valuesB "B"
+    { multiselectA = Multiselect.initModel valuesA "A" Multiselect.Hide
+    , multiselectB = Multiselect.initModel valuesB "B" Multiselect.Hide
     }
 
 
