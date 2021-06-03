@@ -1,4 +1,4 @@
-module Main exposing (..)
+module MinimalExample exposing (..)
 
 -- Import Multiselect
 
@@ -71,8 +71,12 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { multiselectA = Multiselect.initModel valuesA "A"
-    , multiselectB = Multiselect.initModel valuesB "B"
+    let
+        config =
+            Multiselect.defaultConfig
+    in
+    { multiselectA = Multiselect.initModel { config | values = valuesA, tag = "A" }
+    , multiselectB = Multiselect.initModel { config | values = valuesB, tag = "B", isMultiSelect = False }
     }
 
 

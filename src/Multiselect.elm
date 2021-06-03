@@ -1,12 +1,12 @@
 module Multiselect exposing
-    ( initModel, getSelectedValues, populateValues, clearInputText, getValues
+    ( initModel, defaultConfig, getSelectedValues, populateValues, clearInputText, getValues, InputInMenu(..)
     , Model
     , Msg
     , OutMsg(..)
     , view
     , update
     , subscriptions
-    , InputInMenu(..)
+    , SelectItem
     )
 
 {-| An implementation of multiselect control built with and for Elm.
@@ -16,7 +16,7 @@ Please, check example/src/MinimalExample.elm for the minimal example on how to u
 
 # Helpers
 
-@docs initModel, getSelectedValues, populateValues, clearInputText, getValues, InputInMenu
+@docs initModel, defaultConfig, getSelectedValues, populateValues, clearInputText, getValues, InputInMenu
 
 
 # Model
@@ -54,7 +54,6 @@ import Browser.Dom as Dom
 import Browser.Events as BrowserEvents
 import DOM
 import Html exposing (Html)
-import Html.Events as Events
 import Html.Styled
     exposing
         ( div
@@ -69,8 +68,7 @@ import Multiselect.Keycodes as Keycodes
 import Multiselect.SelectCss as SelectCss
 import Process
 import String
-import Task as Task exposing (Task)
-import Time
+import Task exposing (Task)
 
 
 type Status
@@ -95,30 +93,57 @@ type InputInMenu
 
 -}
 type Model
-    = Model
-        { status : Status
-        , values : List ( String, String )
-        , filtered : List ( String, String )
-        , selected : List ( String, String )
-        , protected : Bool
-        , error : Maybe String
-        , input : Maybe String
-        , inputWidth : Float
-        , hovered : Maybe ( String, String )
-        , tag : String
-        , inputInMenu : InputInMenu
-        }
+    = Model ModelState
 
 
-{-| Init model based on the values : List (String, String) and id : String provided by the user.
+type alias ModelState =
+    { status : Status
+    , values : List SelectItem
+    , filtered : List SelectItem
+    , selected : List SelectItem
+    , protected : Bool
+    , error : Maybe String
+    , input : Maybe String
+    , inputWidth : Float
+    , hovered : Maybe SelectItem
+    , tag : String
+    , inputInMenu : InputInMenu
+    , isMultiSelect : Bool
+    }
+
+
+type alias SelectItem =
+    ( String, String )
+
+
+type alias Config =
+    { values : List SelectItem
+    , tag : String
+    , inputInMenu : InputInMenu
+    , isMultiSelect : Bool
+    }
+
+
+{-| Default config for initModel.
+-}
+defaultConfig : Config
+defaultConfig =
+    { values = []
+    , tag = "id_multiselect"
+    , inputInMenu = Hide
+    , isMultiSelect = True
+    }
+
+
+{-| Init model based on the values : SelectItem and id : String provided by the user.
 
     model =
         { multiselect = Multiselect.initModel [ ( "one", "The 1st option" ), ( "two", "The 2nd option" ), ( "three", "The 3rd option" ) ] "id_1"
         }
 
 -}
-initModel : List ( String, String ) -> String -> InputInMenu -> Model
-initModel values tag1 inputInMenu =
+initModel : Config -> Model
+initModel ({ values, inputInMenu, isMultiSelect } as config) =
     Model
         { status = Closed
         , values = values
@@ -129,28 +154,29 @@ initModel values tag1 inputInMenu =
         , input = Just ""
         , inputWidth = 23.0
         , hovered = List.head values
-        , tag = tag1
+        , tag = config.tag
         , inputInMenu = inputInMenu
+        , isMultiSelect = isMultiSelect
         }
 
 
-{-| Get the full list of values : List (String, String)
+{-| Get the full list of values : SelectItem
 -}
-getValues : Model -> List ( String, String )
+getValues : Model -> List SelectItem
 getValues (Model model) =
     model.values
 
 
-{-| Get selected values : List (String, String)
+{-| Get selected values : SelectItem
 -}
-getSelectedValues : Model -> List ( String, String )
+getSelectedValues : Model -> List SelectItem
 getSelectedValues (Model model) =
     model.selected
 
 
-{-| Populate model with values : List (String, String) and preselect selected : List (String, String).
+{-| Populate model with values : SelectItem and preselect selected : SelectItem.
 -}
-populateValues : Model -> List ( String, String ) -> List ( String, String ) -> Model
+populateValues : Model -> List SelectItem -> List SelectItem -> Model
 populateValues (Model model) values selected =
     let
         filtered =
@@ -168,11 +194,27 @@ populateValues (Model model) values selected =
 clearInputText : Model -> ( Model, Cmd Msg )
 clearInputText (Model model) =
     ( Model { model | input = Nothing }
-    , Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+    , focusInput model
     )
 
 
-valuesWithoutSelected : { selected : List ( String, String ), values : List ( String, String ) } -> List ( String, String )
+{-| Put browser focus on input element.
+-}
+focusInput : ModelState -> Cmd Msg
+focusInput model =
+    Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+
+
+addSelected : SelectItem -> ModelState -> List SelectItem
+addSelected item model =
+    if model.isMultiSelect then
+        model.selected ++ [ item ]
+
+    else
+        [ item ]
+
+
+valuesWithoutSelected : { selected : List SelectItem, values : List SelectItem } -> List SelectItem
 valuesWithoutSelected { selected, values } =
     List.filter (\value -> not (List.member value selected)) values
 
@@ -189,14 +231,14 @@ type Msg
     | ClickOnComponent
     | DisableProtection
     | Toggle
-    | OnSelect ( String, String )
-    | RemoveItem ( String, String )
+    | OnSelect SelectItem
+    | RemoveItem SelectItem
     | Clear
     | FocusResult (Result Dom.Error ())
     | ScrollResult (Result Dom.Error ())
     | Filter String
     | Adjust Float
-    | OnHover ( String, String )
+    | OnHover SelectItem
     | Shortcut Int
     | ScrollY (Result Dom.Error Float)
 
@@ -204,8 +246,8 @@ type Msg
 {-| Transparent type for external library messages
 -}
 type OutMsg
-    = Selected ( String, String )
-    | Unselected ( String, String )
+    = Selected SelectItem
+    | Unselected SelectItem
     | Cleared
     | NotFound String
 
@@ -229,17 +271,13 @@ update msg (Model model) =
         Toggle ->
             if model.status == Opened then
                 ( Model { model | status = Closed }
-                , Cmd.batch
-                    [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                    ]
+                , Cmd.batch [ focusInput model ]
                 , Nothing
                 )
 
             else
                 ( Model { model | status = Opened }
-                , Cmd.batch
-                    [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                    ]
+                , Cmd.batch [ focusInput model ]
                 , Nothing
                 )
 
@@ -260,7 +298,7 @@ update msg (Model model) =
             else
                 ( Model { model | status = Opened, protected = True }
                 , Cmd.batch
-                    [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
+                    [ focusInput model
                     , delayInMs 100 <| DisableProtection
                     ]
                 , Nothing
@@ -376,10 +414,13 @@ update msg (Model model) =
         OnSelect item ->
             let
                 selected =
-                    model.selected ++ [ item ]
+                    model |> addSelected item
 
                 filtered =
-                    valuesWithoutSelected { selected = selected, values = model.values }
+                    valuesWithoutSelected
+                        { selected = selected
+                        , values = model.values
+                        }
             in
             ( Model
                 { model
@@ -388,15 +429,14 @@ update msg (Model model) =
                     , hovered = nextSelectedItem model.filtered item
                     , input = Nothing
                     , status =
-                        if List.isEmpty filtered then
+                        if List.isEmpty filtered || not model.isMultiSelect then
                             Closed
 
                         else
                             Opened
                 }
             , Cmd.batch
-                [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                ]
+                [ focusInput model ]
             , Just (Selected item)
             )
 
@@ -427,9 +467,7 @@ update msg (Model model) =
                     , input = Nothing
                     , status = Closed
                 }
-            , Cmd.batch
-                [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                ]
+            , Cmd.batch [ focusInput model ]
             , Just Cleared
             )
 
@@ -555,7 +593,7 @@ update msg (Model model) =
                                     ( id, val )
 
                                 selected =
-                                    model.selected ++ [ item ]
+                                    model |> addSelected item
 
                                 filtered =
                                     valuesWithoutSelected { selected = selected, values = model.values }
@@ -573,9 +611,7 @@ update msg (Model model) =
                                         else
                                             Opened
                                 }
-                            , Cmd.batch
-                                [ Dom.focus ("multiselectInput" ++ model.tag) |> Task.attempt FocusResult
-                                ]
+                            , Cmd.batch [ focusInput model ]
                             , Just (Selected item)
                             )
 
@@ -881,20 +917,24 @@ tags (Model model) =
     div [ css [ SelectCss.tagWrap ] ]
         (List.map
             (\( name, value ) ->
-                tag name value
+                tag model.isMultiSelect name value
             )
             model.selected
         )
 
 
-tag : String -> String -> Html.Styled.Html Msg
-tag name value =
+tag : Bool -> String -> String -> Html.Styled.Html Msg
+tag isRemovable name value =
     div [ css [ SelectCss.tag ] ]
-        [ span
-            [ css [ SelectCss.tagIcon ]
-            , onClick (RemoveItem ( name, value ))
-            ]
-            [ text "×" ]
+        [ if isRemovable then
+            span
+                [ css [ SelectCss.tagIcon ]
+                , onClick (RemoveItem ( name, value ))
+                ]
+                [ text "×" ]
+
+          else
+            text ""
         , span [ css [ SelectCss.tagLabel ] ] [ text value ]
         ]
 

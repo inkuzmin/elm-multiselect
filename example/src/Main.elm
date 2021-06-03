@@ -82,11 +82,21 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { multiselectA = Multiselect.initModel valuesA "A" Multiselect.Hide
-    , multiselectB = Multiselect.initModel valuesB "B" Multiselect.Hide
-    , multiselectC = Multiselect.initModel valuesC "C" Multiselect.Hide
-    , multiselectTagged = Multiselect.initModel valuesD "Tagged" Multiselect.Hide
-    , multiselectTaggedShowPrefix = Multiselect.initModel valuesD "TaggedShowPrefix" Multiselect.Show
+    let
+        config =
+            Multiselect.defaultConfig
+    in
+    { multiselectA = Multiselect.initModel { config | values = valuesA, tag = "A" }
+    , multiselectB = Multiselect.initModel { config | values = valuesB, tag = "B" }
+    , multiselectC = Multiselect.initModel { config | values = valuesC, tag = "C" }
+    , multiselectTagged = Multiselect.initModel { config | values = valuesD, tag = "Tagged" }
+    , multiselectTaggedShowPrefix =
+        Multiselect.initModel
+            { config
+                | values = valuesD
+                , tag = "TaggedShowPrefix"
+                , inputInMenu = Multiselect.Show
+            }
     , selectedA = []
     }
 
@@ -150,11 +160,11 @@ update msg model =
             ( newerModel, Cmd.batch [ Cmd.map Yay subCmd, outCommands ] )
 
         Tags sub ->
-           let
+            let
                 ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectTagged
 
-                ( newSubModel, outCmd) =
+                ( newSubModel, outCmd ) =
                     case outMsg of
                         Just m ->
                             handleTag m subModel
@@ -162,16 +172,16 @@ update msg model =
                         Nothing ->
                             ( subModel, subCmd )
             in
-            ( {model | multiselectTagged = newSubModel}
-            , Cmd.batch (List.map (Cmd.map Tags) [ subCmd, outCmd] ))
+            ( { model | multiselectTagged = newSubModel }
+            , Cmd.batch (List.map (Cmd.map Tags) [ subCmd, outCmd ])
+            )
 
         TagsWithPrefix sub ->
             let
-                ( subModel, subCmd, outMsg) =
+                ( subModel, subCmd, outMsg ) =
                     Multiselect.update sub model.multiselectTaggedShowPrefix
 
-
-                ( newSubModel, outCmd) =
+                ( newSubModel, outCmd ) =
                     case outMsg of
                         Just m ->
                             handleTag m subModel
@@ -179,9 +189,9 @@ update msg model =
                         Nothing ->
                             ( subModel, subCmd )
             in
-            ( {model | multiselectTaggedShowPrefix = newSubModel}
-            ,  Cmd.batch (List.map (Cmd.map TagsWithPrefix) [ subCmd, outCmd ] ))
-
+            ( { model | multiselectTaggedShowPrefix = newSubModel }
+            , Cmd.batch (List.map (Cmd.map TagsWithPrefix) [ subCmd, outCmd ])
+            )
 
         SelectA ->
             ( { model | selectedA = Multiselect.getSelectedValues model.multiselectA }, Cmd.none )
@@ -250,7 +260,7 @@ handleTag msg multiselectModel =
                 ( populated, cmd ) =
                     addTag multiselectModel tag
             in
-            (populated , cmd )
+            ( populated, cmd )
 
         _ ->
             ( multiselectModel, Cmd.none )
